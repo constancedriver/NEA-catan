@@ -1,7 +1,3 @@
-players = ['w', 'b', 'r', 'o']
-playerIndex = 2
-for i in range (len(players)):
-    playerIndex -= 1
-    if playerIndex < 0:
-        playerIndex = 3
-    print(players[playerIndex])
+players = ['w', 'b', 'r', 'o', 'r', 'b', 'b', 'o', 'r', 'r']
+players.list(filter(lambda a: a != 'b', players))
+print(players)
