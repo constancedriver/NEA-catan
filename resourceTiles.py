@@ -5,10 +5,11 @@ class Tile:
         self.resourceNumber = resourceNumber
         self.nodes = nodes
         self.isRobberOn = isRobberOn
+
     def getNodes(self):
         for node in self.nodes:
             return(node)
-
+    
 def get_node_from_tile_num(n):
     a = {1 : [(0,0,0), (0,1,0), (1,1,0), (1,1,1), (0,0,1), (1,0,1)],
      2 : [(0,1,-1), (0,1,0), (1,1,0), (1,2,0), (1,2,-1), (0,2,-1)],

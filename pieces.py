@@ -15,8 +15,7 @@ class Harbour:
     def __init__ (self, position, type:str):
         self.position = position 
         self.type = type 
-def world():
-    print('hello')
+
 def get_node_from_harbour_num(n):
     a = {0:(0,0,0),
         1:(0,0,1),

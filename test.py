@@ -1,3 +1,135 @@
-players = ['w', 'b', 'r', 'o', 'r', 'b', 'b', 'o', 'r', 'r']
-players.list(filter(lambda a: a != 'b', players))
-print(players)
+from game import *
+def longest_road(roads, blocked_nodes=None):
+    """
+    Calculate the longest continuous road in Catan.
+
+    Parameters:
+    - roads: list of tuples (intersection_a, intersection_b)
+      Each tuple represents a road owned by the player.
+    - blocked_nodes: set of intersections blocked by opponent settlements/cities
+
+    Returns:
+    - The length of the longest road
+    """
+
+    if blocked_nodes is None:
+        blocked_nodes = set()
+
+    # -------------------------------------------------
+    # Helper DFS: finds the longest path starting from a node
+    # -------------------------------------------------
+    def dfs(node, used_roads, used_nodes, comp):
+        max_len = 0
+        for i, (a, b) in enumerate(comp):
+            if i in used_roads:
+                continue
+            if a == node or b == node:
+                next_node = b if a == node else a
+                if next_node in blocked_nodes or next_node in used_nodes:
+                    continue
+                used_roads.add(i)
+                used_nodes.add(next_node)
+                max_len = max(max_len, 1 + dfs(next_node, used_roads, used_nodes, comp))
+                used_roads.remove(i)
+                used_nodes.remove(next_node)
+        return max_len
+
+    # -------------------------------------------------
+    # Step 1: Split roads into connected components
+    # -------------------------------------------------
+    components = []
+
+    for road in roads:
+        a, b = road
+        placed = False
+        for comp in components:
+            if any(a in r or b in r for r in comp):
+                comp.append(road)
+                placed = True
+                break
+        if not placed:
+            components.append([road])
+
+    # Merge overlapping components
+    merged = True
+    while merged:
+        merged = False
+        for i in range(len(components)):
+            for j in range(i + 1, len(components)):
+                if any(a in r or b in r for r in components[i] for a, b in components[j]):
+                    components[i].extend(components[j])
+                    components.pop(j)
+                    merged = True
+                    break
+            if merged:
+                break
+
+    longest = 0
+
+    # -------------------------------------------------
+    # Step 2: Process each connected component
+    # -------------------------------------------------
+    for comp in components:
+        # Count degree of each intersection
+        degree = {}
+        for a, b in comp:
+            if a not in blocked_nodes:
+                degree[a] = degree.get(a, 0) + 1
+            if b not in blocked_nodes:
+                degree[b] = degree.get(b, 0) + 1
+
+        # Find endpoints (degree 1 nodes)
+        endpoints = [node for node, d in degree.items() if d == 1]
+
+        # Case 1: Pure loop (no endpoints, all degree 2)
+        if endpoints == [] and degree and all(d == 2 for d in degree.values()):
+            longest = max(longest, len(comp))
+            continue
+
+        # Case 2: Path or loop with tail
+        # Start DFS from all endpoints
+        if endpoints:
+            for node in endpoints:
+                longest = max(longest, dfs(node, set(), {node}, comp))
+        else:
+            # Loop with a tail, or internal loop: start DFS from every node
+            for node in degree.keys():
+                longest = max(longest, dfs(node, set(), {node}, comp))
+
+    return longest
+# ---------------- EXAMPLE USAGE ----------------
+game = Game()
+game.make_tiles()
+game.make_harbours()
+game.make_players()
+game.set_development_cards()
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (3,3,0))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (3,4,-1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (4,4,0))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((0,1,0), (1,1,0))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,1,0), (1,1,1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,1,1), (2,1,1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,1), (2,1,2))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,2), (2,0,2))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,0,2), (1,0,2))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,0,2), (1,0,1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,0,1), (1,1,1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,1), (2,2,1))))
+game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,2,1), (3,2,1))))
+
+
+    # Roads owned by the player
+    
+roads = []
+for road in game.players[game.turnIndex].roads:
+    roads.append(road.location)
+blocked = []
+for i in range (0,3,1):
+    game.next_turn()
+    for outpost in game.players[game.turnIndex].outposts:
+        blocked.append(outpost.location)
+game.next_turn()
+used_nodes = []
+
+    # Calculate the longest legal road
+print("Longest Road Length:", longest_road(roads, blocked))

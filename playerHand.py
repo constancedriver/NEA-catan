@@ -1,6 +1,6 @@
 from pieces import *
 class PlayerHand:
-    def __init__(self, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources=[], development=[], knightsPlayed:int=0, roads=[], outposts=[]):
+    def __init__(self, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development=[], knightsPlayed:int=0, roads=[], outposts=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False):
         self.VP = VP
         self.roadsLeft = roadsLeft
         self.settlementsLeft = settlementsLeft
@@ -10,10 +10,34 @@ class PlayerHand:
         self.knightsPlayed = knightsPlayed
         self.roads = roads
         self.outposts = outposts
+        self.hasLargestArmy = hasLargestArmy
+        self.hasLongestRoad = hasLongestRoad
+
+    def sufficient_resources(self,resourcesNeeded):
+        sufficient = True
+        for resource in resourcesNeeded:
+            if self.resources.count(resource) < resourcesNeeded.count(resource):
+                sufficient = False
+        return sufficient
+    
+    def connected_to_road(self,node):
+        connectedToRoadChain = False
+        # makes sure it is connected to one of the players existing roads
+        for road in self.roads:
+            if (road.nodes[0] == node or road.nodes[1] == node):
+                connectedToRoadChain = True
+        return connectedToRoadChain
+    
+    def settlement_at_node(self,node):
+        settlementAtNode = False
+        for outpost in self.outposts:
+            if outpost.location == node and outpost.isCity == False:
+                settlementAtNode = True 
+        return settlementAtNode       
 
 #before called in game check location     
     def build_settlement(self,node):
-        if 'wood' in self.resources and 'hay' in self.resources and 'brick' in self.resources and 'sheep' in self.resources and self.settlementsLeft > 0:
+        if self.settlementsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('hay')
             self.resources.remove('sheep')
@@ -21,9 +45,9 @@ class PlayerHand:
             self.resouces.append(node = Outpost(self,node))
             self.VP += 1
             self.settlementsLeft -=1
-    # tell if insuffienctn resoucres 
+     
     def build_city(self,node):
-        if self.resources.count('ore') == 3 and self.resources.count('hay') == 2 and self.citiesLeft>0:
+        if self.citiesLeft>0:
             for i in range(1,3):
                 self.resources.remove('ore')
             for i in range (1,2):
@@ -31,11 +55,28 @@ class PlayerHand:
             node.upgrade()
             self.VP += 1
             self.citiesLeft -= 1
-    # tell if insuffienctn resoucres 
+    
     def build_road(self, nodes):
-        if 'wood' in self.resources and 'brick' in self.resources and self.roadsLeft > 0:
+        if self.roadsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('brick')
             self.roads.append(Road(self,nodes)) 
             self.roadsLeft -= 1
-    # tell if insufenctn resoucres 
+     
+    def buy_development_card(self, developmentCard):
+        self.resources.remove('sheep')
+        self.resources.remove('hay')
+        self.resources.remove('ore')
+        self.development.append(developmentCard)
+
+    def discard_resources(self):
+        needToDiscard = self.resources // 2
+        while needToDiscard > 0:
+            wantToDiscard = input('which resource discard')
+            if wantToDiscard in self.resources:
+                self.resources.remove()
+                needToDiscard -= 1
+        
+    def use_knight(self):
+        self.development.remove('knight')
+        self.knightsPlayed +=1

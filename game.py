@@ -96,33 +96,26 @@ class Game:
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.resource)
 
+    def start_rolls(self,player) -> dict:
+        return{player: (random.randint(1,6) + random.randint(1,6))}
+    
     def game_set_up_rolls(self):
-        dicerolls = []
+        diceRolls = {}
         for player in self.players:
-            dicerolls.append(self.roll_dice)
-        largest = 0
-        for roll in dicerolls:
-            if roll > largest:
-                largest = roll
-        # check if there is a draw
-        while dicerolls.count(largest) > 1:
-            #reroll drawing players until only one winner
-            winners = []
-            for i in range (len(dicerolls)):
-                if dicerolls[i] == largest:
-                    winners.append(i)
-            dicerolls = []
-            for item in winners:
-                dicerolls.append(self.roll_dice)
-            largest = 0
-            for roll in dicerolls:
-                if roll > largest:
-                    largest = roll
-        # winner starts the game
-        self.turnIndex = self.players[dicerolls.index(largest)]
+            diceRolls.update(self.start_rolls(player))
+        return diceRolls
+    
+    def dice_roll_winner(self):
+        diceRolls = self.game_set_up_rolls()
+        highestRoll = max(diceRolls.values())
+        highestPlayer = [k for k, v in diceRolls.items() if v == highestRoll]
+        if len(highestPlayer) == 1:
+            return highestPlayer[0]
+        else: 
+            return self.dice_roll_winner()
 
     def game_set_up(self):
-        self.game_set_up_rolls()
+        self.turnIndex = self.players.index(self.dice_roll_winner() )
         for i in range (len(self.players)):
             node1 = input('node')
             self.create_settlement(node1)
@@ -171,57 +164,45 @@ class Game:
                         outpost.colour.resources.append(tile.resource)
                         if outpost.isCity:
                             outpost.colour.resources.append(tile.resource)
-
-    def create_settlement(self,node):
-        player = self.players[self.turnIndex]
-        nodeEmpty = True
-        connectedToRoadChain = False
+    
+    def adjacent_to_settlement(self,node):
         adjacentToSettlement = False
-        for outpost in self.outposts:
-            if outpost.location == node:
-                nodeEmpty = False
-        for road in self.roads:
-            if (road.nodes[0] == node or road.nodes[1] == node) and road in player.roads:
-                connectedToRoadChain = True
         #makes sure at least 2 edges (one node) away from another settlement
         for outpost in self.outposts:
             if self.is_adjacent(node, outpost.location):
                 adjacentToSettlement = True
-        if nodeEmpty and connectedToRoadChain and not(adjacentToSettlement):
-            self.outposts.append(player.build_settlement(node))
-    # say that already a settlement at this location
+        return adjacentToSettlement
+    
+    def node_empty(self,node):
+        nodeEmpty = True
+        for outpost in self.outposts:
+            if outpost.location == node:
+                nodeEmpty = False
+        return nodeEmpty
+
+    def create_settlement(self,node):
+        if self.node_empty(node) and self.players[self.turnIndex].connected_to_road(node) and not(self.players[self.turnIndex].adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
+            self.outposts.append(self.players[self.turnIndex].build_settlement(node))
+
 
     def create_city(self,node):
-        player = self.players[self.turnIndex]
-        correctSettlementAtNode = False
-        for outpost in self.outposts:
-            if outpost.location == node and outpost in player.outposts and outpost.isCity == False:
-                correctSettlementAtNode = True
-        if correctSettlementAtNode:
-            player.build_city(node)
-    #say that there isnt appropriate settlemnt at node
-
-    def create_road(self,nodes):
-        player = self.players[self.turnIndex]
+        if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
+            self.players[self.turnIndex].build_city(node)
+    
+    def edge_empty(self,nodes):
         edgeEmpty = True 
-        connectedToRoadChain = False
         for road in self.roads:
             if road.nodes == nodes:
                 edgeEmpty = False
-        if edgeEmpty and 'brick' in player.resourses and 'wood' in player.resourses:
-            for road in self.roads:
-                if (nodes[0] == road.nodes[0] or nodes[0] == road.nodes[1] or nodes[1] == road.nodes[0] or nodes[1] == road.nodes[1]) and road in player.roads:
-                    connectedToRoadChain = True
-            if connectedToRoadChain:
-                self.roads.append(player.build_road(nodes))
-                return True
-            else:
-                return False
-        else:
-            return False
+        return edgeEmpty
+
+    def create_road(self,nodes):
+        if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']) and (self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1])):
+            self.roads.append(self.players[self.turnIndex].build_road(nodes))
+
     
     def create_development_card(self):
-        if 'sheep' in self.players[self.turnIndex].resources and 'hay' in self.players[self.turnIndex].resources and 'ore' in self.players[self.turnIndex].resources:
+        if self.players[self.turnIndex].sufficent_resources(['sheep', 'ore', 'hay']):
             self.players[self.turnIndex].buy_development_card(self.developmentCards[0])
             self.developmentCards.pop(0)
 
@@ -307,7 +288,70 @@ class Game:
                 print('incorrect location') 
             self.players[self.turnIndex].developments.remove('road building')
 
+    def complete_trade(self, playerTradeWith, inputResources, outputResources):
+        for resource in inputResources:
+            self.players[self.turnIndex].remove(resource)
+            self.players[playerTradeWith].append(resource)
+        for resourse in outputResources:
+            self.players[self.turnIndex].append(resource)
+            self.players[playerTradeWith].remove(resource)
 
+    def trade_with_bank(self,resourceInput, resourceOutput):
+        possibleResources = self.trade_with_harbour()
+        if resourceInput in possibleResources:
+            numberRequired = 2
+        elif 'any' in possibleResources:
+            numberRequired = 3
+        else: 
+            numberRequired = 4
+        if self.players[self.turnIndex].resources.count(resourceInput) >= numberRequired:
+                for i in range (numberRequired):
+                    self.players[self.turnIndex].resources.remove(resourceInput)
+                self.players[self.turnIndex].resources.append(resourceOutput)
+    
+    def trade_with_harbour(self):
+        possibleResources = []
+        for outpost in self.players[self.turnIndex].outposts:
+            for harbour in self.harbours:
+                if harbour.position == outpost.location:
+                    possibleResources.append(harbour.type)
+        return possibleResources
+    
+    def ask_to_trade(self, outputResources):
+        playersWantToTrade = []
+        # ask each other player if they want to trade
+        for i in range (3):
+            self.next_turn()
+            haveResources = True
+            for card in outputResources:
+                if self.players[self.turnIndex].resources.count(card) < outputResources.count(card):
+                    haveResources = False
+            if haveResources: # if they dont have the resources thenthey cannot complete the trade
+                wantToTrade = input(self.players[self.turnIndex], 'do you want to trade y/n?')
+            else:
+                wantToTrade = 'n'
+            if wantToTrade == 'y':
+                playersWantToTrade.append(self.turnIndex)
+            self.next_turn() # get back to to the player whos turn it actually is 
+        return playersWantToTrade
+    
+    def trade_with_players(self, inputResources, outputResources):
+        haveResources = True
+        for card in inputResources:
+            if self.players[self.turnIndex].resources.count(card) < inputResources.count(card):
+                haveResources = False
+        if haveResources:
+            print('trade offer:', inputResources, 'for', outputResources)
+            playersWantToTrade = self.ask_to_trade(outputResources)
+            if len(playersWantToTrade) == 0:
+                print('trade cancelled')
+            elif len(playersWantToTrade) == 1:
+                tradeIndex = 0
+            else:
+                tradeIndex = int(input('who would you like to trade with (input index)?', playersWantToTrade))
+            self.complete_trade(playersWantToTrade[tradeIndex], inputResources, outputResources)
+        else:
+            print('insufficient resources')
 
     def won(self):
         hasWon = False
@@ -332,3 +376,6 @@ def make_list():
         newList.append(int(input))
         input = ('int')
     return newList
+ 
+game = Game()
+game.start_game()
