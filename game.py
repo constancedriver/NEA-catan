@@ -2,6 +2,7 @@ import random
 from resourceTiles import *
 from playerHand import *
 import pieces
+from gui import *
 
 class Game:
     def __init__(self, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[]):
@@ -184,7 +185,6 @@ class Game:
         if self.node_empty(node) and self.players[self.turnIndex].connected_to_road(node) and not(self.players[self.turnIndex].adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
 
-
     def create_city(self,node):
         if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
             self.players[self.turnIndex].build_city(node)
@@ -199,8 +199,8 @@ class Game:
     def create_road(self,nodes):
         if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']) and (self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1])):
             self.roads.append(self.players[self.turnIndex].build_road(nodes))
+        self.check_longest_road(self)
 
-    
     def create_development_card(self):
         if self.players[self.turnIndex].sufficent_resources(['sheep', 'ore', 'hay']):
             self.players[self.turnIndex].buy_development_card(self.developmentCards[0])
@@ -242,6 +242,18 @@ class Game:
         self.players[self.turnIndex].hasLargestArmy = True
         self.players[self.turnIndex].VP += 2
         self.largestArmy = self.players[self.turnIndex].knightsPlayed
+
+    def check_longest_road(self):
+        playerRoads = []
+        otherPlayerOutposts = []
+        for road in self.players[self.turnIndex].roads:
+            playerRoads.append(road.location)
+        for i in range (0,4,1):
+            if i != self.turnIndex:
+                for outpost in self.players[i].outposts:
+                    otherPlayerOutposts.append(outpost.location)
+        
+
 
     def steal_longest_road(self):
         for player in self.players:

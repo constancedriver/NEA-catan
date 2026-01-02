@@ -38,7 +38,7 @@ def longest_road(roads, blocked_nodes=None):
     # Step 1: Split roads into connected components
     # -------------------------------------------------
     components = []
-
+    
     for road in roads:
         a, b = road
         placed = False
@@ -98,37 +98,11 @@ def longest_road(roads, blocked_nodes=None):
 
     return longest
 # ---------------- EXAMPLE USAGE ----------------
-game = Game()
-game.make_tiles()
-game.make_harbours()
-game.make_players()
-game.set_development_cards()
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (3,3,0))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (3,4,-1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((3,4,0), (4,4,0))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((0,1,0), (1,1,0))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,1,0), (1,1,1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,1,1), (2,1,1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,1), (2,1,2))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,2), (2,0,2))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,0,2), (1,0,2))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,0,2), (1,0,1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((1,0,1), (1,1,1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,1,1), (2,2,1))))
-game.players[game.turnIndex].roads.append(Road(game.players[game.turnIndex], ((2,2,1), (3,2,1))))
-
 
     # Roads owned by the player
     
-roads = []
-for road in game.players[game.turnIndex].roads:
-    roads.append(road.location)
+roads = [((3,4,0), (3,3,0)), ((3,4,0), (3,4,-1)), ((3,4,0), (4,4,0)), ((0,1,0), (1,1,0)), ((1,1,0), (1,1,1)), ((1,1,1), (2,1,1)), ((2,1,1), (2,1,2)), ((2,1,2), (2,0,2)), ((2,0,2), (1,0,2)), ((1,0,2), (1,0,1)), ((1,0,1), (1,1,1)), ((2,1,1), (2,2,1)), ((2,2,1), (3,2,1))]
 blocked = []
-for i in range (0,3,1):
-    game.next_turn()
-    for outpost in game.players[game.turnIndex].outposts:
-        blocked.append(outpost.location)
-game.next_turn()
 used_nodes = []
 
     # Calculate the longest legal road
