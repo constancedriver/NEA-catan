@@ -1,1 +1,4 @@
+The aim of the game is to get 10 Victory Points. This can be done by building settlements(1VP), cities(2VP), buying development cards(1:5 chance) or by earning the longest road(2VP) or largest army(2VP).
+In order to buy these you must collect resources by having an outpost(settlement or city) on the cornener of a tile when its number is rolled.
+On your turn you must first roll the dice(by clicking on them) then you can build and/or trade. 
 

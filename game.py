@@ -2,7 +2,7 @@ import random
 from resourceTiles import *
 from playerHand import *
 import pieces
-from gui import *
+import gui
 
 class Game:
     def __init__(self, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[]):
@@ -18,9 +18,9 @@ class Game:
         
     def make_tiles(self):
         terrains = ['ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep', 'hay', 'hay', 'hay', 'hay', 'wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick']
-        res_num = [5,6,11,8,3,4,5,9,11,3,8,12,6,4,10,10,2,9]
+        resNum = [5,6,11,8,3,4,5,9,11,3,8,12,6,4,10,10,2,9]
         random.shuffle(terrains)
-        self.tiles = [Tile(x, res_num[i],get_node_from_tile_num(i+1)) for i,x in enumerate(terrains)]
+        self.tiles = [Tile(x, resNum[i],get_node_from_tile_num(i+1)) for i,x in enumerate(terrains)]
         self.tiles.insert(9, Tile('desert', 0, [(2,2,0), (2,2,1), (3,2,1), (3,3,1), (3,3,0), (2,3,0)], True))
 
     def make_harbours(self):
@@ -61,8 +61,8 @@ class Game:
     def roll_dice(self):
         dice1 = random.randint(1,6)
         dice2 = random.randint(1,6)
-        diceTotal = dice1+dice2
-        return diceTotal
+        gui.display_dice(dice1,dice2)
+        return (dice1+dice2)
 
     def get_adjacent_nodes (node:tuple):
         total = sum(node)
@@ -97,26 +97,13 @@ class Game:
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.resource)
 
-    def start_rolls(self,player) -> dict:
-        return{player: (random.randint(1,6) + random.randint(1,6))}
-    
-    def game_set_up_rolls(self):
-        diceRolls = {}
-        for player in self.players:
-            diceRolls.update(self.start_rolls(player))
-        return diceRolls
-    
-    def dice_roll_winner(self):
-        diceRolls = self.game_set_up_rolls()
-        highestRoll = max(diceRolls.values())
-        highestPlayer = [k for k, v in diceRolls.items() if v == highestRoll]
-        if len(highestPlayer) == 1:
-            return highestPlayer[0]
-        else: 
-            return self.dice_roll_winner()
+    def dice_roll_winner(rolls):
+        highestRoll = max(rolls.values())
+        highestPlayer = [k for k, v in rolls.items() if v == highestRoll]
+        return highestPlayer
 
-    def game_set_up(self):
-        self.turnIndex = self.players.index(self.dice_roll_winner() )
+    def game_set_up(self,startingPlayer):
+        self.turnIndex = self.players.index(startingPlayer)
         for i in range (len(self.players)):
             node1 = input('node')
             self.create_settlement(node1)
@@ -139,25 +126,27 @@ class Game:
             #give starting resources 
             self.give_starting_resources(node1)
     
-    def start_game(self):
+    def start_game(self,startingPlayer):
         self.make_tiles()
         self.make_harbours()
         self.make_players()
-        self.game_set_up()
+        self.game_set_up(startingPlayer)
         self.set_development_cards()
 
     def get_producing_tiles(self):
-        diceTotal = self.roll_dice()
+        diceRoll = self.roll_dice()
+        diceTotal = diceRoll[0]
         if diceTotal == 7:
             self.robber_turn()
         tilesProducing =[]
         for tile in self.tiles:
             if tile.resourceNumber == diceTotal:
                 tilesProducing.append(tile)
-        return tilesProducing
+        return (tilesProducing,diceRoll[1],diceRoll[2])
 
     def give_producing_resources(self):
-        tilesProducing = self.get_producing_tiles()
+        tilesProducingAndDice = self.get_producing_tiles()
+        tilesProducing = tilesProducingAndDice[0]
         for tile in tilesProducing:
             for node in tile.nodes:
                 for outpost in self.outposts:
@@ -165,6 +154,7 @@ class Game:
                         outpost.colour.resources.append(tile.resource)
                         if outpost.isCity:
                             outpost.colour.resources.append(tile.resource)
+        return(tilesProducingAndDice[1],tilesProducingAndDice[2])
     
     def adjacent_to_settlement(self,node):
         adjacentToSettlement = False
@@ -213,7 +203,8 @@ class Game:
         self.move_robber()
         self.steal_card()
     
-    def move_robber(self, tile):
+    def move_robber(self):
+        tile = input('tile')
         moved = False
         while not moved:
             if tile.isRobberOn == False:
@@ -388,6 +379,3 @@ def make_list():
         newList.append(int(input))
         input = ('int')
     return newList
- 
-game = Game()
-game.start_game()
