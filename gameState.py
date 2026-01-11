@@ -6,7 +6,7 @@ import gui
 import game
 
 class GameState:
-    def __init__ (self,currentState:str, pressedNodes=[], rolled:bool=False, tradeOfferTurn=[], tradeOfferOthers=[], acceptedTrade=[], yoPlenty=[]):
+    def __init__ (self,currentState:str='main menu', pressedNodes=[], rolled:bool=False, tradeOfferTurn=[], tradeOfferOthers=[], acceptedTrade=[], yoPlenty=[], humans:int=4, bots:int=0):
         self.currentState=currentState
         self.pressedNodes = pressedNodes
         self.rolled = rolled
@@ -14,6 +14,8 @@ class GameState:
         self.tradeOfferOthers = tradeOfferOthers
         self.acceptedTrade = acceptedTrade
         self.yoPlenty = yoPlenty
+        self.humans = humans
+        self.bots = bots
     
     def convert_gui_coordinates_back(guiCoordinate):
         revertedCoordinate= {(619.94,285): (5,3,2),
@@ -78,17 +80,54 @@ class GameState:
         node2 = self.pressedNodes[1]
         self.pressedNodes = []
         if node1 == node2:
-            game.buildOutpost(self.convert_gui_coordinates_back(node1))
+            game.game1.buildOutpost(self.convert_gui_coordinates_back(node1))
         else:
-            game.buildRoad((self.convert_gui_coordinates_back(node1),self.convert_gui_coordinates_back(node2)))
+            game.game1.buildRoad((self.convert_gui_coordinates_back(node1),self.convert_gui_coordinates_back(node2)))
 
+    def load_pieces(self):
+        for road in game.game1.roads:
+            gui.draw_road(road)
+        for outpost in game.game1.outposts:
+            if outpost.isCity:
+                gui.draw_city(outpost)
+            else:
+                gui.draw_settlement(outpost)
+        i = 0
+        for tile in game.game1.tiles:
+            if tile.isRobberOn:
+                gui.move_robber(i)
+            i +=1
+    
     def load_game_screen(self):
         self.currentState = 'game'
-################################
+        gui.screen.fill(gui.get_colour('water'))
+        gui.draw_harbours(game.game1.harbours)
+        gui.create_game_screen()
+        gui.create_hex_node_buttons()
+        gui.display_dice(0,0)
+        gui.draw_player_banners()
+        gui.draw_building_key() 
+        gui.update_banner_resources([game.game1.players[0].resources , game.game1.players[1].resources,game.game1.players[2].resources,game.game1.players[3].resources])
+        for i in range (0,4,1):
+            gui.update_devs(i,len(game.game1.players[i].development))
+            gui.update_knights(i,game.game1.players[i].knightsPlayed)
+            gui.update_vp(i,game.game1.players[i].VP)
+        gui.new_turn(game.game1.turnIndex, game.game1.players[game.game1.turnIndex]) 
+        self.load_pieces()
+
+    def all_same_type(self, resourceList:list):
+        oneType = False
+        resources = ['wood', 'brick', 'sheep', 'hay', 'ore']
+        for resource in resources:
+            if resourceList.count(resource) == len(resourceList):
+                oneType = True
+        return oneType
 
     def get_command(self):
         command = gui.command(self.currentState)
-        if type(command) == str:
+        if type(command) == int:
+            game.game1.play_knight(command)
+        elif type(command) == str:
             # all screens/rules screen 
             if command == 'rules':
                 gui.rules_screen()
@@ -99,6 +138,26 @@ class GameState:
                     gui.trade_screen()
                 elif self.currentState == 'development':
                     gui.development_screen()
+            # main menu
+            elif command == 'play':
+                self.currentState = 'set up'
+##################start game set up
+            elif command == 'add human':
+                if self.humans + self.bots < 4:
+                    self.humans += 1
+                    gui.update_humans(self.humans)
+            elif command == 'add bot':
+                if self.humans + self.bots < 4:
+                    self.bots += 1
+                    gui.update_bots(self.bots)
+            elif command == 'remove human':
+                if self.humans > 0:
+                    self.humans -=1
+                    gui.update_humans(self.humans)
+            elif command == 'remove bot':
+                if self.bots > 0:
+                    self.bots -=1
+                    gui.update_humans(self.bots)
             
             # game screen
             elif command == 'roll dice':
@@ -174,7 +233,8 @@ class GameState:
                     self.yoPlenty.remove('ore')
                     gui.update_year_of_plenty(self.yoPlenty)
             elif command == 'play year of pleanty complete':
-                game.game1.play_year_of_plenty(self.yoPlenty)
+                if len(self.yoPlenty) == 2:
+                    game.game1.play_year_of_plenty(self.yoPlenty)
 
             elif command == 'buy development':
                 game.game1.create_development_card()
@@ -187,6 +247,12 @@ class GameState:
                 self.acceptedTrade.append(player)
             elif command == 'decline trade':
                 gui.askOtherPlayersForTrade(nextPlayer)
+            elif command == 'trade with bank':
+                if len(self.tradeOfferOthers) == 1 and (2 <= len(self.tradeOfferTurn) <= 4):
+                    if self.all_same_type(self.tradeOfferTurn):
+                        pass
+##########################TRADE WITH BANK !!!!!!!!!!!!!!!!!!!
+                    
             elif command == 'cancel trade':
                 self.tradeOfferOthers = []
                 self.tradeOfferTurn = []
@@ -273,3 +339,4 @@ class GameState:
                 self.build()
         
 
+gameState1 = GameState()

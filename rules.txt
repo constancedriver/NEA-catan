@@ -1,4 +1,28 @@
-The aim of the game is to get 10 Victory Points. This can be done by building settlements(1VP), cities(2VP), buying development cards(1:5 chance) or by earning the longest road(2VP) or largest army(2VP).
-In order to buy these you must collect resources by having an outpost(settlement or city) on the cornener of a tile when its number is rolled.
-On your turn you must first roll the dice(by clicking on them) then you can build and/or trade. 
+The aim of the game is to get 10 Victory Points. This can be done by building settlements(1VP), cities(2VP), buying
+development cards(1/5 chance) or by earning the longest road(2VP) or largest army(2VP). In order to buy these you
+must collect resources by having an outpost(settlement or city) on the corner of a tile when its number is rolled.
 
+
+On your turn you must first roll the dice(by clicking on them) then you can build and/or trade. In order to build an
+outpost, click twice on the corner you wish to place them on. This must be connected to a road of your colour and be
+at least two corners away from any other outpost. A city must be played ontop of an existing settlement that that
+player owns. To build a road you must click on the corners either end of the edge
+you want to place it on. This must be attached to another of your roads. To buy a development card click on the
+'development' button then click 'buy'. Development cards are randomly one of knight (P=14/25) which allows you to move
+the robber and steal one resource from the owner of an outpost adjacent to the new robber tile, a monopoly (2/25)
+allowing you to announce any one type of resource then all other player must give you all of their cards of that
+resource, a road building (2/25) allowing you to play two new roads as if you just bought them, a year of plenty (2/25)
+meaning you acquire two of any resource(s) from the bank, or a victory point (5/25) which is worth one VP. Other than
+VP (which is played automatically when it would cause you to have 10 or more VP) these cannot be played on the turn you buy them. 
+
+
+To trade press the 'trade' button then use the arrows to selects which resources you are inputtining into the trade
+and which resources you want in return. If you want to trade with other players after selecting the resources press
+'complete trade'. If you want to trade with the bank press 'trade with bank' instead. For a normal bank trade you must
+input in 4 of the same type in return for 1 of another. If you have an outpost on a purple harbour you only input 3.
+If you have another harbour then you input 2 of that specific resource for 1 of another. You can only trade with resurces you currently have.
+
+
+If the dice add to 7 then a 'robber turn' starts and players with more than 7 cards must discard half of their
+resources rounded down. Then the player whos turn it is moves the robber and steals a resurce card. When the robber is
+on a tile that tile doesnt produce resources. 

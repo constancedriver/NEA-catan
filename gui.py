@@ -71,10 +71,11 @@ def convert_coordinates(n):
 #  Resource colors 
 def get_colour(colourName):
     colourDef = {
-    'wood' :(0, 105, 0),#(34, 139, 34),      
+    'water': (135, 206, 235),
+    'wood' :(0, 105, 0),     
     'hay':  (255, 229, 33),     
     'brick':(182, 68, 7),     
-    'sheep':(70, 190, 0),#(148, 207, 0),      
+    'sheep':(70, 190, 0),      
     'ore':  (97, 97, 97),       
     'none': (204, 173, 96),
     'any': (115, 0, 255), 
@@ -138,8 +139,9 @@ def create_hex_node_buttons():
     hex_node_coordinates = [(619.94,285),(619.94,375),(542,420),(464.06,375),(464.06,285),(542,240),(777.94,285),(777.94,375),(700,420),(700,240),(935.94,285),(935.94,375),(858,420),(858,240),(541.94,510),(464,555),(386.06,510),(386.06,420),(699.94,510),(622,555),(857.94,510),(780,555),(1015.94,420),(1015.94,510),(938,555),(462.94,645),(385,690),(307.06,645), (307.06,555),(620.94,645), (543,690),(778.94,645), (701,690),(936.94,645), (859,690),(1094.94,555), (1094.94,645),(1017,690),(541.94,780),(464,825), (386.06,780),(699.94,780), (622,825),(857.94,780), (780,825),(1015.94,780),(938,825), (619.94,915),(542,960),(464.06,915),(777.94,915),(700,960),(935.94,915), (858,960)]
     for node in hex_node_coordinates:
         pygame.draw.circle(screen, (0,0,0), node, 10, 2)
+    pygame.display.flip()
 
-def draw_player_banners(players):
+def draw_player_banners(players=PLAYER_COLOURS):
     pygame.draw.rect(screen, get_colour(players[0]), (1183, 20, 183, 193))
     pygame.draw.rect(screen, get_colour(players[1]), (1183, 233, 183, 193))
     pygame.draw.rect(screen, get_colour(players[2]), (1183, 446, 183, 193))
@@ -151,23 +153,23 @@ def draw_player_banners(players):
         screen.blit((SMALLFONT.render(('knights:') , True , (0,0,0))), (1188,150+(i*213)))
     pygame.display.update(1183, 20, 183, 1150)
 
-def update_banner_resources(listOfPlayerResources:list):
+def update_banner_resources(listOfPlayerResources:list, players=PLAYER_COLOURS):
     for i in range(0,4,1):
         pygame.draw.rect(screen, get_colour(players[i]), (1315,70+(i*213), 50, 20))
         screen.blit((SMALLFONT.render(str(len(listOfPlayerResources[i])) , True , (0,0,0))), (1318,70+(i*213)))
     pygame.display.update(1315, 20, 50, 1150)
 
-def update_vp(turnIndex, vp):
+def update_vp(turnIndex, vp, players=PLAYER_COLOURS):
     pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,30+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(vp) , True , (0,0,0))), (1318,30+(turnIndex*213)))
     pygame.display.update(1315, 30+(turnIndex*213), 50, 20)
 
-def update_devs(turnIndex, devs):
+def update_devs(turnIndex, devs, players=PLAYER_COLOURS):
     pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,110+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(devs) , True , (0,0,0))), (1318,110+(turnIndex*213)))
     pygame.display.update(1315, 110+(turnIndex*213), 50, 20)
 
-def update_knights(turnIndex, knights):
+def update_knights(turnIndex, knights, players=PLAYER_COLOURS):
     pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,150+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(knights) , True , (0,0,0))), (1318,150+(turnIndex*213)))
     pygame.display.update(1315, 150+(turnIndex*213), 50, 20)
@@ -194,9 +196,10 @@ def update_largest_army(player):
     pygame.draw.rect(screen, get_colour(colour), (34,580,149,30))
     pygame.display.update(34,580,149,30)
 
-def new_turn(playerColours=PLAYER_COLOURS): # !!!!!!!!!!!!!!!! INPUT PLAYER HAND PROPERTIES!!!!!!!!!!!!!
-    player = game1.players[game1.turnIndex]
-    colour = playerColours[game1.turnIndex]
+def new_turn(turnIndex, playerInfo): 
+    colour = PLAYER_COLOURS[turnIndex]
+    resources = playerInfo.resources
+    resources = []
     pygame.draw.rect(screen, get_colour(colour), (283,1000, 834, 100))
     pygame.draw.rect(screen, get_colour(colour), (283,0, 834, 200))
     pygame.draw.rect(screen, get_colour('wood'), (316,20,127.2,50))
@@ -209,13 +212,12 @@ def new_turn(playerColours=PLAYER_COLOURS): # !!!!!!!!!!!!!!!! INPUT PLAYER HAND
     screen.blit((SMALLFONT.render(str(resources.count('sheep')) , True , (0,0,0))), (693,30))
     screen.blit((SMALLFONT.render(str(resources.count('hay')) , True , (0,0,0))), (854,30))
     screen.blit((SMALLFONT.render(str(resources.count('ore')) , True , (0,0,0))), (1014,30))
-    screen.blit((SMALLFONT.render(('roads left:'+str(player.roadsLeft)) , True , (0,0,0))), (316,130))
-    screen.blit((SMALLFONT.render(('settlements left:'+str(player.settlementsLeft)) , True , (0,0,0))), (716,130))
-    screen.blit((SMALLFONT.render(('cities left:'+str(player.citiesLeft)) , True , (0,0,0))), (316,160))
-    screen.blit((SMALLFONT.render(('knights played:'+str(player.knightsPlayed)) , True , (0,0,0))), (716,160))
-    screen.blit((SMALLFONT.render(('dev:') , True , (0,0,0))), (316,80))
+    screen.blit((SMALLFONT.render(('roads left:'+str(playerInfo.roadsLeft)) , True , (0,0,0))), (316,130))
+    screen.blit((SMALLFONT.render(('settlements left:'+str(playerInfo.settlementsLeft)) , True , (0,0,0))), (716,130))
+    screen.blit((SMALLFONT.render(('cities left:'+str(playerInfo.citiesLeft)) , True , (0,0,0))), (316,160))
+    screen.blit((SMALLFONT.render(('knights played:'+str(playerInfo.knightsPlayed)) , True , (0,0,0))), (716,160))
     i = 1
-    for card in player.development:
+    for card in playerInfo.development:
         screen.blit((SMALLFONT.render((card) , True , (0,0,0))), (316+100*i,80))
         i+=1
     pygame.display.update(283,1000, 834, 100)
@@ -251,7 +253,7 @@ def draw_city(city):
     pygame.draw.rect(screen, get_colour(colour), (x-30, y-15, 15, 30))
     pygame.display.update(x-30, y-15, 15, 30)
 
-def draw_harbours(harbours):
+def draw_harbours(harbours:list):
     for harbour in harbours:
         colour = get_colour(harbour[1])
         node = convert_coordinates(harbour[0])
@@ -284,7 +286,6 @@ def draw_building_key():
     pygame.display.update(0,0,250,460)
 
 def create_game_screen():
-    screen.fill((135, 206, 235))
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center, colour in board:
@@ -308,13 +309,36 @@ def create_game_screen():
     screen.blit((SMALLFONT.render('LONGEST ROAD:' , True , (0,0,0))), (10,480))
     pygame.display.flip()
 
+def wrap_text(text, font, max_width):
+    words = text.split(" ")
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + word + " "
+        if font.size(test_line)[0] <= max_width-20:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word + " "
+
+    lines.append(current_line)
+    return lines
+
 def rules_screen():
     screen.fill((204, 173, 96))
+    screen.blit((SMALLFONT.render('RULES' , True , (0,0,0))), (655,25))
     pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
     screen.blit((SMALLFONT.render('back to game' , True , (0,0,0))), (1233,25))
-    pygame.display.flip()
- #!!!!!###### print actual rules!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    y = 80
+    rules = open(r'rules.txt').read()
+    for line in wrap_text(rules, SMALLFONT, 1400):
+        text_surface = SMALLFONT.render(line, True, (0,0,0))
+        screen.blit(text_surface, (20, y))
+        y += SMALLFONT.get_height() + 2
 
+    pygame.display.flip()
+ 
 def game_end_screen(turnIndex,playerColours=PLAYER_COLOURS):
     colour = playerColours[turnIndex]
     screen.fill((get_colour(colour)))
@@ -324,7 +348,7 @@ def game_end_screen(turnIndex,playerColours=PLAYER_COLOURS):
     pygame.display.flip()
 
 def trade_screen():
-    screen.fill((204, 173, 96))
+    screen.fill((get_colour('none')))
     pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
     screen.blit((SMALLFONT.render('cancel trade' , True , (0,0,0))), (1233,25))
     pygame.draw.rect(screen, (0,255,0), (0, 0, 183, 75))
@@ -332,6 +356,8 @@ def trade_screen():
     screen.blit((SMALLFONT.render('TRADE MENU' , True , (0,0,0))), (620,25))
     pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
     screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
+    pygame.draw.rect(screen, get_colour('any'), (800, 992, 203, 75))
+    screen.blit((SMALLFONT.render('trade with bank' , True , (0,0,0))), (810,1017))
     #creating cards
     pygame.draw.rect(screen, (get_colour('wood')), (34, 360, 240, 480))
     pygame.draw.rect(screen, (get_colour('brick')), (307, 360, 240, 480))
@@ -387,6 +413,8 @@ def update_year_of_plenty(resources:list):
         pygame.draw.rect(screen, (0,0,0), (409, 878, 36,36), 2)
         screen.blit((SMALLFONT.render(str(resources.count('ore')) , True , (0,0,0))), (419,888))
 
+        pygame.display.update(307, 684, 240, 240)
+
 def development_screen():
     screen.fill((204, 173, 96))
     screen.blit((SMALLFONT.render('DEVELOPMENT CARDS' , True , (0,0,0))), (620,25))
@@ -398,7 +426,7 @@ def development_screen():
     pygame.draw.rect(screen, (get_colour('brick')), (307, 468, 240, 75))
     screen.blit((SMALLFONT.render('road building' , True , (0,0,0))), (310,478))
 
-    pygame.draw.rect(screen, (get_colour('wood')), (307, 576, 240, 75))
+    pygame.draw.rect(screen, (get_colour('water')), (307, 576, 240, 75))
     screen.blit((SMALLFONT.render('monopoly' , True , (0,0,0))), (310,586))
     pygame.draw.rect(screen, get_colour('wood'), (310, 610, 36,36))
     pygame.draw.rect(screen, (0,0,0), (310, 610, 36,36), 2)
@@ -413,9 +441,11 @@ def development_screen():
 
     pygame.draw.rect(screen, (get_colour('hay')), (307, 684, 240, 240))
     screen.blit((SMALLFONT.render('year of plenty' , True , (0,0,0))), (310,694))
+    pygame.draw.rect(screen, (0,255,0), (488, 883, 54,36))
+    screen.blit((SMALLFONT.render('use' , True , (0,0,0))), (490,885))
     for i in range (0,5,1):
         pygame.draw.polygon(screen, (0,0,0), ((450,(719+i*41)), (450,(745+i*41)), (476,(732+i*41))))# up
-        pygame.draw.polygon(screen, (0,0,0), ((404,(719+i*41)), (404,(745+i*41)), (378,(732+i*41))))
+        pygame.draw.polygon(screen, (0,0,0), ((404,(719+i*41)), (404,(745+i*41)), (378,(732+i*41))))# down
     update_year_of_plenty([])
 
     pygame.draw.rect(screen, (get_colour('any')), (853, 360, 240, 480))
@@ -428,11 +458,13 @@ def development_screen():
     pygame.display.flip()
 
 def select_knight_placement_screen(): # create buttons for this
-    screen.fill((135, 206, 235))
+    screen.fill((get_colour('water')))
     pygame.draw.rect(screen, (204, 173, 96), (0,0, 250, 1200))
     pygame.draw.rect(screen, (204, 173, 96), (1150,0, 250, 1200))
-    pygame.draw.rect(screen, (255,0,0), (1183, 992, 183, 75))
-    screen.blit((SMALLFONT.render('quit' , True , (0,0,0))), (1249,1017))
+    screen.blit((SMALLFONT.render('press the circle in' , True , (0,0,0))), (10,50))
+    screen.blit((SMALLFONT.render('the center of the' , True , (0,0,0))), (10,80))
+    screen.blit((SMALLFONT.render('tile you want to ' , True , (0,0,0))), (10,110))
+    screen.blit((SMALLFONT.render('place the knight on' , True , (0,0,0))), (10,140))
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center, colour in board:
@@ -442,10 +474,49 @@ def select_knight_placement_screen(): # create buttons for this
         i += 1
     pygame.display.flip()
     
-    #giving inputs to game file
+def select_player_to_steal_resource_from(playerIndexs, players=PLAYER_COLOURS):
+    screen.blit((SMALLFONT.render('select the player' , True , (0,0,0))), (1160,50))
+    screen.blit((SMALLFONT.render('you want to ' , True , (0,0,0))), (1160,80))
+    screen.blit((SMALLFONT.render('steal a random ' , True , (0,0,0))), (1160,110))
+    screen.blit((SMALLFONT.render('resource from ' , True , (0,0,0))), (1160,140))
+    i = 0 
+    for index in playerIndexs:
+        pygame.draw.rect(screen, get_colour(players[index]), (1160, (170+i*108), 183, 75))
+        i +=1
+    pygame.display.update(1150,0, 250, 1200)
+
+def update_humans(humans:int):
+    pygame.draw.rect(screen, get_colour('water'), (690,370,40,40))
+    screen.blit((SMALLFONT.render(str(humans) , True , (0,0,0))), ((149+(2*273)),(376)))
+    pygame.display.update(690,370,40,40)
+
+def update_bots(bots:int):
+    pygame.draw.rect(screen, get_colour('water'), (690,570,40,40))
+    screen.blit((SMALLFONT.render(str(bots) , True , (0,0,0))), ((149+(2*273)),(576)))
+    pygame.display.update(690,570,40,40)
+
+def start_menu():
+    screen.fill(get_colour('water'))
+    screen.blit((SMALLFONT.render('CATAN' , True , (0,0,0))), (655,25))
+    screen.blit((SMALLFONT.render('MAIN MENU' , True , (0,0,0))), (625,85))
+    pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
+    screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
+    pygame.draw.rect(screen, (255,0,0), (1183, 992, 183, 75))
+    screen.blit((SMALLFONT.render('quit' , True , (0,0,0))), (1249,1017))
+    pygame.draw.rect(screen, (get_colour('any')), (517, 722, 366, 150))
+    screen.blit((SMALLFONT.render('PLAY' , True , (0,0,0))), (665,787))
+
+    for j in range (0,2,1):
+            pygame.draw.polygon(screen, (0,0,0), (((116.5+(2*273)),(427+(j*200))),((116.5+(2*273)),(352+(j*200))),((41+(2*273)),(389.5+(j*200))))) # down
+            pygame.draw.polygon(screen, (0,0,0), (((195+(2*273)),(427+(j*200))),((195+(2*273)),(352+(j*200))),((267+(2*273)),(389.5+(j*200))))) # up
+    screen.blit((SMALLFONT.render('select the number of human players:' , True , (0,0,0))), (219,296))
+    screen.blit((SMALLFONT.render('select the number of bot players:' , True , (0,0,0))), (219,506))
+    screen.blit((SMALLFONT.render('total players must be 4' , True , (0,0,0))), (550, 900))
+    screen.blit((SMALLFONT.render('4' , True , (0,0,0))), ((149+(2*273)),(376)))
+    screen.blit((SMALLFONT.render('0' , True , (0,0,0))), ((149+(2*273)),(576)))
+    pygame.display.flip()
 
 def command(currentScreen):
-    running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -454,216 +525,305 @@ def command(currentScreen):
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
+                x = mouse[0]
+                y = mouse[1]
                 #rule screen
-                if 1217 <= mouse[0] <= 1217+183 and 0 <= mouse[1] <= 0+75: #back to game
+                if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
                         message = 'exit rules'
 
                 # all screens 
-                elif 1183 <= mouse[0] <= 1183+183 and 992 <= mouse[1] <= 992+75: # quit button
+                elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
                         pygame.quit()
                         sys.exit()
-                elif 34 <= mouse[0] <= 34+183 and 992 <= mouse[1] <= 992+75: #rules button
+                elif 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
                         message = 'rules'
 
+                if currentScreen == 'main menu':
+                    if 517 <= x <= 517+150 and 722 <= y <= 722+366:
+                        message = 'play'
+                    elif 738 <= x <= 813 and 325 <= y <= 427: # up
+                        message = 'add human'
+                    elif 738 <= x <= 813 and 525 <= y <= 627: # up
+                        message = 'add bot'
+                    elif 587 <= x <= 662.5 and 325 <= y <= 427: # down
+                        message = 'remove human'
+                    elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
+                        message = 'remove bot'
+
                 #trade screen 
-                if currentScreen == 'ask player about trade':
-                    if 460 <= mouse[0] <= 460+223.5 and 393 <= mouse[1] <= 393+414: #accept trade
+                elif currentScreen == 'ask player about trade':
+                    if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
                             message = 'accept trade'
-                    elif 716.5 <= mouse[0] <= 716.5+223.5 and 393 <= mouse[1] <= 393+414: #decline trade
+                    elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
                             message = 'decline trade'
                 
                 elif currentScreen == 'trade':
-                    if 1217 <= mouse[0] <= 1217+183 and 0 <= mouse[1] <= 0+75: #'cancel trade'
+                    if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
                         message = 'cancel trade'
-                    elif 0 <= mouse[0] <= 0+183 and 0 <= mouse[1] <= 0+75: # 'complete trade'
+                    elif 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'complete trade'
                         message = 'complete trade'
+                    elif 800 <= x <= 800+203 and 992 <= y <=75:
+                        message = 'trade with bank'
 
                     #trade arrows - up arrows increase the number of that resourse involved in the trade by 1
                     #down arrown decrease the number of that resource by 1 
                     #you put in - the players whos turn it is 
-                    elif 41 <= mouse [0] <= 41 +75 and 252 <= mouse[1] <= 252 +75: # down
+                    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
                         message = 'turn player: remove wood'
-                    elif 195 <= mouse [0] <= 195 +75 and 252 <= mouse[1] <= 252 +75: #up
+                    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
                         message = 'turn player: add wood'
-                    elif 314 <= mouse [0] <= 314 +75 and 252 <= mouse[1] <= 252 +75: # down
+                    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
                         message = 'turn player: remove brick'
-                    elif 468 <= mouse [0] <= 468 +75 and 252 <= mouse[1] <= 252 +75: #up
+                    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
                         message = 'turn player: add brick'
-                    elif 587 <= mouse [0] <= 587 +75 and 252 <= mouse[1] <= 252 +75: # down
+                    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
                         message = 'turn player: remove sheep'
-                    elif 741 <= mouse [0] <= 741 +75 and 252 <= mouse[1] <= 252 +75: #up
+                    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
                         message = 'turn player: add sheep'
-                    elif 860 <= mouse [0] <= 860 +75 and 252 <= mouse[1] <= 252 +75: # down
+                    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
                         message = 'turn player: remove hay'
-                    elif 1014 <= mouse [0] <= 1014 +75 and 252 <= mouse[1] <= 252 +75: #up
+                    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
                         message = 'turn player: add hay'
-                    elif 1133 <= mouse [0] <= 1133 +75 and 252 <= mouse[1] <= 252 +75: # down
+                    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
                         message = 'turn player: remove ore'
-                    elif 1287 <= mouse [0] <= 1287 +75 and 252 <= mouse[1] <= 252 +75: #up
+                    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
                         message = 'turn player: add ore'
 
                     #other players put in - what the player whos turn it is wants from other players 
-                    elif 41 <= mouse [0] <= 41 +75 and 873 <= mouse[1] <= 873 +75: # down
+                    elif 41 <= x <= 41 +75 and 873 <= y <= 873 +75: # down
                         message = 'other players: remove wood'
-                    elif 195 <= mouse [0] <= 195 +75 and 873 <= mouse[1] <= 873 +75: #up
+                    elif 195 <= x <= 195 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add wood'
-                    elif 314 <= mouse [0] <= 314 +75 and 873 <= mouse[1] <= 873 +75: # down
+                    elif 314 <= x <= 314 +75 and 873 <= y <= 873 +75: # down
                         message = 'other players: remove brick'
-                    elif 468 <= mouse [0] <= 468 +75 and 873 <= mouse[1] <= 873 +75: #up
+                    elif 468 <= x <= 468 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add brick'
-                    elif 587 <= mouse [0] <= 587 +75 and 873 <= mouse[1] <= 873 +75: # down
+                    elif 587 <= x <= 587 +75 and 873 <= y <= 873 +75: # down
                         message = 'other players: remove sheep'
-                    elif 741 <= mouse [0] <= 741 +75 and 873 <= mouse[1] <= 873 +75: #up
+                    elif 741 <= x <= 741 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add sheep'
-                    elif 860 <= mouse [0] <= 860 +75 and 873 <= mouse[1] <= 873 +75: # down
+                    elif 860 <= x <= 860 +75 and 873 <= y <= 873 +75: # down
                         message = 'other players: remove hay'
-                    elif 1014 <= mouse [0] <= 1014 +75 and 873 <= mouse[1] <= 873 +75: #up
+                    elif 1014 <= x <= 1014 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add hay'
-                    elif 1133 <= mouse [0] <= 1133 +75 and 873 <= mouse[1] <= 873 +75: # down
+                    elif 1133 <= x <= 1133 +75 and 873 <= y <= 873 +75: # down
                         message = 'other players: remove ore'
-                    elif 1287 <= mouse [0] <= 1287 +75 and 873 <= mouse[1] <= 873 +75: #up
+                    elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add ore'
                 
                 elif currentScreen == 'development':
-                    if 307 <= mouse[0] <= 307+240 and 360 <= mouse[1] <= 360+75:
+                    if 307 <= x <= 307+240 and 360 <= y <= 360+75:
                         message = 'play knight'
-                    elif 307 <= mouse[0] <= 307+240 and 468 <= mouse[1] <= 468+75:
+                    elif 307 <= x <= 307+240 and 468 <= y <= 468+75:
                         message = 'play road building'
-                    elif 310 <= mouse[0] <= 310+36 and 610 <= mouse[1] <= 610+36:
+
+                    elif 310 <= x <= 310+36 and 610 <= y <= 610+36:
                         message = 'play monopoly wood'
-                    elif 351 <= mouse[0] <= 351+36 and 610 <= mouse[1] <= 610+36:
+                    elif 351 <= x <= 351+36 and 610 <= y <= 610+36:
                         message = 'play monopoly brick'
-                    elif 392 <= mouse[0] <= 392+36 and 610 <= mouse[1] <= 610+36:
+                    elif 392 <= x <= 392+36 and 610 <= y <= 610+36:
                         message = 'play monopoly sheep'
-                    elif 433 <= mouse[0] <= 433+36 and 610 <= mouse[1] <= 610+36:
+                    elif 433 <= x <= 433+36 and 610 <= y <= 610+36:
                         message = 'play monopoly hay'
-                    elif 472 <= mouse[0] <= 472+36 and 610 <= mouse[1] <= 610+36:
+                    elif 472 <= x <= 472+36 and 610 <= y <= 610+36:
                         message = 'play monopoly ore'
-                    elif 307 <= mouse[0] <= 307+240 and 684 <= mouse[1] <= 684+75:
+
+                    elif 450 <= x <= 476 and 719 <= y <= 745: #up
+                        message = 'year of plenty add wood'
+                    elif 450 <= x <= 476 and 760 <= y <= 760+26: #up
+                        message = 'year of plenty add brick'
+                    elif 450 <= x <= 476 and 801 <= y <= 801+26: #up
+                        message = 'year of plenty add sheep'
+                    elif 450 <= x <= 476 and 842 <= y <= 842+26: #up
+                        message = 'year of plenty add hay'
+                    elif 450 <= x <= 476 and 883 <= y <= 883+26: #up
+                        message = 'year of plenty add ore'
+                    elif 378 <= x <= 404 and 719 <= y <= 719+26: #down
+                        message = 'year of plenty remove wood'
+                    elif 378 <= x <= 404 and 760 <= y <= 760+26: #down
+                        message = 'year of plenty remove brick'
+                    elif 378 <= x <= 404 and 801 <= y <= 801+26: #down
+                        message = 'year of plenty remove sheep'
+                    elif 378 <= x <= 404 and 842 <= y <= 842+26: #down
+                        message = 'year of plenty remove hay'
+                    elif 378 <= x <= 404 and 883 <= y <= 883+26: #down
+                        message = 'year of plenty remove ore'
+                    elif 488 <= x <= 506+54 and 883 <= y <= 883+36: #'use' button
                         message = 'play year of plenty complete'
-                    elif 853 <= mouse[0] <= 853+240 and 360 <= mouse[1] <= 360+480:
+
+                    elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         message = 'buy development'
-                    elif 853 <= mouse[0] <= 853+240 and 360 <= mouse[1] <= 360+480:
+                    elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         message = 'load game screen'
+                
+                elif currentScreen == 'knight':
+                    #hex number selected for knight placement
+                    if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
+                        message = 0
+                    elif 700-35 <= x <= 700+35 and 870-35 <= y <= 870+35:
+                        message = 1
+                    elif 858-35 <= x <= 858+35 and 870-35 <= y <= 870+35:
+                        message = 2
+                    elif 464-35 <= x <= 464+35 and 735-35 <= y <= 735+35:
+                        message = 3
+                    elif 622-35 <= x <= 622+35 and 735-35 <= y <= 735+35:
+                        message = 4
+                    elif 780-35 <= x <= 780+35 and 735-35 <= y <= 735+35:
+                        message = 5
+                    elif 938-35 <= x <= 938+35 and 735-35 <= y <= 735+35:
+                        message = 6
+                    elif 385-35 <= x <= 385+35 and 600-35 <= y <= 600+35:
+                        message = 7
+                    elif 543-35 <= x <= 543+35 and 600-35 <= y <= 600+35:
+                        message = 8
+                    elif 701-35 <= x <= 701+35 and 600-35 <= y <= 600+35:
+                        message = 9
+                    elif 859-35 <= x <= 859+35 and 600-35 <= y <= 600+35:
+                        message = 10
+                    elif 1017-35 <= x <= 1017+35 and 600-35 <= y <= 600+35:
+                        message = 11
+                    elif 464-35 <= x <= 464+35 and 465-35 <= y <= 465+35:
+                        message = 12
+                    elif 622-35 <= x <= 622+35 and 465-35 <= y <= 465+35:
+                        message = 13
+                    elif 780-35 <= x <= 780+35 and 465-35 <= y <= 465+35:
+                        message = 14
+                    elif 938-35 <= x <= 938+35 and 465-35 <= y <= 465+35:
+                        message = 15
+                    elif 524-35 <= x <= 524+35 and 330-35 <= y <= 330+35:
+                        message = 16
+                    elif 700-35 <= x <= 700+35 and 330-35 <= y <= 330+35:
+                        message = 17
+                    elif 858-35 <= x <= 858+35 and 330-35 <= y <= 330+35:
+                        message = 18
+                    # choosing player to steal from
+                    elif 1160 <= x <= 1160+183 and 170 <= y <=170+75:
+                        message = 'player index 0'
+                    elif 1160 <= x <= 1160+183 and 278 <= y <=278+75:
+                        message = 'player index 1'
+                    elif 1160 <= x <= 1160+183 and 386 <= y <=386+75:
+                        message = 'player index 2'
+                    elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
+                        message = 'player index 3'
 
                 elif currentScreen == 'game':
-                        if 1183 <= mouse[0] <= 1183+183 and 884 <= mouse[1] <= 884+75: # roll dice button
+                        if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
                             message = 'roll dice'
-                        elif 34 <= mouse[0] <= 34+183 and 776 <= mouse[1] <= 776+75:#trade button
+                        elif 34 <= x <= 34+183 and 776 <= y <= 776+75:#trade button
                             message = 'trade'
-                        elif 34 <= mouse[0] <= 34+183 and 668 <= mouse[1] <= 668+75: # end turn
+                        elif 34 <= x <= 34+183 and 668 <= y <= 668+75: # end turn
                             message = 'development'
-                        elif 34 <= mouse[0] <= 34+183 and 884 <= mouse[1] <= 884+75: # end turn
+                        elif 34 <= x <= 34+183 and 884 <= y <= 884+75: # end turn
                             message = 'end turn'
                         
                     # hex node buttons:
-                        elif  609.94 <= mouse[0] <= 629.94 and 275 <= mouse[1] <= 295 :
+                        elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
                             message = (619.94 , 285)
-                        elif  609.94 <= mouse[0] <= 629.94 and 365 <= mouse[1] <= 385 :
+                        elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
                             message = (619.94 , 375) 
-                        elif  532 <= mouse[0] <= 552 and 410 <= mouse[1] <= 430 :
+                        elif  532 <= x <= 552 and 410 <= y <= 430 :
                             message = (542 , 420)
-                        elif  454.06 <= mouse[0] <= 474.06 and 365 <= mouse[1] <= 385 :
+                        elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
                             message = (464.06 , 375 )
-                        elif  454.06 <= mouse[0] <= 474.06 and 275 <= mouse[1] <= 295 :
+                        elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
                             message = (464.06 , 285)
-                        elif  532 <= mouse[0] <= 552 and 230 <= mouse[1] <= 250 :
+                        elif  532 <= x <= 552 and 230 <= y <= 250 :
                             message = (542 , 240 )
-                        elif  767.94 <= mouse[0] <= 787.94 and 275 <= mouse[1] <= 295 :
+                        elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
                             message = (777.94 , 285 )
-                        elif  767.94 <= mouse[0] <= 787.94 and 365 <= mouse[1] <= 385 :
+                        elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
                             message = (777.94 , 375)
-                        elif  690 <= mouse[0] <= 710 and 410 <= mouse[1] <= 430 :
+                        elif  690 <= x <= 710 and 410 <= y <= 430 :
                             message = ( 700 , 420) 
-                        elif  690 <= mouse[0] <= 710 and 230 <= mouse[1] <= 250 :
+                        elif  690 <= x <= 710 and 230 <= y <= 250 :
                             message = (700 , 240)
-                        elif  925.94 <= mouse[0] <= 945.94 and 275 <= mouse[1] <= 295 :
+                        elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
                             message = (935.94 , 285 )
-                        elif  925.94 <= mouse[0] <= 945.94 and 365 <= mouse[1] <= 385 :
+                        elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
                             message = (935.94 , 375)
-                        elif  848 <= mouse[0] <= 868 and 410 <= mouse[1] <= 430 :
+                        elif  848 <= x <= 868 and 410 <= y <= 430 :
                             message = (858 , 420) 
-                        elif  848 <= mouse[0] <= 868 and 230 <= mouse[1] <= 250 :
+                        elif  848 <= x <= 868 and 230 <= y <= 250 :
                             message = (858 , 240)
-                        elif  531.94 <= mouse[0] <= 551.94 and 500 <= mouse[1] <= 520 :
+                        elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
                             message = (541.94 , 510) 
-                        elif  454 <= mouse[0] <= 474 and 545 <= mouse[1] <= 565 :
+                        elif  454 <= x <= 474 and 545 <= y <= 565 :
                             message = (464 , 555)
-                        elif  376.06 <= mouse[0] <= 396.06 and 500 <= mouse[1] <= 520 :
+                        elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
                             message = (386.06 , 510)
-                        elif  376.06 <= mouse[0] <= 396.06 and 410 <= mouse[1] <= 430 :
+                        elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
                             message = (386.06 , 420)
-                        elif  689.94 <= mouse[0] <= 709.94 and 500 <= mouse[1] <= 520 :
+                        elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
                             message = (699.94 , 510)
-                        elif  612 <= mouse[0] <= 632 and 545 <= mouse[1] <= 565 :
+                        elif  612 <= x <= 632 and 545 <= y <= 565 :
                             message = (622 , 555)
-                        elif  847.94 <= mouse[0] <= 867.94 and 500 <= mouse[1] <= 520 :
+                        elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
                             message = (857.94 , 510)
-                        elif  770 <= mouse[0] <= 790 and 545 <= mouse[1] <= 565 :
+                        elif  770 <= x <= 790 and 545 <= y <= 565 :
                             message = (780 , 555)
-                        elif  1005.94 <= mouse[0] <= 1025.94 and 410 <= mouse[1] <= 430 :
+                        elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
                             message = (1015.94 , 420)
-                        elif  1005.94 <= mouse[0] <= 1025.94 and 500 <= mouse[1] <= 520 :
+                        elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
                             message = (1015.94 , 510)
-                        elif  928 <= mouse[0] <= 948 and 545 <= mouse[1] <= 565 :
+                        elif  928 <= x <= 948 and 545 <= y <= 565 :
                             message = (938 , 555)
-                        elif  452.94 <= mouse[0] <= 472.94 and 635 <= mouse[1] <= 655 :
+                        elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
                             message = (462.94 , 645)
-                        elif  375 <= mouse[0] <= 395 and 680 <= mouse[1] <= 700 :
+                        elif  375 <= x <= 395 and 680 <= y <= 700 :
                             message = (385 , 690) 
-                        elif  297.06 <= mouse[0] <= 317.06 and 635 <= mouse[1] <= 655 :
+                        elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
                             message = (307.06 , 645) 
-                        elif  297.06 <= mouse[0] <= 317.06 and 545 <= mouse[1] <= 565 :
+                        elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
                             message = (307.06 , 555) 
-                        elif  610.94 <= mouse[0] <= 630.94 and 635 <= mouse[1] <= 655 :
+                        elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
                             message = (620.94 , 645) 
-                        elif  533 <= mouse[0] <= 553 and 680 <= mouse[1] <= 700 :
+                        elif  533 <= x <= 553 and 680 <= y <= 700 :
                             message = (543 , 690) 
-                        elif  768.94 <= mouse[0] <= 788.94 and 635 <= mouse[1] <= 655 :
+                        elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
                             message = (778.94 , 645) 
-                        elif  691 <= mouse[0] <= 711 and 680 <= mouse[1] <= 700 :
+                        elif  691 <= x <= 711 and 680 <= y <= 700 :
                             message = (701 , 690) 
-                        elif  926.94 <= mouse[0] <= 946.94 and 635 <= mouse[1] <= 655 :
+                        elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
                             message = (936.94 , 645) 
-                        elif  849 <= mouse[0] <= 869 and 680 <= mouse[1] <= 700 :
+                        elif  849 <= x <= 869 and 680 <= y <= 700 :
                             message = (859 , 690) 
-                        elif  1084.94 <= mouse[0] <= 1104.94 and 545 <= mouse[1] <= 565 :
+                        elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
                             message = (1094.94 , 555) 
-                        elif  1084.94 <= mouse[0] <= 1104.94 and 635 <= mouse[1] <= 655 :
+                        elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
                             message = (1094.94 , 645 )
-                        elif  1007 <= mouse[0] <= 1027 and 680 <= mouse[1] <= 700 :
+                        elif  1007 <= x <= 1027 and 680 <= y <= 700 :
                             message = (1017 , 690) 
-                        elif  531.94 <= mouse[0] <= 551.94 and 770 <= mouse[1] <= 790 :
+                        elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
                             message = (541.94 , 780) 
-                        elif  454 <= mouse[0] <= 474 and 815 <= mouse[1] <= 835 :
+                        elif  454 <= x <= 474 and 815 <= y <= 835 :
                             message = (464 , 825) 
-                        elif  376.06 <= mouse[0] <= 396.06 and 770 <= mouse[1] <= 790 :
+                        elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
                             message = (386.06 , 780) 
-                        elif  689.94 <= mouse[0] <= 709.94 and 770 <= mouse[1] <= 790 :
+                        elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
                             message = (699.94 , 780) 
-                        elif  612 <= mouse[0] <= 632 and 815 <= mouse[1] <= 835 :
+                        elif  612 <= x <= 632 and 815 <= y <= 835 :
                             message = (622 , 825 )
-                        elif  847.94 <= mouse[0] <= 867.94 and 770 <= mouse[1] <= 790 :
+                        elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
                             message = (857.94 , 780) 
-                        elif  770 <= mouse[0] <= 790 and 815 <= mouse[1] <= 835 :
+                        elif  770 <= x <= 790 and 815 <= y <= 835 :
                             message = (780 , 825) 
-                        elif  1005.94 <= mouse[0] <= 1025.94 and 770 <= mouse[1] <= 790 :
+                        elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
                             message = (1015.94 , 780) 
-                        elif  928 <= mouse[0] <= 948 and 815 <= mouse[1] <= 835 :
+                        elif  928 <= x <= 948 and 815 <= y <= 835 :
                             message = (938 , 825) 
-                        elif  609.94 <= mouse[0] <= 629.94 and 905 <= mouse[1] <= 925 :
+                        elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
                             message = (619.94 , 915)
-                        elif  532 <= mouse[0] <= 552 and 950 <= mouse[1] <= 970 :
+                        elif  532 <= x <= 552 and 950 <= y <= 970 :
                             message = (542 , 960)
-                        elif  454.06 <= mouse[0] <= 474.06 and 905 <= mouse[1] <= 925 :
+                        elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
                             message = (464.06 , 915)
-                        elif  767.94 <= mouse[0] <= 787.94 and 905 <= mouse[1] <= 925 :
+                        elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
                             message = (777.94 , 915)
-                        elif  690 <= mouse[0] <= 710 and 950 <= mouse[1] <= 970 :
+                        elif  690 <= x <= 710 and 950 <= y <= 970 :
                             message = (700 , 960)
-                        elif  925.94 <= mouse[0] <= 945.94 and 905 <= mouse[1] <= 925 :
+                        elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
                             message = (935.94 , 915)
-                        elif  848 <= mouse[0] <= 868 and 950 <= mouse[1] <= 970 :
+                        elif  848 <= x <= 868 and 950 <= y <= 970 :
                             message = (858 , 960)
         return message 
 
@@ -676,4 +836,9 @@ pygame.display.set_caption("Catan Board")
 board = generate_catan_layout(WIDTH // 2, HEIGHT // 2)
 running = True
 while running:
-    screen.fill((204, 173, 96))
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+    
+    rules_screen()

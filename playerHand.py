@@ -1,6 +1,6 @@
 from pieces import *
 class PlayerHand:
-    def __init__(self, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development=[], knightsPlayed:int=0, roads=[], outposts=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False):
+    def __init__(self, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development=[], knightsPlayed:int=0, roads=[], outposts=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False):
         self.VP = VP
         self.roadsLeft = roadsLeft
         self.settlementsLeft = settlementsLeft
@@ -12,6 +12,7 @@ class PlayerHand:
         self.outposts = outposts
         self.hasLargestArmy = hasLargestArmy
         self.hasLongestRoad = hasLongestRoad
+        self.isBot = isBot
 
     def sufficient_resources(self,resourcesNeeded):
         sufficient = True

@@ -1,4 +1,5 @@
 import random
+import time
 from resourceTiles import *
 from playerHand import *
 import pieces
@@ -97,13 +98,21 @@ class Game:
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.resource)
 
-    def dice_roll_winner(rolls):
+    def dice_roll_winner(self, players:list):
+        rolls = []
+        for i in range (len(players)):
+            rolls.append((self.roll_dice()))
+            gui.screen.fill(gui.get_colour(players[i]))
+            time.sleep(4)
         highestRoll = max(rolls.values())
         highestPlayer = [k for k, v in rolls.items() if v == highestRoll]
-        return highestPlayer
+        if len(highestPlayer) == 1:
+            return highestPlayer[0]
+        else:
+            self.dice_roll_winner(highestPlayer)
 
-    def game_set_up(self,startingPlayer):
-        self.turnIndex = self.players.index(startingPlayer)
+    def game_set_up(self):
+        self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
         for i in range (len(self.players)):
             node1 = input('node')
             self.create_settlement(node1)
@@ -126,12 +135,12 @@ class Game:
             #give starting resources 
             self.give_starting_resources(node1)
     
-    def start_game(self,startingPlayer):
+    def start_game(self):
         self.make_tiles()
         self.make_harbours()
         self.make_players()
-        self.game_set_up(startingPlayer)
         self.set_development_cards()
+        self.game_set_up()
 
     def get_producing_tiles(self):
         diceRoll = self.roll_dice()
@@ -372,6 +381,12 @@ class Game:
                 winningPlayer = player
         return (winningPlayer, 'won with', winningVP, 'points')
 
+    # taking inputs from the gui
+    running = True
+    while running:
+        command = gui.command()
+
+game1 = Game()
 def make_list():
     newList = []
     input = ('int')
