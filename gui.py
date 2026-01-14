@@ -191,8 +191,7 @@ def update_longest_road(player):
     pygame.draw.rect(screen, get_colour(colour), (34,510,149,30))
     pygame.display.update(34,510,149,30)
 
-def update_largest_army(player):
-    colour = players[player]
+def update_largest_army(colour):
     pygame.draw.rect(screen, get_colour(colour), (34,580,149,30))
     pygame.display.update(34,580,149,30)
 
@@ -339,8 +338,7 @@ def rules_screen():
 
     pygame.display.flip()
  
-def game_end_screen(turnIndex,playerColours=PLAYER_COLOURS):
-    colour = playerColours[turnIndex]
+def game_end_screen(colour):
     screen.fill((get_colour(colour)))
     screen.blit((SMALLFONT.render('GAME END' , True , (0,0,0))), (620,550))
     pygame.draw.rect(screen, (255,0,0), (1183, 992, 183, 75))
@@ -375,8 +373,9 @@ def trade_screen():
     pygame.display.flip()
 
 def askOtherPlayersForTrade(playerTurn, players, playerToAsk):
-    if playerToAsk != playerTurn:
-        player = players[playerToAsk]
+    #if playerToAsk != playerTurn:
+        #player = players[playerToAsk]
+        player = playerTurn
         pygame.draw.rect(screen, get_colour(player), (427,360,546,480))
         pygame.draw.rect(screen, (0,255,0), (460,393,223.5,414))
         pygame.draw.rect(screen, (255,0,0), (716.5,393,223.5,414))
@@ -390,6 +389,15 @@ def reDrawTradeOfferYou(tradeOffer, others=bool):
             pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),(252+(others*621)), 75,75))
             screen.blit((SMALLFONT.render(str(tradeOffer.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),(280+(others*621))))
     pygame.display.flip()
+
+def select_player_to_trade_with(playersToChooseFrom:list):
+    pygame.draw.rect(screen, get_colour('water'), (427,360,546,480))
+    screen.blit((SMALLFONT.render('select player to trade with:' , True , (0,0,0))), (470,400))
+    i = 0 
+    for player in playersToChooseFrom:
+        pygame.draw.rect(screen, get_colour(player), (620, (430+i*108), 183, 75))
+        i +=1
+    pygame.display.update(427,360,546,480)
 
 def update_year_of_plenty(resources:list):
     if len(resources) <= 2:
@@ -457,7 +465,7 @@ def development_screen():
     screen.blit((SMALLFONT.render('back to game' , True , (0,0,0))), (1233,25))
     pygame.display.flip()
 
-def select_knight_placement_screen(): # create buttons for this
+def select_robber_placement_screen(): # create buttons for this
     screen.fill((get_colour('water')))
     pygame.draw.rect(screen, (204, 173, 96), (0,0, 250, 1200))
     pygame.draw.rect(screen, (204, 173, 96), (1150,0, 250, 1200))
@@ -656,8 +664,8 @@ def command(currentScreen):
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         message = 'load game screen'
                 
-                elif currentScreen == 'knight':
-                    #hex number selected for knight placement
+                elif currentScreen == 'robber':
+                    #hex number selected for robber placement
                     if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
                         message = 0
                     elif 700-35 <= x <= 700+35 and 870-35 <= y <= 870+35:
@@ -705,6 +713,118 @@ def command(currentScreen):
                         message = 'player index 2'
                     elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
                         message = 'player index 3'
+
+                elif currentScreen == 'place starting resources':
+                    # hex node buttons:
+                        if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
+                            message = (619.94 , 285)
+                        elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
+                            message = (619.94 , 375) 
+                        elif  532 <= x <= 552 and 410 <= y <= 430 :
+                            message = (542 , 420)
+                        elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
+                            message = (464.06 , 375 )
+                        elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
+                            message = (464.06 , 285)
+                        elif  532 <= x <= 552 and 230 <= y <= 250 :
+                            message = (542 , 240 )
+                        elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
+                            message = (777.94 , 285 )
+                        elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
+                            message = (777.94 , 375)
+                        elif  690 <= x <= 710 and 410 <= y <= 430 :
+                            message = ( 700 , 420) 
+                        elif  690 <= x <= 710 and 230 <= y <= 250 :
+                            message = (700 , 240)
+                        elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
+                            message = (935.94 , 285 )
+                        elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
+                            message = (935.94 , 375)
+                        elif  848 <= x <= 868 and 410 <= y <= 430 :
+                            message = (858 , 420) 
+                        elif  848 <= x <= 868 and 230 <= y <= 250 :
+                            message = (858 , 240)
+                        elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
+                            message = (541.94 , 510) 
+                        elif  454 <= x <= 474 and 545 <= y <= 565 :
+                            message = (464 , 555)
+                        elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
+                            message = (386.06 , 510)
+                        elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
+                            message = (386.06 , 420)
+                        elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
+                            message = (699.94 , 510)
+                        elif  612 <= x <= 632 and 545 <= y <= 565 :
+                            message = (622 , 555)
+                        elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
+                            message = (857.94 , 510)
+                        elif  770 <= x <= 790 and 545 <= y <= 565 :
+                            message = (780 , 555)
+                        elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
+                            message = (1015.94 , 420)
+                        elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
+                            message = (1015.94 , 510)
+                        elif  928 <= x <= 948 and 545 <= y <= 565 :
+                            message = (938 , 555)
+                        elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
+                            message = (462.94 , 645)
+                        elif  375 <= x <= 395 and 680 <= y <= 700 :
+                            message = (385 , 690) 
+                        elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
+                            message = (307.06 , 645) 
+                        elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
+                            message = (307.06 , 555) 
+                        elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
+                            message = (620.94 , 645) 
+                        elif  533 <= x <= 553 and 680 <= y <= 700 :
+                            message = (543 , 690) 
+                        elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
+                            message = (778.94 , 645) 
+                        elif  691 <= x <= 711 and 680 <= y <= 700 :
+                            message = (701 , 690) 
+                        elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
+                            message = (936.94 , 645) 
+                        elif  849 <= x <= 869 and 680 <= y <= 700 :
+                            message = (859 , 690) 
+                        elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
+                            message = (1094.94 , 555) 
+                        elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
+                            message = (1094.94 , 645 )
+                        elif  1007 <= x <= 1027 and 680 <= y <= 700 :
+                            message = (1017 , 690) 
+                        elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
+                            message = (541.94 , 780) 
+                        elif  454 <= x <= 474 and 815 <= y <= 835 :
+                            message = (464 , 825) 
+                        elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
+                            message = (386.06 , 780) 
+                        elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
+                            message = (699.94 , 780) 
+                        elif  612 <= x <= 632 and 815 <= y <= 835 :
+                            message = (622 , 825 )
+                        elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
+                            message = (857.94 , 780) 
+                        elif  770 <= x <= 790 and 815 <= y <= 835 :
+                            message = (780 , 825) 
+                        elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
+                            message = (1015.94 , 780) 
+                        elif  928 <= x <= 948 and 815 <= y <= 835 :
+                            message = (938 , 825) 
+                        elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
+                            message = (619.94 , 915)
+                        elif  532 <= x <= 552 and 950 <= y <= 970 :
+                            message = (542 , 960)
+                        elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
+                            message = (464.06 , 915)
+                        elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
+                            message = (777.94 , 915)
+                        elif  690 <= x <= 710 and 950 <= y <= 970 :
+                            message = (700 , 960)
+                        elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
+                            message = (935.94 , 915)
+                        elif  848 <= x <= 868 and 950 <= y <= 970 :
+                            message = (858 , 960)
+
 
                 elif currentScreen == 'game':
                         if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
@@ -840,5 +960,15 @@ while running:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse = pygame.mouse.get_pos()
+                x = mouse[0]
+                y = mouse[1]
+                if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+                        pygame.quit()
+                        sys.exit()
     
-    rules_screen()
+    screen.fill(get_colour('none'))
+    game_end_screen('blue')
+    pygame.display.flip()

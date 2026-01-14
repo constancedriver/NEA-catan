@@ -1,6 +1,6 @@
-from pieces import *
+import pieces
 class PlayerHand:
-    def __init__(self, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development=[], knightsPlayed:int=0, roads=[], outposts=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False):
+    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources:list=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development:list=[], knightsPlayed:int=0, roads:list=[], outposts:list=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False):
         self.VP = VP
         self.roadsLeft = roadsLeft
         self.settlementsLeft = settlementsLeft
@@ -13,6 +13,7 @@ class PlayerHand:
         self.hasLargestArmy = hasLargestArmy
         self.hasLongestRoad = hasLongestRoad
         self.isBot = isBot
+        self.colour = colour
 
     def sufficient_resources(self,resourcesNeeded):
         sufficient = True
@@ -43,9 +44,11 @@ class PlayerHand:
             self.resources.remove('hay')
             self.resources.remove('sheep')
             self.resources.remove('brick')
-            self.resouces.append(node = Outpost(self,node))
+            settlement = pieces.Outpost(self,node)
+            self.outposts.append(settlement)
             self.VP += 1
             self.settlementsLeft -=1
+            return settlement
      
     def build_city(self,node):
         if self.citiesLeft>0:
@@ -61,8 +64,10 @@ class PlayerHand:
         if self.roadsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('brick')
-            self.roads.append(Road(self,nodes)) 
+            road = pieces.Road(self,nodes)
+            self.roads.append(road) 
             self.roadsLeft -= 1
+            return road
      
     def buy_development_card(self, developmentCard):
         self.resources.remove('sheep')
