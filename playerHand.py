@@ -1,4 +1,6 @@
 import pieces
+import gui
+
 class PlayerHand:
     def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources:list=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development:list=[], knightsPlayed:int=0, roads:list=[], outposts:list=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False):
         self.VP = VP

@@ -141,44 +141,49 @@ def create_hex_node_buttons():
         pygame.draw.circle(screen, (0,0,0), node, 10, 2)
     pygame.display.flip()
 
-def draw_player_banners(players=PLAYER_COLOURS):
-    pygame.draw.rect(screen, get_colour(players[0]), (1183, 20, 183, 193))
-    pygame.draw.rect(screen, get_colour(players[1]), (1183, 233, 183, 193))
-    pygame.draw.rect(screen, get_colour(players[2]), (1183, 446, 183, 193))
-    pygame.draw.rect(screen, get_colour(players[3]), (1183, 659, 183, 193))
-    for i in range (0,4,1):
-        screen.blit((SMALLFONT.render(('VPs:') , True , (0,0,0))), (1188,30+(i*213)))
-        screen.blit((SMALLFONT.render(('resources:') , True , (0,0,0))), (1188,70+(i*213)))
-        screen.blit((SMALLFONT.render(('devs:') , True , (0,0,0))), (1188,110+(i*213)))
-        screen.blit((SMALLFONT.render(('knights:') , True , (0,0,0))), (1188,150+(i*213)))
+def draw_player_banners(players:list):
+    turnIndex = 0
+    for player in players:
+        pygame.draw.rect(screen, get_colour(player.colour), (1183, 20+213*turnIndex, 183, 193))
+        screen.blit((SMALLFONT.render(('VPs:') , True , (0,0,0))), (1188,30+(turnIndex*213)))
+        screen.blit((SMALLFONT.render(('resources:') , True , (0,0,0))), (1188,70+(turnIndex*213)))
+        screen.blit((SMALLFONT.render(('devs:') , True , (0,0,0))), (1188,110+(turnIndex*213)))
+        screen.blit((SMALLFONT.render(('knights:') , True , (0,0,0))), (1188,150+(turnIndex*213)))
+        update_vp(player, turnIndex)
+        update_devs(player, turnIndex)
+        update_knights(player, turnIndex)
+        turnIndex += 1
+    update_banner_resources(players)
     pygame.display.update(1183, 20, 183, 1150)
 
-def update_banner_resources(listOfPlayerResources:list, players=PLAYER_COLOURS):
-    for i in range(0,4,1):
-        pygame.draw.rect(screen, get_colour(players[i]), (1315,70+(i*213), 50, 20))
-        screen.blit((SMALLFONT.render(str(len(listOfPlayerResources[i])) , True , (0,0,0))), (1318,70+(i*213)))
+def update_banner_resources(players:list):
+    i = 0
+    for player in players:
+        pygame.draw.rect(screen, get_colour(player.colour), (1315,70+(i*213), 50, 20))
+        screen.blit((SMALLFONT.render(str(len(player.resources)) , True , (0,0,0))), (1318,70+(i*213)))
+        i += 1
     pygame.display.update(1315, 20, 50, 1150)
 
-def update_vp(turnIndex, vp, players=PLAYER_COLOURS):
-    pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,30+(turnIndex*213), 50, 20))
-    screen.blit((SMALLFONT.render(str(vp) , True , (0,0,0))), (1318,30+(turnIndex*213)))
+def update_vp(player, turnIndex):
+    pygame.draw.rect(screen, get_colour(player.colour), (1315,30+(turnIndex*213), 50, 20))
+    screen.blit((SMALLFONT.render(str(player.VP) , True , (0,0,0))), (1318,30+(turnIndex*213)))
     pygame.display.update(1315, 30+(turnIndex*213), 50, 20)
 
-def update_devs(turnIndex, devs, players=PLAYER_COLOURS):
-    pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,110+(turnIndex*213), 50, 20))
-    screen.blit((SMALLFONT.render(str(devs) , True , (0,0,0))), (1318,110+(turnIndex*213)))
+def update_devs(player, turnIndex):
+    pygame.draw.rect(screen, get_colour(player.colour), (1315,110+(turnIndex*213), 50, 20))
+    screen.blit((SMALLFONT.render(str(player.development) , True , (0,0,0))), (1318,110+(turnIndex*213)))
     pygame.display.update(1315, 110+(turnIndex*213), 50, 20)
 
-def update_knights(turnIndex, knights, players=PLAYER_COLOURS):
-    pygame.draw.rect(screen, get_colour(players[turnIndex]), (1315,150+(turnIndex*213), 50, 20))
-    screen.blit((SMALLFONT.render(str(knights) , True , (0,0,0))), (1318,150+(turnIndex*213)))
+def update_knights(player, turnIndex):
+    pygame.draw.rect(screen, get_colour(player.colour), (1315,150+(turnIndex*213), 50, 20))
+    screen.blit((SMALLFONT.render(str(player.knightsPlayed) , True , (0,0,0))), (1318,150+(turnIndex*213)))
     pygame.display.update(1315, 150+(turnIndex*213), 50, 20)
 
 def move_robber(hex):
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
-    for hex_center, colour in board:
-        draw_center_circle(screen, hex_center, CIRCLE_RADIUS)
+    for hex_center in board:
+        pygame.draw.circle(screen, (204, 173, 96), hex_center, 35)
         screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
         i += 1
     hex_bottom_coord = convert_coordinates(hex)
@@ -186,19 +191,17 @@ def move_robber(hex):
     pygame.draw.rect(screen, (100,100,100), (hex_bottom_coord[0]-10, hex_bottom_coord[1]-95,20,30))
     pygame.display.flip()       
 
-def update_longest_road(player):
-    colour = players[player]
-    pygame.draw.rect(screen, get_colour(colour), (34,510,149,30))
+def update_longest_road(player:str):
+    pygame.draw.rect(screen, get_colour(player), (34,510,149,30))
     pygame.display.update(34,510,149,30)
 
 def update_largest_army(colour):
     pygame.draw.rect(screen, get_colour(colour), (34,580,149,30))
     pygame.display.update(34,580,149,30)
 
-def new_turn(turnIndex, playerInfo): 
-    colour = PLAYER_COLOURS[turnIndex]
-    resources = playerInfo.resources
-    resources = []
+def new_turn(player): 
+    colour = player.colour
+    resources = player.resources
     pygame.draw.rect(screen, get_colour(colour), (283,1000, 834, 100))
     pygame.draw.rect(screen, get_colour(colour), (283,0, 834, 200))
     pygame.draw.rect(screen, get_colour('wood'), (316,20,127.2,50))
@@ -211,12 +214,13 @@ def new_turn(turnIndex, playerInfo):
     screen.blit((SMALLFONT.render(str(resources.count('sheep')) , True , (0,0,0))), (693,30))
     screen.blit((SMALLFONT.render(str(resources.count('hay')) , True , (0,0,0))), (854,30))
     screen.blit((SMALLFONT.render(str(resources.count('ore')) , True , (0,0,0))), (1014,30))
-    screen.blit((SMALLFONT.render(('roads left:'+str(playerInfo.roadsLeft)) , True , (0,0,0))), (316,130))
-    screen.blit((SMALLFONT.render(('settlements left:'+str(playerInfo.settlementsLeft)) , True , (0,0,0))), (716,130))
-    screen.blit((SMALLFONT.render(('cities left:'+str(playerInfo.citiesLeft)) , True , (0,0,0))), (316,160))
-    screen.blit((SMALLFONT.render(('knights played:'+str(playerInfo.knightsPlayed)) , True , (0,0,0))), (716,160))
+    screen.blit((SMALLFONT.render(('roads left:'+str(player.roadsLeft)) , True , (0,0,0))), (316,130))
+    screen.blit((SMALLFONT.render(('settlements left:'+str(player.settlementsLeft)) , True , (0,0,0))), (716,130))
+    screen.blit((SMALLFONT.render(('cities left:'+str(player.citiesLeft)) , True , (0,0,0))), (316,160))
+    screen.blit((SMALLFONT.render(('knights played:'+str(player.knightsPlayed)) , True , (0,0,0))), (716,160))
     i = 1
-    for card in playerInfo.development:
+    screen.blit((SMALLFONT.render(('dev:') , True , (0,0,0))), (316,80))
+    for card in player.development: # write out each unplayed development card
         screen.blit((SMALLFONT.render((card) , True , (0,0,0))), (316+100*i,80))
         i+=1
     pygame.display.update(283,1000, 834, 100)
@@ -227,9 +231,8 @@ def node_pressed(node):
     pygame.display.update( 848 , 950 , 868 , 970 )
 
 def draw_road(road):
-    locations = road[0]
-    colour = road[1]
-    pygame.draw.lines(screen, get_colour(colour), False, (convert_coordinates(locations[0]),convert_coordinates(locations[1])), 10)
+    locations = road.location
+    pygame.draw.lines(screen, get_colour(road.colour), False, (convert_coordinates(locations[0]),convert_coordinates(locations[1])), 10)
     create_hex_node_buttons()
     pygame.display.flip()
 
@@ -254,8 +257,8 @@ def draw_city(city):
 
 def draw_harbours(harbours:list):
     for harbour in harbours:
-        colour = get_colour(harbour[1])
-        node = convert_coordinates(harbour[0])
+        colour = get_colour(harbour.type)
+        node = convert_coordinates(harbour.position)
         pygame.draw.circle(screen, colour, node, 25)
 
 def draw_building_key():
@@ -284,11 +287,11 @@ def draw_building_key():
     screen.blit((SMALLFONT.render('unless it is a VP' , True , (0,0,0))), (10,420))
     pygame.display.update(0,0,250,460)
 
-def create_game_screen():
+def create_game_screen(resourceTypes):
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center, colour in board:
-        draw_hex(screen, colour, hex_center)
+        draw_hex(screen, get_colour(resourceTypes[i]), hex_center)
         pygame.draw.circle(screen, (204, 173, 96), hex_center, 35)
         screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
         i += 1
@@ -345,6 +348,34 @@ def game_end_screen(colour):
     screen.blit((SMALLFONT.render('quit' , True , (0,0,0))), (1249,1017))
     pygame.display.flip()
 
+def redraw_discard_cards(discardCards):
+    resourceOrder = ['wood', 'brick', 'sheep', 'hay', 'ore']
+    for i in range (0,5,1):
+            pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),252, 75,75))
+            screen.blit((SMALLFONT.render(str(discardCards.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),(280+(others*621))))
+    pygame.display.flip()
+
+def discard_cards_screen(player):
+    screen.fill(get_colour('none'))
+    pygame.draw.rect(screen, (get_colour(player)), (0, 0, 1400, 225))
+    pygame.draw.rect(screen, (get_colour(player)), (0, 900, 1400, 300))
+    pygame.draw.rect(screen, (0,255,0), (0, 0, 230, 75))
+    screen.blit((SMALLFONT.render('selected resources' , True , (0,0,0))), (6,25))
+    screen.blit((SMALLFONT.render('DISCARD CARD MENU' , True , (0,0,0))), (550,25))
+    #creating cards
+    pygame.draw.rect(screen, (get_colour('wood')), (34, 360, 240, 480))
+    pygame.draw.rect(screen, (get_colour('brick')), (307, 360, 240, 480))
+    pygame.draw.rect(screen, (get_colour('sheep')), (580, 360, 240, 480))
+    pygame.draw.rect(screen, (get_colour('hay')), (853, 360, 240, 480))
+    pygame.draw.rect(screen, (get_colour('ore')), (1126, 360, 240, 480))
+    # creating arrows
+    screen.blit((SMALLFONT.render('select a number of resources equal to half the number you have (rounding down)' , True , (0,0,0))), (250,1000))
+    for i in range (0,5,1):
+        screen.blit((SMALLFONT.render('0' , True , (0,0,0))), ((149+(i*273)),(280)))
+        pygame.draw.polygon(screen, (0,0,0), (((116.5+(i*273)),(327)),((116.5+(i*273)),(252)),((41+(i*273)),(289.5)))) # down
+        pygame.draw.polygon(screen, (0,0,0), (((195+(i*273)),(327)),((195+(i*273)),(252)),((267+(i*273)),(289.5)))) # up
+    pygame.display.flip()
+
 def trade_screen():
     screen.fill((get_colour('none')))
     pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
@@ -372,7 +403,7 @@ def trade_screen():
             pygame.draw.polygon(screen, (0,0,0), (((195+(i*273)),(327+(j*621))),((195+(i*273)),(252+(j*621))),((267+(i*273)),(289.5+(j*621))))) # up
     pygame.display.flip()
 
-def askOtherPlayersForTrade(playerTurn, players, playerToAsk):
+def ask_others_for_trade(playerTurn, players, playerToAsk):
     #if playerToAsk != playerTurn:
         #player = players[playerToAsk]
         player = playerTurn
@@ -383,7 +414,7 @@ def askOtherPlayersForTrade(playerTurn, players, playerToAsk):
         screen.blit((SMALLFONT.render('decline trade' , True , (0,0,0))), (726.5,400))
         pygame.display.update(427,360,546,480)
             
-def reDrawTradeOfferYou(tradeOffer, others=bool):
+def redraw_trade_offer_you(tradeOffer, others=bool):
     resourceOrder = ['wood', 'brick', 'sheep', 'hay', 'ore']
     for i in range (0,5,1):
             pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),(252+(others*621)), 75,75))
@@ -466,7 +497,6 @@ def development_screen():
     pygame.display.flip()
 
 def select_robber_placement_screen(): # create buttons for this
-    screen.fill((get_colour('water')))
     pygame.draw.rect(screen, (204, 173, 96), (0,0, 250, 1200))
     pygame.draw.rect(screen, (204, 173, 96), (1150,0, 250, 1200))
     screen.blit((SMALLFONT.render('press the circle in' , True , (0,0,0))), (10,50))
@@ -475,8 +505,7 @@ def select_robber_placement_screen(): # create buttons for this
     screen.blit((SMALLFONT.render('place the knight on' , True , (0,0,0))), (10,140))
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
-    for hex_center, colour in board:
-        draw_hex(screen, colour, hex_center)
+    for hex_center in board:
         pygame.draw.circle(screen, (145, 105, 2), hex_center, 35)
         screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
         i += 1
@@ -492,6 +521,14 @@ def select_player_to_steal_resource_from(playerIndexs, players=PLAYER_COLOURS):
         pygame.draw.rect(screen, get_colour(players[index]), (1160, (170+i*108), 183, 75))
         i +=1
     pygame.display.update(1150,0, 250, 1200)
+
+def starting_screen():
+    screen.blit((SMALLFONT.render('first select where' , True , (0,0,0))), (10,50))
+    screen.blit((SMALLFONT.render('you want to place' , True , (0,0,0))), (10,80))
+    screen.blit((SMALLFONT.render('your settlement ' , True , (0,0,0))), (10,110))
+    screen.blit((SMALLFONT.render('then your road then' , True , (0,0,0))), (10,140))
+    screen.blit((SMALLFONT.render('press \'next turn\'' , True , (0,0,0))), (10,170))
+    pygame.display.update(0,0,250,200)
 
 def update_humans(humans:int):
     pygame.draw.rect(screen, get_colour('water'), (690,370,40,40))
@@ -557,6 +594,33 @@ def command(currentScreen):
                         message = 'remove human'
                     elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
                         message = 'remove bot'
+
+                #discard cards screen
+                elif currentScreen == 'discard':
+                    if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'complete trade'
+                        message = 'discard cards'
+                    #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
+                    #down arrown decrease the number of that resource by 1 
+                    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
+                        message = 'discard: remove wood'
+                    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
+                        message = 'discard: add wood'
+                    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
+                        message = 'discard: remove brick'
+                    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
+                        message = 'discard: add brick'
+                    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
+                        message = 'discard: remove sheep'
+                    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
+                        message = 'discard: add sheep'
+                    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
+                        message = 'discard: remove hay'
+                    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
+                        message = 'discard: add hay'
+                    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
+                        message = 'discard: remove ore'
+                    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
+                        message = 'discard: add ore'
 
                 #trade screen 
                 elif currentScreen == 'ask player about trade':
@@ -706,13 +770,13 @@ def command(currentScreen):
                         message = 18
                     # choosing player to steal from
                     elif 1160 <= x <= 1160+183 and 170 <= y <=170+75:
-                        message = 'player index 0'
+                        message = 'steal from player index 0'
                     elif 1160 <= x <= 1160+183 and 278 <= y <=278+75:
-                        message = 'player index 1'
+                        message = 'steal from player index 1'
                     elif 1160 <= x <= 1160+183 and 386 <= y <=386+75:
-                        message = 'player index 2'
+                        message = 'steal from player index 2'
                     elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
-                        message = 'player index 3'
+                        message = 'steal from player index 3'
 
                 elif currentScreen == 'place starting resources':
                     # hex node buttons:
@@ -969,6 +1033,5 @@ while running:
                         pygame.quit()
                         sys.exit()
     
-    screen.fill(get_colour('none'))
-    game_end_screen('blue')
+    discard_cards_screen('blue')
     pygame.display.flip()

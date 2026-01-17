@@ -1,10 +1,10 @@
 import random
 class Tile:
-    def __init__ (self, resource:str, resourceNumber:int, nodes, isRobberOn:bool=False):
+    def __init__ (self, resource:str, resourceNumber:int, nodes, robberIsOn:bool=False):
         self.resource = resource
         self.resourceNumber = resourceNumber
         self.nodes = nodes
-        self.isRobberOn = isRobberOn
+        self.robberIsOn = robberIsOn
 
     def getNodes(self):
         for node in self.nodes:

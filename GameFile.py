@@ -7,7 +7,7 @@ import gameState
 import gui
 
 class Game:
-    def __init__(self, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[]):
+    def __init__(self, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[], state=gameState.GameState(), askToTrade:list=[], acceptedTrade:list=[]):
         self.tiles = tiles
         self.harbours = harbours
         self.players = players
@@ -17,6 +17,9 @@ class Game:
         self.largestArmy = largestArmy
         self.turnIndex = turnIndex
         self.developmentCards = developmentCards
+        self.state = state
+        self.askToTrade = askToTrade
+        self.acceptedTrade = acceptedTrade
 
     def make_tiles(self):
         terrains = ['ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep', 'hay', 'hay', 'hay', 'hay', 'wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick']
@@ -51,6 +54,7 @@ class Game:
         self.players.append(orange)
 
     def next_turn(self):
+        self.game_end()
         self.turnIndex += 1
         if self.turnIndex > 3:
             self.turnIndex = 0 
@@ -82,7 +86,7 @@ class Game:
         else:
             return False
 
-    def find_tiles_at_node(self, node):
+    def find_tiles_at_node(self, node:tuple):
         tilesAdjacent = []
         for tile in self.tiles:
             if node in tile.nodes:
@@ -95,7 +99,7 @@ class Game:
                 playersOnTile.append(outpost.colour)
         return playersOnTile
     
-    def adjacent_to_settlement(self,node):
+    def adjacent_to_settlement(self,node:tuple):
         adjacentToSettlement = False
         #makes sure at least 2 edges (one node) away from another settlement
         for outpost in self.outposts:
@@ -103,14 +107,21 @@ class Game:
                 adjacentToSettlement = True
         return adjacentToSettlement
     
-    def node_empty(self,node):
+    def node_empty(self,node:tuple):
         nodeEmpty = True
         for outpost in self.outposts:
             if outpost.location == node:
                 nodeEmpty = False
         return nodeEmpty
     
-    def give_starting_resources(self,node):
+    def edge_empty(self,nodes:list):
+        edgeEmpty = True 
+        for road in self.roads:
+            if road.nodes == nodes:
+                edgeEmpty = False
+        return edgeEmpty
+    
+    def give_starting_resources(self,node:tuple):
         player = self.players[self.turnIndex]
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.resource)
@@ -131,10 +142,10 @@ class Game:
 
     def game_set_up(self):
         self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
-        gameState.state.currentScreen = 'place starting resources'
+        self.state.currentScreen = 'place starting resources'
         self.load_starting_screen()
 
-    def place_starting_settlement(self,node):
+    def place_starting_settlement(self,node:tuple):
         legal = False
         if len(self.outposts) == len(self.roads): # for game set up outposts must be played before roads
             legal = True
@@ -147,7 +158,7 @@ class Game:
             # get starting resources for the second settlement you place
             self.give_starting_resources(node)
         
-    def place_starting_road(self, nodes):
+    def place_starting_road(self, nodes:list):
         legal = False
         if self.edge_empty(nodes):
             for node in nodes: # road must be attached to settlement 
@@ -165,7 +176,7 @@ class Game:
             elif len(self.roads) > 5: 
                 self.previous_turn()
             elif len(self.roads) >= 8:
-                gameState.state.currentScreen = 'game'
+                self.state.currentScreen = 'game'
                 self.load_game_screen()
     
     def start_game(self):
@@ -174,7 +185,6 @@ class Game:
         self.make_players()
         self.set_development_cards()
         self.game_set_up()
-        state = gameState.GameState()
 
     def get_producing_tiles(self):
         diceTotal = self.roll_dice()
@@ -201,15 +211,308 @@ class Game:
                                 if outpost.isCity:
                                     player.resources.append(tile.resource)
             
-    def create_settlement(self,node):
+    def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
         if self.players[self.turnIndex].connected_to_road(node) and not(self.players[self.turnIndex].adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
+            gui.update_vp(self.players[self.turnIndex], self.turnIndex)
 
-    def create_city(self,node):
+    def create_city(self,node:tuple):
         #cities are upgraded settlements 
         #cities cost: 'ore', 'ore', 'ore', 'hay', 'hay'
         if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
             self.players[self.turnIndex].build_city(node)
+            gui.update_vp(self.players[self.turnIndex], self.turnIndex)
+        
+    def create_outpost(self,node:tuple):
+        if self.node_empty(node):
+            self.create_settlement(node)
+        else:
+            self.create_city(node)
+
+    def create_road(self,nodes:list):
+        if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']) and (self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1])):
+            self.roads.append(self.players[self.turnIndex].build_road(nodes))
+#        self.check_longest_road(self)
+
+    def create_development_card(self):
+        # developmet cards give you a random card from the pile 
+        # cost: 'sheep', 'ore', 'hay'
+        if self.players[self.turnIndex].sufficent_resources(['sheep', 'ore', 'hay']):
+            self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
+
+    def sufficent_resources(self,player,resourcesNeeded:list):
+        sufficent = True
+        resources = ['wood', 'brick', 'sheep', 'hay', 'ore']
+        for resource in resources:
+            if player.resources.count(resource) < resourcesNeeded.count(resource):
+                sufficent = False
+        return sufficent
+
+    def discard_cards(self, chosenCards:list):
+        player = self.robber_turn()
+        # must discard no. resources DIV 2
+        if len(chosenCards) == (len(player.resources)//2) and self.sufficent_resources(player, chosenCards):
+            for resource in chosenCards:
+                player.resources.remove(resource)
+        self.state.discardCards = []
+        self.robber_turn()
+
+    def robber_turn(self):
+        needToDiscard = []
+        for player in self.players:
+            #must discard cards if have 7 or more cards
+            if len(player.resources) > 6:
+                needToDiscard.append(player)
+        if len(needToDiscard) == 0:
+            gui.select_robber_placement_screen()
+            self.state.currentScreen = 'robber'
+        else:
+            self.state.currentScreen = 'discard'
+            gui.discard_cards_screen(player)
+            return needToDiscard[0]
+
+    def move_robber(self, tileNum:int):
+        tile = self.tiles[tileNum]
+        if tile.robberIsOn() == False:
+            #the robber cannot be placed on the same tile it was just on
+            for resourceTile in self.tiles:
+                if resourceTile.robberIsOn == True:
+                    resourceTile.robberIsOn = False
+            tile.robberIsOn = True
+            gui.move_robber(tileNum)
+            self.choose_player_to_steal_from()
+
+    def players_on_robber_tile(self):
+        playersOnRobberTile = []
+        for tile in self.tiles:
+            if tile.robberIsOn == True:
+                playersOnRobberTile.append(self.find_players_on_tile(tile))
+        return playersOnRobberTile
+    
+    def choose_player_to_steal_from(self):
+        self.state.currentScreen = 'robber'
+        gui.select_player_to_steal_resource_from(self.players_on_robber_tile())
+
+    def steal_card(self, chosenPlayerNum:int):
+        possiblePlayers = self.players_on_robber_tile()
+        chosenPlayer = possiblePlayers[chosenPlayerNum]
+        self.players[self.turnIndex].resources.append(chosenPlayer.resources.pop(random.randint(0,len(chosenPlayer.resources))))
+        self.state.currentScreen = 'game'
+        self.load_game_screen()
+
+    def steal_largest_army(self):
+        for player in self.players:
+            if player.hasLargestArmy == True:
+                player.hasLargestArmy = False
+                player.VP -= 2
+        self.players[self.turnIndex].hasLargestArmy = True
+        self.players[self.turnIndex].VP += 2
+        self.largestArmy = self.players[self.turnIndex].knightsPlayed
+        gui.update_vp(self.players[self.turnIndex], self.turnIndex)
+        gui.update_largest_army(self.players[self.turnIndex].colour)
+    
+    def play_knight(self,tile):
+        if 'knight' in self.players[self.turnIndex].developments:
+            self.move_robber(tile)
+            self.steal_card()
+            self.players[self.turnIndex].use_knight()
+            if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
+                self.steal_largest_army()
+            self.load_board()
+            gui.select_robber_placement_screen()
+            self.draw_robber()
+            self.state.currentScreen = 'robber'
+    
+    def play_monopoly(self,resourceType:str):
+        if 'monopoly' in self.players[self.turnIndex].developments:
+            resourceTypeCount = 0
+            for player in self.players:
+                resourceTypeCount += player.resources.count(resourceType)
+                # removes all instances of the resourceType from the resources list
+                player.resources = list(filter(lambda a: a != resourceType, player.resources))
+            for i in range(resourceTypeCount):
+                self.players[self.turnIndex].resources.append(resourceType)
+            self.players[self.turnIndex].developments.remove('monopoly')
+            self.load_game_screen()
+        
+    def play_year_of_plenty(self, resourceType1, resourceType2):
+        if 'year of plenty' in self.players[self.turnIndex].developments:
+            self.players[self.turnIndex].resources.append(resourceType1)
+            self.players[self.turnIndex].resources.append(resourceType2)
+            self.players[self.turnIndex].developments.remove('year of plenty')
+            self.load_game_screen()
+
+    def play_road_building(self):
+        if 'road building' in self.players[self.turnIndex].developments:
+            for i in range(2):
+                self.players[self.turnIndex].resources.append('brick')
+                self.players[self.turnIndex].resources.append('wood')
+            self.players[self.turnIndex].developments.remove('road building')
+            self.load_game_screen()
+
+    def complete_trade(self, inputResources, outputResources):
+        playerTradeWith = self.choose_player_to_trade_with(inputResources)
+        for resourceIn in inputResources:
+            self.players[self.turnIndex].remove(resourceIn)
+            self.players[playerTradeWith].append(resourceIn)
+        for resourceOut in outputResources:
+            self.players[self.turnIndex].append(resourceOut)
+            self.players[playerTradeWith].remove(resourceOut)
+        self.state.tradeOfferTurn = []
+        self.state.tradeOfferOthers = []
+        self.load_game_screen()
+
+    def trade_with_bank(self,resourceInput, resourceOutput):
+        possibleResources = self.trade_with_harbour()
+        #having an outpost on a harbour reduces the number of required resources
+        if resourceInput in possibleResources:
+            numberRequired = 2 
+        elif 'any' in possibleResources:
+            numberRequired = 3
+        else: 
+            numberRequired = 4
+        if self.players[self.turnIndex].resources.count(resourceInput) >= numberRequired:
+            for i in range (numberRequired):
+                self.players[self.turnIndex].resources.remove(resourceInput)
+            self.players[self.turnIndex].resources.append(resourceOutput)
+            self.state.tradeOfferTurn = []
+            self.state.tradeOfferOthers = []
+            self.load_game_screen()
+    
+    def trade_with_harbour(self):
+        possibleResources = []
+        # in order to get the benifit of a harbour, you must have an outpost on it
+        for outpost in self.players[self.turnIndex].outposts:
+            for harbour in self.harbours:
+                if harbour.position == outpost.location:
+                    possibleResources.append(harbour.type)
+        return possibleResources
+
+#    def choose_player_to_trade_with(self, inputResources):
+#        choices = self.trade_with_players(inputResources)
+
+    def can_trade_with(self,inputResources, outputResources):
+        canTradeWith = []
+        if self.sufficent_resources(self.players[self.turnIndex], inputResources):
+            for player in self.players:
+                if self.sufficent_resources(player, outputResources) and player != self.players[self.turnIndex]:
+                    canTradeWith.append(player)
+        self.askToTrade = canTradeWith
+        self.trade_with_players()
+
+    def answered_trade(self,accepted:bool):
+        if accepted:
+            self.acceptedTrade.append(self.askToTrade.pop(0))
+        else:
+            del self.askToTrade[0]
+        self.trade_with_players()
+        
+    def trade_with_players(self):
+        if len(self.askToTrade) != 0:
+            gui.ask_others_for_trade(self.askToTrade[0].colour)
+        elif len(self.acceptedTrade) != 0:
+            gui.select_player_to_trade_with(self.acceptedTrade)
+                
+
+    def won(self):
+        hasWon = False
+        # can only win on your turn because that is the only time you can gain VP
+        player = self.players[self.turnIndex]
+        if (player.VP + player.developments.count('victory points')) >= 10:
+            hasWon = True
+        return hasWon
+
+    def game_end(self):
+        if self.won():
+            gui.game_end_screen(self.players[self.turnIndex].colour)
+            self.state.currentScreen = 'end'
+    
+    def draw_robber(self):
+        robberTile = 9
+        i = 0
+        for tile in self.tiles:
+            if tile.robberIsOn:
+                robberTile = i
+                i +=1
+        gui.move_robber(self.tiles[robberTile].getNodes()[0])
+
+    def load_board(self):
+        gui.screen.fill((gui.get_colour('water')))
+        gui.draw_harbours(self.harbours)
+        resourceTypes = []
+        for tile in self.tiles:
+            resourceTypes.append(tile.resource)
+        gui.create_game_screen(resourceTypes)
+        for road in self.roads:
+            gui.draw_road(road)
+        for outpost in self.outposts:
+            if outpost.isCity:
+                gui.draw_city(outpost)
+            else: 
+                gui.draw_settlement(outpost)
+        self.draw_robber()
+        
+    def load_game_screen(self):
+        self.load_board()
+        gui.draw_building_key()
+        if self.largestArmy >= 3:
+            for player in self.players:
+                if player.hasLargestArmy:
+                    gui.update_largest_army(player.colour)
+        if self.longestRoad >=5: 
+            for player in self.players:
+                if player.hasLongestRoad:
+                    gui.update_longest_road(player.colour)
+        gui.draw_player_banners(self.players)
+        gui.new_turn(self.players[self.turnIndex])
+        gui.pygame.display.flip()
+
+    def load_starting_screen(self):
+        self.load_board()
+        gui.starting_screen()
+
+    def convert_command(self,command):
+        action = {'roll dice'           : self.give_producing_resources(),
+                  'play'                : self.start_game(),
+                  'end turn'            : self.next_turn(),
+                  'load game screen'    : self.load_game_screen(),
+                  'play knight'         : self.play_knight(),
+                  'play road building'  : self.play_road_building(),
+                  'play monopoly wood'  : self.play_monopoly('wood'),
+                  'play monopoly brick' : self.play_monopoly('brick'),
+                  'play monopoly sheep' : self.play_monopoly('sheep'),
+                  'play monopoly hay'   : self.play_monopoly('hay'),
+                  'play monopoly ore'   : self.play_monopoly('ore'),
+                  'buy development'     : self.create_development_card(),
+                  'accepted'            : self.answered_trade(True),
+                  'declined'            : self.answered_trade(False),
+                  'steal from player index 0'      : self.steal_card(0),
+                  'steal from player index 1'      : self.steal_card(1),
+                  'steal from player index 2'      : self.steal_card(2),
+                  'steal from player index 3'      : self.steal_card(3)
+        }
+        return action[command]
+    
+    def carry_out_command(self):
+        command = self.state.get_command()
+        if type(command) == int:
+            self.move_robber(command)
+        elif type(command) == str:
+            self.carry_out_command(command)
+        else: # is a list
+            if command[0] == 'year of plenty':
+                self.play_year_of_plenty(command[1])
+            elif command[0] == 'discard cards':
+                self.discard_cards(command[1])
+            elif command[0] == 'trade with bank':
+                self.trade_with_bank(command[1], command[2])
+            elif command[0] == 'complete trade':
+                #self.ask_for_trade(command[1], command[2])
+                pass
+            elif len(command) == 2:
+                self.create_road(command)
+            else: 
+                self.create_outpost(command)
