@@ -16,6 +16,13 @@ class Harbour:
         self.position = position 
         self.type = type 
 
+class DevelopmentCards:
+    def __init__(self, type:str, canPlay:bool=False):
+        self.type = type
+        self.canPlay = canPlay
+    def able_to_play(self):
+        self.canPlay = True
+
 def get_node_from_harbour_num(n):
     a = {0:(0,0,0),
         1:(0,0,1),
@@ -37,6 +44,3 @@ def get_node_from_harbour_num(n):
         17:(0,1,-1)
         }
     return a[n]
-
-s1 = Outpost('white', (3,4,0))
-s2 = Outpost('red', (2,1,1), True)

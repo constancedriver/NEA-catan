@@ -34,13 +34,13 @@ class Game:
 
     def set_development_cards(self):
         for i in range (14):
-            self.developmentCards.append('knight')
+            self.developmentCards.append(pieces.DevelopmentCards('knight'))
         for i in range (5):
-            self.developmentCards.append('victory point')
+            self.developmentCards.append(pieces.DevelopmentCards('victory point', True))
         for i in range(2):
-            self.developmentCards.append('monopoly')
-            self.developmentCards.append('year of plenty')
-            self.developmentCards.append('road building')
+            self.developmentCards.append(pieces.DevelopmentCards('monopoly'))
+            self.developmentCards.append(pieces.DevelopmentCards('year of plenty'))
+            self.developmentCards.append(pieces.DevelopmentCards('road building'))
         random.shuffle(self.developmentCards)
 
     def make_players(self):
@@ -58,6 +58,8 @@ class Game:
         self.turnIndex += 1
         if self.turnIndex > 3:
             self.turnIndex = 0 
+        for card in self.players[self.turnIndex].development:
+            card.able_to_play()
         gui.new_turn(self.players[self.turnIndex])
 
     def previous_turn(self):
@@ -314,8 +316,16 @@ class Game:
         gui.update_vp(self.players[self.turnIndex], self.turnIndex)
         gui.update_largest_army(self.players[self.turnIndex].colour)
     
+    def check_able_to_use(self, typeWanted:str):
+        ableToUse = False
+        if typeWanted in self.players[self.turnIndex].development:
+            for card in self.players[self.turnIndex].development:
+                if card.type == typeWanted and card.canPlay:
+                    ableToUse = True
+        return ableToUse
+    
     def play_knight(self,tile):
-        if 'knight' in self.players[self.turnIndex].developments:
+        if self.check_able_to_use('knight'):
             self.move_robber(tile)
             self.steal_card()
             self.players[self.turnIndex].use_knight()
@@ -327,43 +337,31 @@ class Game:
             self.state.currentScreen = 'robber'
     
     def play_monopoly(self,resourceType:str):
-        if 'monopoly' in self.players[self.turnIndex].developments:
+        if self.check_able_to_use('monopoly'):
             resourceTypeCount = 0
             for player in self.players:
                 resourceTypeCount += player.resources.count(resourceType)
                 # removes all instances of the resourceType from the resources list
                 player.resources = list(filter(lambda a: a != resourceType, player.resources))
-            for i in range(resourceTypeCount):
+            for i in range(0,resourceTypeCount,1):
                 self.players[self.turnIndex].resources.append(resourceType)
             self.players[self.turnIndex].developments.remove('monopoly')
             self.load_game_screen()
         
     def play_year_of_plenty(self, resourceType1, resourceType2):
-        if 'year of plenty' in self.players[self.turnIndex].developments:
+        if self.check_able_to_use('year of plenty'):
             self.players[self.turnIndex].resources.append(resourceType1)
             self.players[self.turnIndex].resources.append(resourceType2)
             self.players[self.turnIndex].developments.remove('year of plenty')
             self.load_game_screen()
 
     def play_road_building(self):
-        if 'road building' in self.players[self.turnIndex].developments:
+        if self.check_able_to_use('road building'):
             for i in range(2):
                 self.players[self.turnIndex].resources.append('brick')
                 self.players[self.turnIndex].resources.append('wood')
             self.players[self.turnIndex].developments.remove('road building')
             self.load_game_screen()
-
-    def complete_trade(self, inputResources, outputResources):
-        playerTradeWith = self.choose_player_to_trade_with(inputResources)
-        for resourceIn in inputResources:
-            self.players[self.turnIndex].remove(resourceIn)
-            self.players[playerTradeWith].append(resourceIn)
-        for resourceOut in outputResources:
-            self.players[self.turnIndex].append(resourceOut)
-            self.players[playerTradeWith].remove(resourceOut)
-        self.state.tradeOfferTurn = []
-        self.state.tradeOfferOthers = []
-        self.load_game_screen()
 
     def trade_with_bank(self,resourceInput, resourceOutput):
         possibleResources = self.trade_with_harbour()
@@ -378,8 +376,8 @@ class Game:
             for i in range (numberRequired):
                 self.players[self.turnIndex].resources.remove(resourceInput)
             self.players[self.turnIndex].resources.append(resourceOutput)
-            self.state.tradeOfferTurn = []
-            self.state.tradeOfferOthers = []
+            self.state.tradeOfferTurn.clear()
+            self.state.tradeOfferOthers.clear()
             self.load_game_screen()
     
     def trade_with_harbour(self):
@@ -391,14 +389,31 @@ class Game:
                     possibleResources.append(harbour.type)
         return possibleResources
 
-#    def choose_player_to_trade_with(self, inputResources):
-#        choices = self.trade_with_players(inputResources)
+    def complete_trade(self):
+        #give resources from player whos turn it is to other player
+        for resourceTurn in self.state.tradeOfferTurn:
+            self.players[self.turnIndex].resources.remove(resourceTurn)
+            self.acceptedTrade[0].resources.append(resourceTurn)
+        #give resources from other player to players whos turn it is
+        for resourceOther in self.state.tradeOfferOthers:
+            self.acceptedTrade[0].resources.remove(resourceOther)
+            self.players[self.turnIndex].resource.append(resourceOther)
+        self.state.tradeOfferOthers.clear()
+        self.state.tradeOfferTurn.clear()
+        self.acceptedTrade.clear()
+        self.load_game_screen()
 
-    def can_trade_with(self,inputResources, outputResources):
+    def choose_player_to_trade_with(self,index:int):
+        chosenPlayer = self.acceptedTrade(index)
+        self.acceptedTrade.clear()
+        self.acceptedTrade.append(chosenPlayer)
+        self.complete_trade()
+
+    def can_trade_with(self):
         canTradeWith = []
-        if self.sufficent_resources(self.players[self.turnIndex], inputResources):
+        if self.sufficent_resources(self.players[self.turnIndex], self.state.tradeOfferTurn):
             for player in self.players:
-                if self.sufficent_resources(player, outputResources) and player != self.players[self.turnIndex]:
+                if self.sufficent_resources(player, self.state.tradeOfferOthers) and player != self.players[self.turnIndex]:
                     canTradeWith.append(player)
         self.askToTrade = canTradeWith
         self.trade_with_players()
@@ -413,9 +428,11 @@ class Game:
     def trade_with_players(self):
         if len(self.askToTrade) != 0:
             gui.ask_others_for_trade(self.askToTrade[0].colour)
-        elif len(self.acceptedTrade) != 0:
+        elif len(self.acceptedTrade) == 1:
+            self.complete_trade()
+        elif len(self.acceptedTrade) > 1:
+            self.state.currentScreen = 'choose player to trade with'
             gui.select_player_to_trade_with(self.acceptedTrade)
-                
 
     def won(self):
         hasWon = False
@@ -489,10 +506,14 @@ class Game:
                   'buy development'     : self.create_development_card(),
                   'accepted'            : self.answered_trade(True),
                   'declined'            : self.answered_trade(False),
-                  'steal from player index 0'      : self.steal_card(0),
-                  'steal from player index 1'      : self.steal_card(1),
-                  'steal from player index 2'      : self.steal_card(2),
-                  'steal from player index 3'      : self.steal_card(3)
+                  'steal from player index 0': self.steal_card(0),
+                  'steal from player index 1': self.steal_card(1),
+                  'steal from player index 2': self.steal_card(2),
+                  'steal from player index 3': self.steal_card(3),
+                  'trade with player index 0': self.choose_player_to_trade_with(0),
+                  'trade with player index 1': self.choose_player_to_trade_with(1),
+                  'trade with player index 2': self.choose_player_to_trade_with(2),
+                  'trade with player index 3': self.choose_player_to_trade_with(3),
         }
         return action[command]
     
@@ -510,8 +531,7 @@ class Game:
             elif command[0] == 'trade with bank':
                 self.trade_with_bank(command[1], command[2])
             elif command[0] == 'complete trade':
-                #self.ask_for_trade(command[1], command[2])
-                pass
+                self.can_trade_with(command[1], command[2])
             elif len(command) == 2:
                 self.create_road(command)
             else: 

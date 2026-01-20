@@ -1,88 +1,54 @@
-def split_locations(roads):
-    components = []
-    for road in roads:
-        a, b = road
-        placed = False
-        for comp in components:
-            if any(a in r or b in r for r in comp):
-                comp.append(road)
-                placed = True
-                break
-        if not placed:
-            components.append([road])
-    return components
+import random 
+# Define the decision tree as a dictionary
+tree = {
+    'A': [],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F', 'G'],
+    'D': ['H', 'B'],
+    'E': ['B', 'I'],
+    'F': ['C', 'J', 'K'],
+    'G': ['C', 'L'],
+    'H': ['D'], 'I': ['E'], 'J': ['F','K'], 'K': ['J','F'],
+    'L': ['G','M'], 'M': ['L'], 
+    'N': ['O'], 'O': [], 'P': ['O']
+}
 
-def merge_components(roads):
-    components = split_locations(roads)
-    merged = True
-    while merged:
-        merged = False
-        for i in range(len(components)):
-            for j in range(i + 1, len(components)):
-                if any(a in r or b in r for r in components[i] for a, b in components[j]):
-                    components[i].extend(components[j])
-                    components.pop(j)
-                    merged = True
-                    break
-            if merged:
-                break
-    return components
+blocked = ['A', 'O']
 
-#Depth first search
-def dfs(node, used_roads, used_nodes, components, blocked_nodes):
-        max_len = 0
-        for i, (a, b) in enumerate(components):
-            if i in used_roads:
-                continue
-            if a == node or b == node:
-                next_node = b if a == node else a
-                if next_node in blocked_nodes or next_node in used_nodes:
-                    continue
-                used_roads.add(i)
-                used_nodes.add(next_node)
-                max_len = max(max_len, 1 + dfs(next_node, used_roads, used_nodes, components, blocked_nodes))
-                used_roads.remove(i)
-                used_nodes.remove(next_node)
-        return max_len
+def find_end_nodes( blocked):
+        endNodes = []
+        nodes = ['A', 'H', 'I', 'M', 'N', 'O', 'P']
+        for node in nodes:
+            if nodes.count(node) == 1 and node not in blocked:
+                endNodes.append(node)
+        return endNodes
 
-def find_longest(components, blocked_nodes):
-    longest = 0
-    for comp in components:
-    # Count degree of each intersection
-        degree = {}
-        for a, b in comp:
-            if a not in blocked_nodes:
-                degree[a] = degree.get(a, 0) + 1
-            if b not in blocked_nodes:
-                degree[b] = degree.get(b, 0) + 1
+def get_current_adjacent_nodes(node, roads):
+        adjacentNodes = []
+        for road in roads:
+            if road[0] == node:
+                adjacentNodes.append(road[1])
+            elif road[1] == node:
+                adjacentNodes.append(road[0])
+        return adjacentNodes
 
-        # Find endpoints (degree 1 nodes)
-        endpoints = [node for node, d in degree.items() if d == 1]
+def dfs_max_length_one_chain(tree:dict, node, visited:list=None, depth:int=0, maxDepth:int=0):
+    if not visited:
+        visited = []
+    visited.append(node) # mark node as visited
+    for child in tree[node]:  # recursively visit children
+        if child not in visited:
+            childDepth = dfs_max_length_one_chain(tree,child,visited.copy(), depth+1, max(maxDepth,depth+1))
+            # visited is a copy so that is doesnt change every instance of visited and effect the loop
+            maxDepth=max(maxDepth, childDepth)
+    return maxDepth
 
-        # Case 1: Pure loop (no endpoints, all degree 2)
-        if endpoints == [] and degree and all(d == 2 for d in degree.values()):
-            longest = max(longest, len(comp))
-            continue
+def dfs_max_length(tree, blocked=blocked):
+    longestPlayerRoad = 0
+    endNodes = find_end_nodes(blocked)
+    for node in endNodes:
+        longestPlayerRoad = max(longestPlayerRoad, dfs_max_length_one_chain(tree, node))
+    return longestPlayerRoad
 
-        # Case 2: Path or loop with tail
-        # Start DFS from all endpoints
-        if endpoints:
-            for node in endpoints:
-                longest = max(longest, dfs(node, set(), {node}, comp))
-        else:
-            # Loop with a tail, or internal loop: start DFS from every node
-            for node in degree.keys():
-                longest = max(longest, dfs(node, set(), {node}, comp))
-
-    return longest
-
-def longest_road_chain(road_locations,blocked_nodes):
-    return find_longest(road_locations,blocked_nodes)
-
-###test####
-    
-roads = [((3,4,0), (3,3,0)), ((3,4,0), (3,4,-1)), ((3,4,0), (4,4,0)), ((0,1,0), (1,1,0)), ((1,1,0), (1,1,1)), ((1,1,1), (2,1,1)), ((2,1,1), (2,1,2)), ((2,1,2), (2,0,2)), ((2,0,2), (1,0,2)), ((1,0,2), (1,0,1)), ((1,0,1), (1,1,1)), ((2,1,1), (2,2,1)), ((2,2,1), (3,2,1))]
-blocked = []
-
-    # Calculate the longest legal road
-print("Longest Road Length:", longest_road_chain(roads, blocked))
+# Run DFS starting from node 'A'
+print(dfs_max_length(tree))

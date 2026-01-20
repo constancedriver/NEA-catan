@@ -403,10 +403,7 @@ def trade_screen():
             pygame.draw.polygon(screen, (0,0,0), (((195+(i*273)),(327+(j*621))),((195+(i*273)),(252+(j*621))),((267+(i*273)),(289.5+(j*621))))) # up
     pygame.display.flip()
 
-def ask_others_for_trade(playerTurn, players, playerToAsk):
-    #if playerToAsk != playerTurn:
-        #player = players[playerToAsk]
-        player = playerTurn
+def ask_others_for_trade(player):
         pygame.draw.rect(screen, get_colour(player), (427,360,546,480))
         pygame.draw.rect(screen, (0,255,0), (460,393,223.5,414))
         pygame.draw.rect(screen, (255,0,0), (716.5,393,223.5,414))
@@ -628,6 +625,15 @@ def command(currentScreen):
                             message = 'accept trade'
                     elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
                             message = 'decline trade'
+                elif currentScreen == 'choose player to trade with':
+                    if 620 <= x <= 620+183 and 430 <= y <= 430+75:
+                        message = 'trade with player index 0'
+                    elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
+                        message = 'trade with player index 1'
+                    elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
+                        message = 'trade with player index 2'
+                    elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
+                        message = 'trade with player index 3'
                 
                 elif currentScreen == 'trade':
                     if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'

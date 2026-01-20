@@ -229,9 +229,11 @@ class GameState:
                 
             # trade screen
             elif command == 'accept trade':
-                self.acceptedTrade.append(player)
+                self.acceptedTrade.append(True)
+                self.asked_all_others()
             elif command == 'decline trade':
-                gui.ask_others_for_trade(nextPlayer)
+                self.acceptedTrade.append(False)
+                self.asked_all_other()
             elif command == 'trade with bank':
                 if len(self.tradeOfferOthers) == 1 and (2 <= len(self.tradeOfferTurn) <= 4):
                     if self.all_same_type(self.tradeOfferTurn):
