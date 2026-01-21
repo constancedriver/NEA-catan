@@ -1,8 +1,16 @@
-from game import *
-game1 =  Game()
-game1.start_game()
-while not game1.won():
-    game1.roll_dice()
-    # do turn things
-    game1.next_turn()
-#game1.game_end()
+import GameFile
+import gui
+import gameState
+game =  GameFile.Game()
+
+gui.start_menu()
+running = True
+
+# main game loop
+def main_loop(game):
+    while game.running:
+         command = game.carry_out_command()
+
+    
+    gui.pygame.quit()
+    gui.sys.exit()

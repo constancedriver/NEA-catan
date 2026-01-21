@@ -1,6 +1,5 @@
 import pygame
 import math
-import time
 import sys
 pygame.font.init()
 
@@ -558,12 +557,11 @@ def start_menu():
     screen.blit((SMALLFONT.render('0' , True , (0,0,0))), ((149+(2*273)),(576)))
     pygame.display.flip()
 
-def command(currentScreen):
-    while running:
+def command(state):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                message = {'TYPE': 'prog',
+                           'command': 'quit'}
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
@@ -571,30 +569,45 @@ def command(currentScreen):
                 y = mouse[1]
                 #rule screen
                 if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
-                        message = 'exit rules'
+                        message = {'TYPE': 'visual',
+                           'command': 'exit rules'}
 
                 # all screens 
                 elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                        pygame.quit()
-                        sys.exit()
+                        message = {'TYPE': 'prog',
+                           'command': 'quit'}
                 elif 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
-                        message = 'rules'
-
-                if currentScreen == 'main menu':
+                        message = {'TYPE': 'visual',
+                           'command': 'rules'}
+                        
+                if state.currentScreen == 'main menu':
                     if 517 <= x <= 517+150 and 722 <= y <= 722+366:
-                        message = 'play'
+                        message = {'TYPE': 'prog',
+                           'command': 'play'}
                     elif 738 <= x <= 813 and 325 <= y <= 427: # up
-                        message = 'add human'
+                        message = {'TYPE': 'visual',
+                           'command': 'add human'}
                     elif 738 <= x <= 813 and 525 <= y <= 627: # up
-                        message = 'add bot'
+                        message = {'TYPE': 'visual',
+                           'command': 'add bot'}
                     elif 587 <= x <= 662.5 and 325 <= y <= 427: # down
-                        message = 'remove human'
+                        message = {'TYPE': 'visual',
+                           'command': 'remove human'}
                     elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
-                        message = 'remove bot'
-
+                        message = {'TYPE': 'visual',
+                           'command': 'remove bot'}
+                    elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+                        message = {'TYPE': 'prog',
+                           'command': 'quit'}
+                
+                #game end screen 
+                elif state.currentScreen == 'end':
+                    if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+                        message = {'TYPE': 'prog',
+                           'command': 'quit'}
                 #discard cards screen
-                elif currentScreen == 'discard':
-                    if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'complete trade'
+                elif state.currentScreen == 'discard':
+                    if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'selected resources'
                         message = 'discard cards'
                     #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
                     #down arrown decrease the number of that resource by 1 
@@ -620,12 +633,12 @@ def command(currentScreen):
                         message = 'discard: add ore'
 
                 #trade screen 
-                elif currentScreen == 'ask player about trade':
+                elif state.currentScreen == 'ask player about trade':
                     if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
                             message = 'accept trade'
                     elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
                             message = 'decline trade'
-                elif currentScreen == 'choose player to trade with':
+                elif state.currentScreen == 'choose player to trade with':
                     if 620 <= x <= 620+183 and 430 <= y <= 430+75:
                         message = 'trade with player index 0'
                     elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
@@ -635,7 +648,7 @@ def command(currentScreen):
                     elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
                         message = 'trade with player index 3'
                 
-                elif currentScreen == 'trade':
+                elif state.currentScreen == 'trade':
                     if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
                         message = 'cancel trade'
                     elif 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'complete trade'
@@ -689,7 +702,7 @@ def command(currentScreen):
                     elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
                         message = 'other players: add ore'
                 
-                elif currentScreen == 'development':
+                elif state.currentScreen == 'development':
                     if 307 <= x <= 307+240 and 360 <= y <= 360+75:
                         message = 'play knight'
                     elif 307 <= x <= 307+240 and 468 <= y <= 468+75:
@@ -734,7 +747,7 @@ def command(currentScreen):
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         message = 'load game screen'
                 
-                elif currentScreen == 'robber':
+                elif state.currentScreen == 'robber':
                     #hex number selected for robber placement
                     if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
                         message = 0
@@ -784,7 +797,7 @@ def command(currentScreen):
                     elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
                         message = 'steal from player index 3'
 
-                elif currentScreen == 'place starting resources':
+                elif state.currentScreen == 'place starting resources':
                     # hex node buttons:
                         if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
                             message = (619.94 , 285)
@@ -896,7 +909,7 @@ def command(currentScreen):
                             message = (858 , 960)
 
 
-                elif currentScreen == 'game':
+                elif state.currentScreen == 'game':
                         if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
                             message = 'roll dice'
                         elif 34 <= x <= 34+183 and 776 <= y <= 776+75:#trade button
@@ -905,6 +918,9 @@ def command(currentScreen):
                             message = 'development'
                         elif 34 <= x <= 34+183 and 884 <= y <= 884+75: # end turn
                             message = 'end turn'
+                        elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+                            pygame.quit()
+                            sys.exit()
                         
                     # hex node buttons:
                         elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
@@ -1017,27 +1033,9 @@ def command(currentScreen):
                             message = (858 , 960)
         return message 
 
-    
 # ---------- INIT ----------
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Catan Board")
 
 board = generate_catan_layout(WIDTH // 2, HEIGHT // 2)
-running = True
-while running:
-    for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-                
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse = pygame.mouse.get_pos()
-                x = mouse[0]
-                y = mouse[1]
-                if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                        pygame.quit()
-                        sys.exit()
-    
-    discard_cards_screen('blue')
-    pygame.display.flip()
