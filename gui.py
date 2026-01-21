@@ -561,7 +561,7 @@ def command(state):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 message = {'TYPE': 'prog',
-                           'command': 'quit'}
+                           'COMMAND': 'quit'}
                 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse = pygame.mouse.get_pos()
@@ -570,467 +570,811 @@ def command(state):
                 #rule screen
                 if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
                         message = {'TYPE': 'visual',
-                           'command': 'exit rules'}
+                           'COMMAND': 'exit rules'}
 
                 # all screens 
                 elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
                         message = {'TYPE': 'prog',
-                           'command': 'quit'}
+                           'COMMAND': 'quit'}
                 elif 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
                         message = {'TYPE': 'visual',
-                           'command': 'rules'}
+                           'COMMAND': 'rules'}
                         
                 if state.currentScreen == 'main menu':
                     if 517 <= x <= 517+150 and 722 <= y <= 722+366:
                         message = {'TYPE': 'prog',
-                           'command': 'play'}
+                           'COMMAND': 'play'}
                     elif 738 <= x <= 813 and 325 <= y <= 427: # up
                         message = {'TYPE': 'visual',
-                           'command': 'add human'}
+                           'COMMAND': 'add human'}
                     elif 738 <= x <= 813 and 525 <= y <= 627: # up
                         message = {'TYPE': 'visual',
-                           'command': 'add bot'}
+                           'COMMAND': 'add bot'}
                     elif 587 <= x <= 662.5 and 325 <= y <= 427: # down
                         message = {'TYPE': 'visual',
-                           'command': 'remove human'}
+                           'COMMAND': 'remove human'}
                     elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
                         message = {'TYPE': 'visual',
-                           'command': 'remove bot'}
+                           'COMMAND': 'remove bot'}
                     elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
                         message = {'TYPE': 'prog',
-                           'command': 'quit'}
+                           'COMMAND': 'quit'}
                 
                 #game end screen 
                 elif state.currentScreen == 'end':
                     if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
                         message = {'TYPE': 'prog',
-                           'command': 'quit'}
+                           'COMMAND': 'quit'}
                 #discard cards screen
                 elif state.currentScreen == 'discard':
                     if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'selected resources'
-                        message = 'discard cards'
+#maybe should be 'visual'??
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'discard cards',
+                           'resources': state.discardCards}
                     #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
                     #down arrown decrease the number of that resource by 1 
                     elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
-                        message = 'discard: remove wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: remove wood'}
                     elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
-                        message = 'discard: add wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: add wood'}
                     elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
-                        message = 'discard: remove brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: remove brick'}
                     elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
-                        message = 'discard: add brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: add brick'}
                     elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
-                        message = 'discard: remove sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: remove sheep'}
                     elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
-                        message = 'discard: add sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: add sheep'}
                     elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
-                        message = 'discard: remove hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: remove hay'}
                     elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
-                        message = 'discard: add hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: add hay'}
                     elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
-                        message = 'discard: remove ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: remove ore'}
                     elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
-                        message = 'discard: add ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'discard: add ore'}
 
                 #trade screen 
                 elif state.currentScreen == 'ask player about trade':
                     if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
-                            message = 'accept trade'
+                            message = {'TYPE': 'visual',
+                           'COMMAND': 'accept trae'}
                     elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
-                            message = 'decline trade'
+                            message = {'TYPE': 'visual',
+                           'COMMAND': 'decline trade'}
+                
                 elif state.currentScreen == 'choose player to trade with':
                     if 620 <= x <= 620+183 and 430 <= y <= 430+75:
-                        message = 'trade with player index 0'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 0}
                     elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
-                        message = 'trade with player index 1'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 1}
                     elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
-                        message = 'trade with player index 2'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 2}
                     elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
-                        message = 'trade with player index 3'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 3}
                 
                 elif state.currentScreen == 'trade':
                     if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
-                        message = 'cancel trade'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'cancel trade'}
                     elif 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'complete trade'
-                        message = 'complete trade'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'complete trade',
+                           'TURN PLAYER RESOURCES': state.tradeOfferTurn,
+                           'OTHER PLAYER RESOURCES': state.tradeOfferOthers}
                     elif 800 <= x <= 800+203 and 992 <= y <=75:
-                        message = 'trade with bank'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'trade with bank',
+                           'INPUT RESOURCES': state.tradeOfferTurn,
+                           'OUTPUT RESOURCES': state.tradeOfferOthers}
 
                     #trade arrows - up arrows increase the number of that resourse involved in the trade by 1
                     #down arrown decrease the number of that resource by 1 
                     #you put in - the players whos turn it is 
                     elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
-                        message = 'turn player: remove wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: remove wood'}
                     elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
-                        message = 'turn player: add wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: add wood'}
                     elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
-                        message = 'turn player: remove brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: remove brick'}
                     elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
-                        message = 'turn player: add brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: add brick'}
                     elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
-                        message = 'turn player: remove sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: remove sheep'}
                     elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
-                        message = 'turn player: add sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: add sheep'}
                     elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
-                        message = 'turn player: remove hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: remove hay'}
                     elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
-                        message = 'turn player: add hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: add hay'}
                     elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
-                        message = 'turn player: remove ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: remove ore'}
                     elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
-                        message = 'turn player: add ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'turn player: add ore'}
 
                     #other players put in - what the player whos turn it is wants from other players 
                     elif 41 <= x <= 41 +75 and 873 <= y <= 873 +75: # down
-                        message = 'other players: remove wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: remove wood'}
                     elif 195 <= x <= 195 +75 and 873 <= y <= 873 +75: #up
-                        message = 'other players: add wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: add wood'}
                     elif 314 <= x <= 314 +75 and 873 <= y <= 873 +75: # down
-                        message = 'other players: remove brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: remove brick'}
                     elif 468 <= x <= 468 +75 and 873 <= y <= 873 +75: #up
-                        message = 'other players: add brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: add brick'}
                     elif 587 <= x <= 587 +75 and 873 <= y <= 873 +75: # down
-                        message = 'other players: remove sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: remove sheep'}
                     elif 741 <= x <= 741 +75 and 873 <= y <= 873 +75: #up
-                        message = 'other players: add sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: add sheep'}
                     elif 860 <= x <= 860 +75 and 873 <= y <= 873 +75: # down
-                        message = 'other players: remove hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: remove hay'}
                     elif 1014 <= x <= 1014 +75 and 873 <= y <= 873 +75: #up
-                        message = 'other players: add hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: add hay'}
                     elif 1133 <= x <= 1133 +75 and 873 <= y <= 873 +75: # down
-                        message = 'other players: remove ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: remove ore'}
                     elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
-                        message = 'other players: add ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'other players: add ore'}
                 
                 elif state.currentScreen == 'development':
                     if 307 <= x <= 307+240 and 360 <= y <= 360+75:
-                        message = 'play knight'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play knight'}
                     elif 307 <= x <= 307+240 and 468 <= y <= 468+75:
-                        message = 'play road building'
-
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play road building'}
+                        
                     elif 310 <= x <= 310+36 and 610 <= y <= 610+36:
-                        message = 'play monopoly wood'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play monopoly',
+                           'RESOURCE': 'wood'}
                     elif 351 <= x <= 351+36 and 610 <= y <= 610+36:
-                        message = 'play monopoly brick'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play monopoly',
+                           'RESOURCE': 'brick'}
                     elif 392 <= x <= 392+36 and 610 <= y <= 610+36:
-                        message = 'play monopoly sheep'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play monopoly',
+                           'RESOURCE': 'sheep'}
                     elif 433 <= x <= 433+36 and 610 <= y <= 610+36:
-                        message = 'play monopoly hay'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play monopoly',
+                           'RESOURCE': 'hay'}
                     elif 472 <= x <= 472+36 and 610 <= y <= 610+36:
-                        message = 'play monopoly ore'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play monopoly',
+                           'RESOURCE': 'ore'}
 
                     elif 450 <= x <= 476 and 719 <= y <= 745: #up
-                        message = 'year of plenty add wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty add wood'}
                     elif 450 <= x <= 476 and 760 <= y <= 760+26: #up
-                        message = 'year of plenty add brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty add brick'}
                     elif 450 <= x <= 476 and 801 <= y <= 801+26: #up
-                        message = 'year of plenty add sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty add sheep'}
                     elif 450 <= x <= 476 and 842 <= y <= 842+26: #up
-                        message = 'year of plenty add hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty add hay'}
                     elif 450 <= x <= 476 and 883 <= y <= 883+26: #up
-                        message = 'year of plenty add ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty add ore'}
                     elif 378 <= x <= 404 and 719 <= y <= 719+26: #down
-                        message = 'year of plenty remove wood'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty remove wood'}
                     elif 378 <= x <= 404 and 760 <= y <= 760+26: #down
-                        message = 'year of plenty remove brick'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty remove brick'}
                     elif 378 <= x <= 404 and 801 <= y <= 801+26: #down
-                        message = 'year of plenty remove sheep'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty remove sheep'}
                     elif 378 <= x <= 404 and 842 <= y <= 842+26: #down
-                        message = 'year of plenty remove hay'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty remove hay'}
                     elif 378 <= x <= 404 and 883 <= y <= 883+26: #down
-                        message = 'year of plenty remove ore'
+                        message = {'TYPE': 'visual',
+                           'COMMAND': 'year of plenty remove ore'}
                     elif 488 <= x <= 506+54 and 883 <= y <= 883+36: #'use' button
-                        message = 'play year of plenty complete'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'play year of plenty',
+                           'resources': state.yoPlenty}
 
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
-                        message = 'buy development'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'buy development'}
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
-                        message = 'load game screen'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'load game screen'}
                 
                 elif state.currentScreen == 'robber':
-                    #hex number selected for robber placement
+                    #HEX NUMBER selected for robber placement
                     if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
-                        message = 0
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 0}
                     elif 700-35 <= x <= 700+35 and 870-35 <= y <= 870+35:
-                        message = 1
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 1}
                     elif 858-35 <= x <= 858+35 and 870-35 <= y <= 870+35:
-                        message = 2
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 2}
                     elif 464-35 <= x <= 464+35 and 735-35 <= y <= 735+35:
-                        message = 3
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 3}
                     elif 622-35 <= x <= 622+35 and 735-35 <= y <= 735+35:
-                        message = 4
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 4}
                     elif 780-35 <= x <= 780+35 and 735-35 <= y <= 735+35:
-                        message = 5
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 5}
                     elif 938-35 <= x <= 938+35 and 735-35 <= y <= 735+35:
-                        message = 6
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 6}
                     elif 385-35 <= x <= 385+35 and 600-35 <= y <= 600+35:
-                        message = 7
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 7}
                     elif 543-35 <= x <= 543+35 and 600-35 <= y <= 600+35:
-                        message = 8
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 8}
                     elif 701-35 <= x <= 701+35 and 600-35 <= y <= 600+35:
-                        message = 9
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 9}
                     elif 859-35 <= x <= 859+35 and 600-35 <= y <= 600+35:
-                        message = 10
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 10}
                     elif 1017-35 <= x <= 1017+35 and 600-35 <= y <= 600+35:
-                        message = 11
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 11}
                     elif 464-35 <= x <= 464+35 and 465-35 <= y <= 465+35:
-                        message = 12
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 12}
                     elif 622-35 <= x <= 622+35 and 465-35 <= y <= 465+35:
-                        message = 13
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 13}
                     elif 780-35 <= x <= 780+35 and 465-35 <= y <= 465+35:
-                        message = 14
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 14}
                     elif 938-35 <= x <= 938+35 and 465-35 <= y <= 465+35:
-                        message = 15
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 15}
                     elif 524-35 <= x <= 524+35 and 330-35 <= y <= 330+35:
-                        message = 16
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 16}
                     elif 700-35 <= x <= 700+35 and 330-35 <= y <= 330+35:
-                        message = 17
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 17}
                     elif 858-35 <= x <= 858+35 and 330-35 <= y <= 330+35:
-                        message = 18
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'choose where to play knight',
+                           'HEX NUMBER': 18}
                     # choosing player to steal from
                     elif 1160 <= x <= 1160+183 and 170 <= y <=170+75:
-                        message = 'steal from player index 0'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'steal from player',
+                           'INDEX': 0}
                     elif 1160 <= x <= 1160+183 and 278 <= y <=278+75:
-                        message = 'steal from player index 1'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'steal from player',
+                           'INDEX': 1}
                     elif 1160 <= x <= 1160+183 and 386 <= y <=386+75:
-                        message = 'steal from player index 2'
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'steal from player',
+                           'INDEX': 2}
                     elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
-                        message = 'steal from player index 3'
-
+                        message = {'TYPE': 'prog',
+                           'COMMAND': 'steal from player',
+                           'INDEX': 3}
+                
                 elif state.currentScreen == 'place starting resources':
                     # hex node buttons:
                         if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
-                            message = (619.94 , 285)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 285)}
                         elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
-                            message = (619.94 , 375) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 375)}
                         elif  532 <= x <= 552 and 410 <= y <= 430 :
-                            message = (542 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 420)} 
                         elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
-                            message = (464.06 , 375 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 375 )} 
                         elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
-                            message = (464.06 , 285)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 285)} 
                         elif  532 <= x <= 552 and 230 <= y <= 250 :
-                            message = (542 , 240 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 240)} 
                         elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
-                            message = (777.94 , 285 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 285)} 
                         elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
-                            message = (777.94 , 375)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 375)} 
                         elif  690 <= x <= 710 and 410 <= y <= 430 :
-                            message = ( 700 , 420) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 420)} 
                         elif  690 <= x <= 710 and 230 <= y <= 250 :
-                            message = (700 , 240)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 240)} 
                         elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
-                            message = (935.94 , 285 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 285)} 
                         elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
-                            message = (935.94 , 375)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 375)} 
                         elif  848 <= x <= 868 and 410 <= y <= 430 :
-                            message = (858 , 420) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 420)} 
                         elif  848 <= x <= 868 and 230 <= y <= 250 :
-                            message = (858 , 240)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 240)} 
                         elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
-                            message = (541.94 , 510) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (541.94 , 510)} 
                         elif  454 <= x <= 474 and 545 <= y <= 565 :
-                            message = (464 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464 , 555)} 
                         elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
-                            message = (386.06 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 510)} 
                         elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
-                            message = (386.06 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 420)} 
                         elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
-                            message = (699.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (699.94 , 510)} 
                         elif  612 <= x <= 632 and 545 <= y <= 565 :
-                            message = (622 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (622 , 555)} 
                         elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
-                            message = (857.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (857.94 , 510)} 
                         elif  770 <= x <= 790 and 545 <= y <= 565 :
-                            message = (780 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (780 , 555)} 
                         elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
-                            message = (1015.94 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 420)} 
                         elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
-                            message = (1015.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 510)} 
                         elif  928 <= x <= 948 and 545 <= y <= 565 :
-                            message = (938 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (938 , 555)} 
                         elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
-                            message = (462.94 , 645)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (462.94 , 645)} 
                         elif  375 <= x <= 395 and 680 <= y <= 700 :
-                            message = (385 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (385 , 690)} 
                         elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
-                            message = (307.06 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (307.06 , 645)}  
                         elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
-                            message = (307.06 , 555) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (307.06 , 555)}  
                         elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
-                            message = (620.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (620.94 , 645)}  
                         elif  533 <= x <= 553 and 680 <= y <= 700 :
-                            message = (543 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (543 , 690)}  
                         elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
-                            message = (778.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (778.94 , 645)}   
                         elif  691 <= x <= 711 and 680 <= y <= 700 :
-                            message = (701 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (701 , 690)} 
                         elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
-                            message = (936.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (936.94 , 645)} 
                         elif  849 <= x <= 869 and 680 <= y <= 700 :
-                            message = (859 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (859 , 690)} 
                         elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
-                            message = (1094.94 , 555) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1094.94 , 555)} 
                         elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
-                            message = (1094.94 , 645 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1094.94 , 645)}
                         elif  1007 <= x <= 1027 and 680 <= y <= 700 :
-                            message = (1017 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1017 , 690)} 
                         elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
-                            message = (541.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (541.94 , 780)}  
                         elif  454 <= x <= 474 and 815 <= y <= 835 :
-                            message = (464 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464 , 825)} 
                         elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
-                            message = (386.06 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 780)} 
                         elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
-                            message = (699.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (699.94 , 780)}  
                         elif  612 <= x <= 632 and 815 <= y <= 835 :
-                            message = (622 , 825 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (622 , 825)}
                         elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
-                            message = (857.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (857.94 , 780)}
                         elif  770 <= x <= 790 and 815 <= y <= 835 :
-                            message = (780 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (780 , 825)} 
                         elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
-                            message = (1015.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 780)} 
                         elif  928 <= x <= 948 and 815 <= y <= 835 :
-                            message = (938 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (938 , 825)} 
                         elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
-                            message = (619.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 915)} 
                         elif  532 <= x <= 552 and 950 <= y <= 970 :
-                            message = (542 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 960)}
                         elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
-                            message = (464.06 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 915)}
                         elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
-                            message = (777.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 915)}
                         elif  690 <= x <= 710 and 950 <= y <= 970 :
-                            message = (700 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 960)}
                         elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
-                            message = (935.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 915)}
                         elif  848 <= x <= 868 and 950 <= y <= 970 :
-                            message = (858 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 960)}
 
 
                 elif state.currentScreen == 'game':
                         if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
-                            message = 'roll dice'
+                            message = {'TYPE': 'prog',
+                                'COMMAND': 'roll dice'}
                         elif 34 <= x <= 34+183 and 776 <= y <= 776+75:#trade button
-                            message = 'trade'
-                        elif 34 <= x <= 34+183 and 668 <= y <= 668+75: # end turn
-                            message = 'development'
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'trade'}
+                        elif 34 <= x <= 34+183 and 668 <= y <= 668+75: # developemnt
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'development'}
                         elif 34 <= x <= 34+183 and 884 <= y <= 884+75: # end turn
-                            message = 'end turn'
+                            message = {'TYPE': 'prog',
+                                'COMMAND': 'end turn'}
                         elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                            pygame.quit()
-                            sys.exit()
+                            message = {'TYPE': 'prog',
+                                'COMMAND': 'quit'}
                         
-                    # hex node buttons:
-                        elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
-                            message = (619.94 , 285)
+                    # hex NODE buttons:
+                        if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 285)}
                         elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
-                            message = (619.94 , 375) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 375)}
                         elif  532 <= x <= 552 and 410 <= y <= 430 :
-                            message = (542 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 420)} 
                         elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
-                            message = (464.06 , 375 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 375 )} 
                         elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
-                            message = (464.06 , 285)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 285)} 
                         elif  532 <= x <= 552 and 230 <= y <= 250 :
-                            message = (542 , 240 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 240)} 
                         elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
-                            message = (777.94 , 285 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 285)} 
                         elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
-                            message = (777.94 , 375)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 375)} 
                         elif  690 <= x <= 710 and 410 <= y <= 430 :
-                            message = ( 700 , 420) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 420)} 
                         elif  690 <= x <= 710 and 230 <= y <= 250 :
-                            message = (700 , 240)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 240)} 
                         elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
-                            message = (935.94 , 285 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 285)} 
                         elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
-                            message = (935.94 , 375)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 375)} 
                         elif  848 <= x <= 868 and 410 <= y <= 430 :
-                            message = (858 , 420) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 420)} 
                         elif  848 <= x <= 868 and 230 <= y <= 250 :
-                            message = (858 , 240)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 240)} 
                         elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
-                            message = (541.94 , 510) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (541.94 , 510)} 
                         elif  454 <= x <= 474 and 545 <= y <= 565 :
-                            message = (464 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464 , 555)} 
                         elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
-                            message = (386.06 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 510)} 
                         elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
-                            message = (386.06 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 420)} 
                         elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
-                            message = (699.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (699.94 , 510)} 
                         elif  612 <= x <= 632 and 545 <= y <= 565 :
-                            message = (622 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (622 , 555)} 
                         elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
-                            message = (857.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (857.94 , 510)} 
                         elif  770 <= x <= 790 and 545 <= y <= 565 :
-                            message = (780 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (780 , 555)} 
                         elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
-                            message = (1015.94 , 420)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 420)} 
                         elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
-                            message = (1015.94 , 510)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 510)} 
                         elif  928 <= x <= 948 and 545 <= y <= 565 :
-                            message = (938 , 555)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (938 , 555)} 
                         elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
-                            message = (462.94 , 645)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (462.94 , 645)} 
                         elif  375 <= x <= 395 and 680 <= y <= 700 :
-                            message = (385 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (385 , 690)} 
                         elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
-                            message = (307.06 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (307.06 , 645)}  
                         elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
-                            message = (307.06 , 555) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (307.06 , 555)}  
                         elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
-                            message = (620.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (620.94 , 645)}  
                         elif  533 <= x <= 553 and 680 <= y <= 700 :
-                            message = (543 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (543 , 690)}  
                         elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
-                            message = (778.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (778.94 , 645)}   
                         elif  691 <= x <= 711 and 680 <= y <= 700 :
-                            message = (701 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (701 , 690)} 
                         elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
-                            message = (936.94 , 645) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (936.94 , 645)} 
                         elif  849 <= x <= 869 and 680 <= y <= 700 :
-                            message = (859 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (859 , 690)} 
                         elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
-                            message = (1094.94 , 555) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1094.94 , 555)} 
                         elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
-                            message = (1094.94 , 645 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1094.94 , 645)}
                         elif  1007 <= x <= 1027 and 680 <= y <= 700 :
-                            message = (1017 , 690) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1017 , 690)} 
                         elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
-                            message = (541.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (541.94 , 780)}  
                         elif  454 <= x <= 474 and 815 <= y <= 835 :
-                            message = (464 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464 , 825)} 
                         elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
-                            message = (386.06 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (386.06 , 780)} 
                         elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
-                            message = (699.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (699.94 , 780)}  
                         elif  612 <= x <= 632 and 815 <= y <= 835 :
-                            message = (622 , 825 )
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (622 , 825)}
                         elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
-                            message = (857.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (857.94 , 780)}
                         elif  770 <= x <= 790 and 815 <= y <= 835 :
-                            message = (780 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (780 , 825)} 
                         elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
-                            message = (1015.94 , 780) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (1015.94 , 780)} 
                         elif  928 <= x <= 948 and 815 <= y <= 835 :
-                            message = (938 , 825) 
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (938 , 825)} 
                         elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
-                            message = (619.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (619.94 , 915)} 
                         elif  532 <= x <= 552 and 950 <= y <= 970 :
-                            message = (542 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (542 , 960)}
                         elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
-                            message = (464.06 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (464.06 , 915)}
                         elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
-                            message = (777.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (777.94 , 915)}
                         elif  690 <= x <= 710 and 950 <= y <= 970 :
-                            message = (700 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (700 , 960)}
                         elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
-                            message = (935.94 , 915)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (935.94 , 915)}
                         elif  848 <= x <= 868 and 950 <= y <= 970 :
-                            message = (858 , 960)
+                            message = {'TYPE': 'visual',
+                                'COMMAND': 'node selected',
+                                'NODE': (858 , 960)}
+
         return message 
 
 # ---------- INIT ----------
