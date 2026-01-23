@@ -1,19 +1,22 @@
-class Road:
-    def __init__ (self, colour:str, location):
-        self.colour = colour
+class Piece:
+    def __init__ (self, location:list, colour:str):
         self.location = location
+        self.colour = colour
 
-class Outpost:
+class Road(Piece):
+    def __init__ (self, colour:str, location):
+        super.__innit__(location, colour)
+
+class Outpost(Piece):
     def __init__ (self, colour:str, location, isCity:bool=False):
-        self.colour = colour
-        self.location = location
+        super().__init__(location, colour)
         self.isCity = isCity
     def upgrade(self):
         self.isCity = True
         
 class Harbour:
-    def __init__ (self, position, type:str):
-        self.position = position 
+    def __init__ (self, type:str, position):
+        self.position = position
         self.type = type 
 
 class DevelopmentCards:

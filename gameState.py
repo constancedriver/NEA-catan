@@ -1,7 +1,7 @@
 import gui
 
 class GameState:
-    def __init__ (self,currentScreen:str='main menu', pressedNodes:list=[], rolled:bool=False, tradeOfferTurn:list=[], tradeOfferOthers:list=[], acceptedTrade:list=[], yoPlenty:list=[], discardCards:list=[], humans:int=4, bots:int=0, playerAsking:str='none', numberAsked:int=0):
+    def __init__ (self, currentScreen:str='main menu', pressedNodes:list=[], rolled:bool=False, tradeOfferTurn:list=[], tradeOfferOthers:list=[], acceptedTrade:list=[], yoPlenty:list=[], discardCards:list=[], humans:int=4, bots:int=0, playerAsking:str='none', numberAsked:int=0):
         self.currentScreen = currentScreen
         self.pressedNodes = pressedNodes
         self.rolled = rolled
@@ -72,15 +72,6 @@ class GameState:
                             (858,960)   : (0,2,-2)
                             }
         return revertedCoordinate[guiCoordinate]
-    
-    def build(self):
-        node1 = self.pressedNodes[0]
-        node2 = self.pressedNodes[1]
-        self.pressedNodes = []
-        if node1 == node2:
-            return [node1]
-        else:
-            return [node1,node2]
 
     def all_same_type(self, resourceList:list):
         oneType = False
@@ -98,230 +89,198 @@ class GameState:
         else:
             return self.acceptedTrade
 
-    def get_command(self):
-        command = gui.command(self.currentScreen)
-        if type(command) == int:
-            return command
-        elif type(command) == str:
+    def get_command(self, command):
             # all screens/rules screen 
-            if command == 'rules':
+            if command['COMMAND'] == 'rules':
                 gui.rules_screen()
-            elif command == 'exit rules':
-                if self.currentScreen == 'game':
-                    self.load_game_screen()
-                elif self.currentScreen == 'trade':
+            elif command['COMMAND'] == 'exit rules':
+                if self.currentScreen == 'trade':
                     gui.trade_screen()
                 elif self.currentScreen == 'development':
                     gui.development_screen()
             # main menu
-            elif command == 'add human':
+            elif command['COMMAND'] == 'add human':
                 if self.humans + self.bots < 4:
                     self.humans += 1
                     gui.update_humans(self.humans)
-            elif command == 'add bot':
+            elif command['COMMAND'] == 'add bot':
                 if self.humans + self.bots < 4:
                     self.bots += 1
                     gui.update_bots(self.bots)
-            elif command == 'remove human':
+            elif command['COMMAND'] == 'remove human':
                 if self.humans > 0:
                     self.humans -=1
                     gui.update_humans(self.humans)
-            elif command == 'remove bot':
+            elif command['COMMAND'] == 'remove bot':
                 if self.bots > 0:
                     self.bots -=1
-                    gui.update_humans(self.bots)
+                    gui.update_bots(self.bots)
             
             # game screen
-            elif command == 'trade':
+            elif command['COMMAND'] == 'trade':
                 self.currentScreen = 'trade'
-                self.tradeOfferOthers = []
-                self.tradeOfferTurn = []
+                self.tradeOfferOthers.clear()
+                self.tradeOfferTurn.clear()
                 gui.trade_screen()
-            elif command == 'development':
+            elif command['COMMAND'] == 'development':
                 self.currentScreen = 'development'
-                self.yoPlenty = []
+                self.yoPlenty.clear()
                 gui.development_screen()
             
             # development screen
-            elif command == 'year of plenty add wood':
+            elif command['COMMAND'] == 'year of plenty add wood':
                 if len(self.yoPlenty) < 2:
                     self.yoPlenty.append('wood')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty add brick':
+            elif command['COMMAND'] == 'year of plenty add brick':
                 if len(self.yoPlenty) < 2:
                     self.yoPlenty.append('brick')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty add sheep':
+            elif command['COMMAND'] == 'year of plenty add sheep':
                 if len(self.yoPlenty) < 2:
                     self.yoPlenty.append('sheep')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty add hay':
+            elif command['COMMAND'] == 'year of plenty add hay':
                 if len(self.yoPlenty) < 2:
                     self.yoPlenty.append('hay')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty add ore':
+            elif command['COMMAND'] == 'year of plenty add ore':
                 if len(self.yoPlenty) < 2:
                     self.yoPlenty.append('ore')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty remove wood':
+            elif command['COMMAND'] == 'year of plenty remove wood':
                 if 'wood' in self.yoPlenty:
                     self.yoPlenty.remove('wood')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty remove brick':
+            elif command['COMMAND'] == 'year of plenty remove brick':
                 if 'brick' in self.yoPlenty:
                     self.yoPlenty.remove('brick')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty remove sheep':
+            elif command['COMMAND'] == 'year of plenty remove sheep':
                 if 'sheep' in self.yoPlenty:
                     self.yoPlenty.remove('sheep')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty remove hay':
+            elif command['COMMAND'] == 'year of plenty remove hay':
                 if 'hay' in self.yoPlenty:
                     self.yoPlenty.remove('hay')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'year of plenty remove ore':
+            elif command['COMMAND'] == 'year of plenty remove ore':
                 if 'ore' in self.yoPlenty:
                     self.yoPlenty.remove('ore')
                     gui.update_year_of_plenty(self.yoPlenty)
-            elif command == 'play year of pleanty complete':
-                if len(self.yoPlenty) == 2:
-                    return ['year of plenty', self.yoPlenty]
             
-            # discard card screen
-            elif command == 'discard cards':
-                command = ['discard', self.discardCards]
-            # arrows 
-            elif command == 'discard: remove wood':
+            # discard card screen arrows 
+            elif command['COMMAND'] == 'discard: remove wood':
                 if 'wood' in self.discardCards:
                     self.discardCards.remove('wood')
                     gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: remove brick':
+            elif command['COMMAND'] == 'discard: remove brick':
                 if 'brick' in self.discardCards:
                     self.discardCards.remove('brick')
                     gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: remove sheep':
+            elif command['COMMAND'] == 'discard: remove sheep':
                 if 'sheep' in self.discardCards:
                     self.discardCards.remove('sheep')
                     gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: remove hay':
+            elif command['COMMAND'] == 'discard: remove hay':
                 if 'hay' in self.discardCards:
                     self.discardCards.remove('hay')
                     gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: remove ore':
+            elif command['COMMAND'] == 'discard: remove ore':
                 if 'ore' in self.discardCards:
                     self.discardCards.remove('ore')
                     gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: add wood':
+            elif command['COMMAND'] == 'discard: add wood':
                 self.discardCards.append('wood')
                 gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: add brick':
+            elif command['COMMAND'] == 'discard: add brick':
                 self.discardCards.append('brick')
                 gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: add sheep':
+            elif command['COMMAND'] == 'discard: add sheep':
                 self.discardCards.append('sheep')
                 gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: add hay':
+            elif command['COMMAND'] == 'discard: add hay':
                 self.discardCards.append('hay')
                 gui.redraw_discard_cards(self.discardCards)
-            elif command == 'discard: add ore':
+            elif command['COMMAND'] == 'discard: add ore':
                 self.discardCards.append('ore')
                 gui.redraw_discard_cards(self.discardCards)
                 
-            # trade screen
-            elif command == 'accept trade':
-                self.acceptedTrade.append(True)
-                self.asked_all_others()
-            elif command == 'decline trade':
-                self.acceptedTrade.append(False)
-                self.asked_all_other()
-            elif command == 'trade with bank':
-                if len(self.tradeOfferOthers) == 1 and (2 <= len(self.tradeOfferTurn) <= 4):
-                    if self.all_same_type(self.tradeOfferTurn):
-                        command  = ['trade with bank', self.tradeOfferTurn[0], self.tradeOfferOthers[0]]
-                    
-            elif command == 'cancel trade':
-                self.tradeOfferOthers = []
-                self.tradeOfferTurn = []
-                return 'load game screen'
-            elif command == 'complete trade':
-                command = ['complete trade', self.tradeOfferTurn, self.tradeOfferOthers]
 
             # trade menu arrows
-            if command == 'turn player: remove wood':
+            elif command['COMMAND'] == 'turn player: remove wood':
                 if 'wood' in self.tradeOfferTurn:
                     self.tradeOfferTurn.remove('wood')
                     gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: remove brick':
+            elif command['COMMAND'] == 'turn player: remove brick':
                 if 'brick' in self.tradeOfferTurn:
                     self.tradeOfferTurn.remove('brick')
                     gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: remove sheep':
+            elif command['COMMAND'] == 'turn player: remove sheep':
                 if 'sheep' in self.tradeOfferTurn:
                     self.tradeOfferTurn.remove('sheep')
                     gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: remove hay':
+            elif command['COMMAND'] == 'turn player: remove hay':
                 if 'hay' in self.tradeOfferTurn:
                     self.tradeOfferTurn.remove('hay')
                     gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: remove ore':
+            elif command['COMMAND'] == 'turn player: remove ore':
                 if 'ore' in self.tradeOfferTurn:
                     self.tradeOfferTurn.remove('ore')
                     gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: add wood':
+            elif command['COMMAND'] == 'turn player: add wood':
                 self.tradeOfferTurn.append('wood')
                 gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: add brick':
+            elif command['COMMAND'] == 'turn player: add brick':
                 self.tradeOfferTurn.append('brick')
                 gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: add sheep':
+            elif command['COMMAND'] == 'turn player: add sheep':
                 self.tradeOfferTurn.append('sheep')
                 gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: add hay':
+            elif command['COMMAND'] == 'turn player: add hay':
                 self.tradeOfferTurn.append('hay')
                 gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'turn player: add ore':
+            elif command['COMMAND'] == 'turn player: add ore':
                 self.tradeOfferTurn.append('ore')
                 gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
-            if command == 'other players: remove wood':
+            elif command['COMMAND'] == 'other players: remove wood':
                 if 'wood' in self.tradeOfferOthers:
                     self.tradeOfferOthers.remove('wood')
                     gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: remove brick':
+            elif command['COMMAND'] == 'other players: remove brick':
                 if 'brick' in self.tradeOfferOthers:
                     self.tradeOfferOthers.remove('brick')
                     gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: remove sheep':
+            elif command['COMMAND'] == 'other players: remove sheep':
                 if 'sheep' in self.tradeOfferOthers:
                     self.tradeOfferOthers.remove('sheep')
                     gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: remove hay':
+            elif command['COMMAND'] == 'other players: remove hay':
                 if 'hay' in self.tradeOfferOthers:
                     self.tradeOfferOthers.remove('hay')
                     gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: remove ore':
+            elif command['COMMAND'] == 'other players: remove ore':
                 if 'ore' in self.tradeOfferOthers:
                     self.tradeOfferOthers.remove('ore')
                     gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: add wood':
+            elif command['COMMAND'] == 'other players: add wood':
                 self.tradeOfferOthers.append('wood')
                 gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: add brick':
+            elif command['COMMAND'] == 'other players: add brick':
                 self.tradeOfferOthers.append('brick')
                 gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: add sheep':
+            elif command['COMMAND'] == 'other players: add sheep':
                 self.tradeOfferOthers.append('sheep')
                 gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: add hay':
+            elif command['COMMAND'] == 'other players: add hay':
                 self.tradeOfferOthers.append('hay')
                 gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            if command == 'other players: add ore':
+            elif command['COMMAND'] == 'other players: add ore':
                 self.tradeOfferOthers.append('ore')
                 gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
-            else:
-                return command
-        else: # nodes pressed
-            self.pressedNodes.append(command)
-            gui.node_pressed(command)
-            if len(self.pressedNodes) == 2:
-                self.build()
 
+            
+            # node pressed
+            elif command['COMMAND'] == 'node selected':
+                self.pressedNodes.append(self.convert_gui_coordinates_back(command['NODE']))
+                gui.node_pressed(command['NODE'])

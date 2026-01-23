@@ -7,7 +7,8 @@ import gameState
 import gui
 
 class Game:
-    def __init__(self, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[], state=gameState.GameState(), askToTrade:list=[], acceptedTrade:list=[]):
+    def __init__(self, running:bool=True, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[], state=gameState.GameState(), askToTrade:list=[], acceptedTrade:list=[]):
+        self.running = running
         self.tiles = tiles
         self.harbours = harbours
         self.players = players
@@ -133,16 +134,21 @@ class Game:
         rolls = []
         for player in players:
             gui.screen.fill(gui.get_colour(player.colour))
-            rolls.append((self.roll_dice()))
-            time.sleep(4)
-        highestRoll = max(rolls.values())
-        highestPlayer = [k for k, v in rolls.items() if v == highestRoll]
+            rolls.append([self.roll_dice(),player])
+            time.sleep(2)
+        highestRoll=0
+        for i in range (0,len(players),1):
+            highestRoll = max(rolls[i][0], highestRoll)
+        #highestPlayer = [k for k, item in rolls if item[0] == highestRoll]
+        highestPlayer = [player for roll, player in rolls if roll == highestRoll]
         if len(highestPlayer) == 1:
             return highestPlayer[0]
         else:
-            self.dice_roll_winner(highestPlayer)
+            return self.dice_roll_winner(highestPlayer)
 
     def game_set_up(self):
+        gui.screen.fill((gui.get_colour('none')))
+        gui.pygame.display.flip()
         self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
         self.state.currentScreen = 'place starting resources'
         self.load_starting_screen()
@@ -212,7 +218,16 @@ class Game:
                                 # cities get an extra resource 
                                 if outpost.isCity:
                                     player.resources.append(tile.resource)
-            
+
+    def build(self):
+        selectedNodes = game.state.pressedNodes
+        game.state.pressedNodes.clear()
+        game.load_game_screen()
+        if selectedNodes[0] == selectedNodes[1]:
+            self.create_outpost(selectedNodes[0])
+        elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
+            self.create_road(selectedNodes)
+
     def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
@@ -237,8 +252,89 @@ class Game:
     def create_road(self,nodes:list):
         if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']) and (self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1])):
             self.roads.append(self.players[self.turnIndex].build_road(nodes))
-#        self.check_longest_road(self)
+        self.check_longest_road(self)
 
+    def steal_longest_road(self):
+        #update VP
+        for player in self.players:
+            if player.hasLongestRoad == True:
+                player.hasLongestRoad = False
+                player.VP -= 2
+        self.players[self.turnIndex].hasLongestRoad = True
+        self.players[self.turnIndex].VP += 2
+        #update new comparison value 
+        self.longestRoad = self.players[self.turnIndex].playerLongestRoad
+        #update visuals
+        gui.update_vp(self.players[self.turnIndex], self.turnIndex)
+        gui.update_longest_road(self.players[self.turnIndex].colour)
+
+    def check_longest_road(self):
+        # get all locations to calculate the players longest road
+        roads = []
+        blocks =[]
+        for road in self.players[self.turnIndex].roads:
+            roads.append(road.location)
+        for player in self.players:
+            if player != self.players[self.turnIndex]:
+                for outpost in self.players[self.turnIndex].outposts:
+                    blocks.append(outpost.location)
+        #calculate players longest road and if new longest road update longest road
+        self.players[self.turnIndex].playerLongestRoad = self.dfs_max_length(roads, blocks)
+        if self.players[self.turnIndex].playerLongestRoad > self.longestRoad:
+            self.steal_longest_road()
+
+    def get_nodes(self, roads:list):
+        nodes = []
+        for road in roads:
+            nodes.append(road[0])
+            nodes.append(road[1])
+        return nodes
+    
+    def find_end_nodes(self, blocked:list):
+        endNodes = []
+        nodes = self.get_nodes()
+        for node in nodes:
+            if nodes.count(node) == 1 and node not in blocked:
+                endNodes.append(node)
+
+    def get_current_adjacent_nodes(self,node, roads:list):
+            adjacentNodes = []
+            for road in roads:
+                if road[0] == node:
+                    adjacentNodes.append(road[1])
+                elif road[1] == node:
+                    adjacentNodes.append(road[0])
+            return adjacentNodes
+    
+    def create_tree(self, roads:list, blocks:list):
+        nodes = self.get_nodes(roads)
+        tree = {}
+        for node in nodes:
+            if node in blocks:
+                tree.update({node: []})
+            else:
+                tree.update({node: self.get_current_adjacent_nodes(node)})
+        return tree
+        
+    def dfs_max_length_one_chain(self, tree:dict, node, visited:list=None, depth:int=0, maxDepth:int=0):
+        if not visited:
+            visited = []
+        visited.append(node) # mark node as visited
+        for child in tree[node]:  # recursively visit children
+            if child not in visited:
+                childDepth = self.dfs_max_length_one_chain(tree,child,visited.copy(), depth+1, max(maxDepth,depth+1))
+                # visited is a copy so that is doesnt change every instance of visited and effect the loop
+                maxDepth=max(maxDepth, childDepth)
+        return maxDepth
+
+    def dfs_max_length(self, roads:list, blocked:list):
+        tree = self.create_tree(roads, blocked)
+        longestPlayerRoad = 0
+        endNodes = self.find_end_nodes(blocked)
+        for node in endNodes:
+            longestPlayerRoad = max(longestPlayerRoad, self.dfs_max_length_one_chain(tree, node))
+        return longestPlayerRoad
+    
     def create_development_card(self):
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
@@ -348,10 +444,11 @@ class Game:
             self.players[self.turnIndex].developments.remove('monopoly')
             self.load_game_screen()
         
-    def play_year_of_plenty(self, resourceType1, resourceType2):
-        if self.check_able_to_use('year of plenty'):
-            self.players[self.turnIndex].resources.append(resourceType1)
-            self.players[self.turnIndex].resources.append(resourceType2)
+    def play_year_of_plenty(self):
+        if self.check_able_to_use('year of plenty') and len(self.state.yoPlenty) == 2:
+            resources = self.state.yoPlenty
+            self.players[self.turnIndex].resources.append(resources[0])
+            self.players[self.turnIndex].resources.append(resources[1])
             self.players[self.turnIndex].developments.remove('year of plenty')
             self.load_game_screen()
 
@@ -491,48 +588,56 @@ class Game:
         self.load_board()
         gui.starting_screen()
 
-    def convert_command(self,command):
+    def cancel_trade(self):
+        self.state.tradeOfferOthers.clear()
+        self.state.tradeOfferTurn.clear()
+        self.load_board()
+
+    def quit(self):
+        self.running = False
+        
+    def carry_out_command(self,command):
         action = {'roll dice'           : self.give_producing_resources(),
                   'play'                : self.start_game(),
                   'end turn'            : self.next_turn(),
                   'load game screen'    : self.load_game_screen(),
                   'play knight'         : self.play_knight(),
                   'play road building'  : self.play_road_building(),
-                  'play monopoly wood'  : self.play_monopoly('wood'),
-                  'play monopoly brick' : self.play_monopoly('brick'),
-                  'play monopoly sheep' : self.play_monopoly('sheep'),
-                  'play monopoly hay'   : self.play_monopoly('hay'),
-                  'play monopoly ore'   : self.play_monopoly('ore'),
+                  'play monopoly wood'  : self.play_monopoly(command['RESOURCE']),
                   'buy development'     : self.create_development_card(),
-                  'accepted'            : self.answered_trade(True),
-                  'declined'            : self.answered_trade(False),
-                  'steal from player index 0': self.steal_card(0),
-                  'steal from player index 1': self.steal_card(1),
-                  'steal from player index 2': self.steal_card(2),
-                  'steal from player index 3': self.steal_card(3),
-                  'trade with player index 0': self.choose_player_to_trade_with(0),
-                  'trade with player index 1': self.choose_player_to_trade_with(1),
-                  'trade with player index 2': self.choose_player_to_trade_with(2),
-                  'trade with player index 3': self.choose_player_to_trade_with(3),
-        }
-        return action[command]
+                  'trade choice'        : self.answered_trade(command['CHOICE']),
+                  'steal from player'   : self.steal_card(command['INDEX']),
+                  'trade with player'   : self.choose_player_to_trade_with(command['INDEX']),
+                  'play year of plenty' : self.play_year_of_plenty(),
+                  'cancel trade'        : self.cancel_trade(),
+                  'trade with bank'     : self.trade_with_bank(),
+                  'quit'                : self.quit()
+                  }
+        return action[command['COMMAND']]
+
+# main game loop
+def main_loop(game):
+    while game.running:
+        command = gui.command(game.state.currentScreen)
+        if command != None:
+            if command['TYPE'] == 'visual':
+                if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':
+                    game.load_game_screen()
+                else:
+                    #handel in game state
+                    game.state.get_command(command)
+            elif command['TYPE'] == 'prog':
+                #handel in game file
+                game.carry_out_command(command)
+            else:
+                print('error')
+            if len(game.state.pressedNodes):
+                game.build()
     
-    def carry_out_command(self):
-        command = self.state.get_command()
-        if type(command) == int:
-            self.move_robber(command)
-        elif type(command) == str:
-            self.carry_out_command(command)
-        else: # is a list
-            if command[0] == 'year of plenty':
-                self.play_year_of_plenty(command[1])
-            elif command[0] == 'discard cards':
-                self.discard_cards(command[1])
-            elif command[0] == 'trade with bank':
-                self.trade_with_bank(command[1], command[2])
-            elif command[0] == 'complete trade':
-                self.can_trade_with(command[1], command[2])
-            elif len(command) == 2:
-                self.create_road(command)
-            else: 
-                self.create_outpost(command)
+    gui.pygame.quit()
+    gui.sys.exit()
+
+#calling game 
+game =  Game()    
+gui.start_menu()
+main_loop(game)
