@@ -27,7 +27,7 @@ class Game:
         resNum = [5,6,11,8,3,4,5,9,11,3,8,12,6,4,10,10,2,9]
         random.shuffle(terrains)
         self.tiles = [resourceTiles.Tile(x, resNum[i],resourceTiles.get_node_from_tile_num(i+1)) for i,x in enumerate(terrains)]
-        self.tiles.insert(9, resourceTiles.Tile('desert', 0, [(2,2,0), (2,2,1), (3,2,1), (3,3,1), (3,3,0), (2,3,0)], True))
+        self.tiles.insert(9, resourceTiles.Tile('none', 0, [(2,2,0), (2,2,1), (3,2,1), (3,3,1), (3,3,0), (2,3,0)], True))
 
     def make_harbours(self):
         types = ['any', 'any','brick', 'brick', 'wood', 'wood', 'any', 'any', 'hay', 'hay', 'ore', 'ore', 'any', 'any', 'sheep', 'sheep', 'any', 'any']
@@ -135,7 +135,7 @@ class Game:
         for player in players:
             gui.screen.fill(gui.get_colour(player.colour))
             rolls.append([self.roll_dice(),player])
-            time.sleep(2)
+            time.sleep(1)
         highestRoll=0
         for i in range (0,len(players),1):
             highestRoll = max(rolls[i][0], highestRoll)
@@ -150,7 +150,7 @@ class Game:
         gui.screen.fill((gui.get_colour('none')))
         gui.pygame.display.flip()
         self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
-        self.state.currentScreen = 'place starting resources'
+        self.state.currentScreen = 'place starting pieces'
         self.load_starting_screen()
 
     def place_starting_settlement(self,node:tuple):
@@ -220,19 +220,21 @@ class Game:
                                     player.resources.append(tile.resource)
 
     def build(self):
-        selectedNodes = game.state.pressedNodes
-        game.state.pressedNodes.clear()
-        game.load_game_screen()
+        selectedNodes = []
+        for node in self.state.pressedNodes:
+            selectedNodes.append(node)
+        self.state.pressedNodes.clear()
         if selectedNodes[0] == selectedNodes[1]:
             self.create_outpost(selectedNodes[0])
         elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
             self.create_road(selectedNodes)
+        self.load_game_screen()
 
     def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if self.players[self.turnIndex].connected_to_road(node) and not(self.players[self.turnIndex].adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
+        if (self.state.currentScreen == 'place starting pieces' or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
             gui.update_vp(self.players[self.turnIndex], self.turnIndex)
 
@@ -250,9 +252,18 @@ class Game:
             self.create_city(node)
 
     def create_road(self,nodes:list):
-        if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']) and (self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1])):
-            self.roads.append(self.players[self.turnIndex].build_road(nodes))
-        self.check_longest_road(self)
+        if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']):
+            if self.state.currentScreen == 'place starting pieces':
+                connectedToSettlement = False
+                for outpost in self.players[self.turnIndex].outposts:
+                    if self.is_adjacent(nodes[0], outpost) or self.is_adjacent(nodes[1], outpost):
+                        connectedToSettlement = True
+                if connectedToSettlement:
+                    self.roads.append(self.players[self.turnIndex].build_road(nodes))
+                    self.check_longest_road(self)
+            elif self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1]):
+                self.roads.append(self.players[self.turnIndex].build_road(nodes))
+                self.check_longest_road(self)
 
     def steal_longest_road(self):
         #update VP
@@ -550,7 +561,7 @@ class Game:
         for tile in self.tiles:
             if tile.robberIsOn:
                 robberTile = i
-                i +=1
+            i +=1
         gui.move_robber(self.tiles[robberTile].getNodes()[0])
 
     def load_board(self):
@@ -587,6 +598,7 @@ class Game:
     def load_starting_screen(self):
         self.load_board()
         gui.starting_screen()
+        gui.new_turn(self.players[self.turnIndex])
 
     def cancel_trade(self):
         self.state.tradeOfferOthers.clear()
@@ -595,23 +607,25 @@ class Game:
 
     def quit(self):
         self.running = False
+        gui.pygame.quit()
+        gui.sys.exit()
         
     def carry_out_command(self,command):
-        action = {'roll dice'           : self.give_producing_resources(),
-                  'play'                : self.start_game(),
-                  'end turn'            : self.next_turn(),
-                  'load game screen'    : self.load_game_screen(),
-                  'play knight'         : self.play_knight(),
-                  'play road building'  : self.play_road_building(),
-                  'play monopoly wood'  : self.play_monopoly(command['RESOURCE']),
-                  'buy development'     : self.create_development_card(),
-                  'trade choice'        : self.answered_trade(command['CHOICE']),
-                  'steal from player'   : self.steal_card(command['INDEX']),
-                  'trade with player'   : self.choose_player_to_trade_with(command['INDEX']),
-                  'play year of plenty' : self.play_year_of_plenty(),
-                  'cancel trade'        : self.cancel_trade(),
-                  'trade with bank'     : self.trade_with_bank(),
-                  'quit'                : self.quit()
+        action = {'roll dice'           : lambda:self.give_producing_resources(),
+                  'play'                : lambda:self.start_game(),
+                  'end turn'            : lambda:self.next_turn(),
+                  'load game screen'    : lambda:self.load_game_screen(),
+                  'play knight'         : lambda:self.play_knight(),
+                  'play road building'  : lambda:self.play_road_building(),
+                  'play monopoly wood'  : lambda:self.play_monopoly(command['RESOURCE']),
+                  'buy development'     : lambda:self.create_development_card(),
+                  'trade choice'        : lambda:self.answered_trade(command['CHOICE']),
+                  'steal from player'   : lambda:self.steal_card(command['INDEX']),
+                  'trade with player'   : lambda:self.choose_player_to_trade_with(command['INDEX']),
+                  'play year of plenty' : lambda:self.play_year_of_plenty(),
+                  'cancel trade'        : lambda:self.cancel_trade(),
+                  'trade with bank'     : lambda:self.trade_with_bank(),
+                  'quit'                : lambda:self.quit()
                   }
         return action[command['COMMAND']]
 
@@ -625,13 +639,15 @@ def main_loop(game):
                     game.load_game_screen()
                 else:
                     #handel in game state
-                    game.state.get_command(command)
+                    action = game.state.get_command(command)
             elif command['TYPE'] == 'prog':
                 #handel in game file
-                game.carry_out_command(command)
-            else:
-                print('error')
-            if len(game.state.pressedNodes):
+                action = game.carry_out_command(command)
+            if action is None:
+                print('ERROR: couldnt find command')
+            else: 
+                action()
+            if len(game.state.pressedNodes) == 2:
                 game.build()
     
     gui.pygame.quit()

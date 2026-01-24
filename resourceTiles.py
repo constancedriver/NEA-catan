@@ -7,8 +7,10 @@ class Tile:
         self.robberIsOn = robberIsOn
 
     def getNodes(self):
+        nodeList=[]
         for node in self.nodes:
-            return(node)
+            nodeList.append(node)
+        return nodeList
     
 def get_node_from_tile_num(n):
     a = {1 : [(0,0,0), (0,1,0), (1,1,0), (1,1,1), (0,0,1), (1,0,1)],

@@ -8,6 +8,8 @@ SMALLFONT = pygame.font.SysFont('Corbel',35)
 HEX_RADIUS = 90
 PLAYER_COLOURS = ['white', 'blue', 'red', 'orange']
 
+
+
 #coordinate system (created by me) used in the game file converted to the actual coordinated on the screen
 
 def convert_coordinates(n:tuple):
@@ -127,6 +129,13 @@ def generate_catan_layout(center_x, center_y, hexRadius=HEX_RADIUS): # add tiles
 
     return layout
 
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Catan Board")
+
+board = generate_catan_layout(WIDTH // 2, HEIGHT // 2)
+
+
 def display_dice(dice1, dice2):
     pygame.draw.rect(screen, (255,255,255), (1183, 884, 75, 75))
     pygame.draw.rect(screen, (255,255,255), (1291, 884, 75, 75))
@@ -182,8 +191,8 @@ def move_robber(hex):
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center in board:
-        pygame.draw.circle(screen, (204, 173, 96), hex_center, 35)
-        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
+        pygame.draw.circle(screen, (204, 173, 96), hex_center[0], 35)
+        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0][0]-8,hex_center[0][1]-10))
         i += 1
     hex_bottom_coord = convert_coordinates(hex)
     pygame.draw.circle(screen, (100,100,100), (hex_bottom_coord[0], hex_bottom_coord[1]-105), 15)
@@ -227,7 +236,7 @@ def new_turn(player):
 
 def node_pressed(node):
     pygame.draw.circle(screen, (0,0,0), (node[0] ,node[1]), 10, )
-    pygame.display.update( 848 , 950 , 868 , 970 )
+    pygame.display.flip()
 
 def draw_road(road):
     locations = road.location
@@ -308,6 +317,7 @@ def create_game_screen(resourceTypes):
     screen.blit((SMALLFONT.render('development' , True , (0,0,0))), (47,693))
     screen.blit((SMALLFONT.render('LARGEST ARMY:' , True , (0,0,0))), (10,550))
     screen.blit((SMALLFONT.render('LONGEST ROAD:' , True , (0,0,0))), (10,480))
+    create_hex_node_buttons()
     pygame.display.flip()
 
 def wrap_text(text, font, max_width):
@@ -351,7 +361,7 @@ def redraw_discard_cards(discardCards):
     resourceOrder = ['wood', 'brick', 'sheep', 'hay', 'ore']
     for i in range (0,5,1):
             pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),252, 75,75))
-            screen.blit((SMALLFONT.render(str(discardCards.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),(280+(others*621))))
+            screen.blit((SMALLFONT.render(str(discardCards.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),280))
     pygame.display.flip()
 
 def discard_cards_screen(player):
@@ -519,12 +529,16 @@ def select_player_to_steal_resource_from(playerIndexs, players=PLAYER_COLOURS):
     pygame.display.update(1150,0, 250, 1200)
 
 def starting_screen():
+    pygame.draw.rect(screen, (204, 173, 96), (0,0, 250, 1200))
+    pygame.draw.rect(screen, (204, 173, 96), (1150,0, 250, 1200))
     screen.blit((SMALLFONT.render('first select where' , True , (0,0,0))), (10,50))
     screen.blit((SMALLFONT.render('you want to place' , True , (0,0,0))), (10,80))
     screen.blit((SMALLFONT.render('your settlement ' , True , (0,0,0))), (10,110))
     screen.blit((SMALLFONT.render('then your road then' , True , (0,0,0))), (10,140))
     screen.blit((SMALLFONT.render('press \'next turn\'' , True , (0,0,0))), (10,170))
-    pygame.display.update(0,0,250,200)
+    pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
+    screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
+    pygame.display.flip()
 
 def update_humans(humans:int):
     pygame.draw.rect(screen, get_colour('water'), (690,370,40,40))
@@ -557,122 +571,82 @@ def start_menu():
     screen.blit((SMALLFONT.render('0' , True , (0,0,0))), ((149+(2*273)),(576)))
     pygame.display.flip()
 
-def command(currentScreen):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return {'TYPE': 'prog',
-                           'COMMAND': 'quit'}
-                
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse = pygame.mouse.get_pos()
-                x = mouse[0]
-                y = mouse[1]
-                #rule screen
-                if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'exit rules'}
-
-                # all screens 
-                elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'quit'}
-                elif 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'rules'}
-                        
-                if currentScreen == 'main menu':
-                    if 517 <= x <= 517+150 and 722 <= y <= 722+366:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play'}
-                    elif 738 <= x <= 813 and 325 <= y <= 427: # up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'add human'}
-                    elif 738 <= x <= 813 and 525 <= y <= 627: # up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'add bot'}
-                    elif 587 <= x <= 662.5 and 325 <= y <= 427: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'remove human'}
-                    elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'remove bot'}
-                    elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'quit'}
-                
-                #game end screen 
-                elif currentScreen == 'end':
-                    if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'quit'}
-                #discard cards screen
-                elif currentScreen == 'discard':
-                    if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'selected resources'
+def command_main_menu(x,y):
+    if 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
+        return {'TYPE': 'visual',
+                'COMMAND': 'rules'}
+    elif 517 <= x <= 517+366 and 722 <= y <= 722+150:
+        return {'TYPE': 'prog',
+                'COMMAND': 'play'}
+    elif 738 <= x <= 813 and 325 <= y <= 427: # up
+        return {'TYPE': 'visual',
+                'COMMAND': 'add human'}
+    elif 738 <= x <= 813 and 525 <= y <= 627: # up
+        return {'TYPE': 'visual',
+                'COMMAND': 'add bot'}
+    elif 587 <= x <= 662.5 and 325 <= y <= 427: # down
+        return {'TYPE': 'visual',
+                'COMMAND': 'remove human'}
+    elif 587 <= x <= 662.5 and 525 <= y <= 627: # down
+        return {'TYPE': 'visual',
+                'COMMAND': 'remove bot'}
+    elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+        return {'TYPE': 'prog',
+                'COMMAND': 'quit'}
+    
+def command_end_screen(x,y):
+    if 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+        return {'TYPE': 'prog',
+                'COMMAND': 'quit'}
+    
+def command_discard_screen(x,y):
+    if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'selected resources'
                         return {'TYPE': 'prog',
                            'COMMAND': 'discard cards'}
                     #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
                     #down arrown decrease the number of that resource by 1 
-                    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
+    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove wood'}
-                    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
+                           'COMMAND': 'discard: remove',
+                           'RESOURCE': 'wood'}
+    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add wood'}
-                    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
+                           'COMMAND': 'discard: add',
+                           'RESOURCE': 'wood'}
+    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove brick'}
-                    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
+                           'COMMAND': 'discard: remove',
+                           'RESOURCE': 'brick'}
+    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add brick'}
-                    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
+                           'COMMAND': 'discard: add',
+                           'RESOURCE': 'brick'}
+    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove sheep'}
-                    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
+                           'COMMAND': 'discard: remove',
+                           'RESOURCE': 'sheep'}
+    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add sheep'}
-                    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
+                           'COMMAND': 'discard: add',
+                           'RESOURCE': 'sheep'}
+    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove hay'}
-                    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
+                           'COMMAND': 'discard: remove',
+                           'RESOURCE': 'hay'}
+    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add hay'}
-                    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
+                           'COMMAND': 'discard: add',
+                           'RESOURCE': 'hay'}
+    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove ore'}
-                    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
+                           'COMMAND': 'discard: remove',
+                           'RESOURCE': 'ore'}
+    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add ore'}
-
-                #trade screen 
-                elif currentScreen == 'ask player about trade':
-                    if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
-                            return {'TYPE': 'prog',
-                           'COMMAND': 'trade choice',
-                           'CHOICE': True}
-                    elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
-                            return {'TYPE': 'prog',
-                           'COMMAND': 'trade choice',
-                           'CHOICE': False}
-                
-                elif currentScreen == 'choose player to trade with':
-                    if 620 <= x <= 620+183 and 430 <= y <= 430+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
-                           'INDEX': 0}
-                    elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
-                           'INDEX': 1}
-                    elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
-                           'INDEX': 2}
-                    elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
-                           'INDEX': 3}
-                
-                elif currentScreen == 'trade':
+                           'COMMAND': 'discard: add',
+                           'RESOURCE': 'ore'}
+    
+def command_trade(x,y):
                     if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
                         return {'TYPE': 'prog',
                            'COMMAND': 'cancel trade'}
@@ -688,68 +662,116 @@ def command(currentScreen):
                     #you put in - the players whos turn it is 
                     elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove wood'}
+                           'COMMAND': 'turn player: remove',
+                           'RESOURCE': 'wood'}
                     elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add wood'}
+                           'COMMAND': 'turn player: add',
+                           'RESOURCE': 'wood'}
                     elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove brick'}
+                           'COMMAND': 'turn player: remove',
+                           'RESOURCE': 'brick'}
                     elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add brick'}
+                           'COMMAND': 'turn player: add',
+                           'RESOURCE': 'brick'}
                     elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                            'COMMAND': 'turn player: remove sheep'}
+                            'COMMAND': 'turn player: remove',
+                           'RESOURCE': 'sheep'}
                     elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add sheep'}
+                           'COMMAND': 'turn player: add',
+                           'RESOURCE': 'sheep'}
                     elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove hay'}
+                           'COMMAND': 'turn player: remove',
+                           'RESOURCE': 'hay'}
                     elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add hay'}
+                           'COMMAND': 'turn player: add',
+                           'RESOURCE': 'hay'}
                     elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove ore'}
+                           'COMMAND': 'turn player: remove',
+                           'RESOURCE': 'ore'}
                     elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add ore'}
+                           'COMMAND': 'turn player: add',
+                           'RESOURCE': 'ore'}
 
                     #other players put in - what the player whos turn it is wants from other players 
                     elif 41 <= x <= 41 +75 and 873 <= y <= 873 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove wood'}
+                           'COMMAND': 'other players: remove',
+                           'RESOURCE': 'wood'}
                     elif 195 <= x <= 195 +75 and 873 <= y <= 873 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add wood'}
+                           'COMMAND': 'other players: add',
+                           'RESOURCE': 'wood'}
                     elif 314 <= x <= 314 +75 and 873 <= y <= 873 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove brick'}
+                           'COMMAND': 'other players: remove',
+                           'RESOURCE': 'brick'}
                     elif 468 <= x <= 468 +75 and 873 <= y <= 873 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add brick'}
+                           'COMMAND': 'other players: add',
+                           'RESOURCE': 'brick'}
                     elif 587 <= x <= 587 +75 and 873 <= y <= 873 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove sheep'}
+                           'COMMAND': 'other players: remove',
+                           'RESOURCE': 'sheep'}
                     elif 741 <= x <= 741 +75 and 873 <= y <= 873 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add sheep'}
+                           'COMMAND': 'other players: add',
+                           'RESOURCE': 'sheep'}
                     elif 860 <= x <= 860 +75 and 873 <= y <= 873 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove hay'}
+                           'COMMAND': 'other players: remove',
+                           'RESOURCE': 'hay'}
                     elif 1014 <= x <= 1014 +75 and 873 <= y <= 873 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add hay'}
+                           'COMMAND': 'other players: add',
+                           'RESOURCE': 'hay'}
                     elif 1133 <= x <= 1133 +75 and 873 <= y <= 873 +75: # down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove ore'}
+                           'COMMAND': 'other players: remove',
+                           'RESOURCE': 'ore'}
                     elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add ore'}
-                
-                elif currentScreen == 'development':
+                           'COMMAND': 'other players: add',
+                           'RESOURCE': 'ore'}
+
+def command_ask_player_about_trade(x,y):
+    if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
+        return {'TYPE': 'prog',
+                'COMMAND': 'trade choice',
+                'CHOICE': True}
+    elif 716.5 <= x <= 716.5+223.5 and 393 <= y <= 393+414: #decline trade
+        return {'TYPE': 'prog',
+                'COMMAND': 'trade choice',
+                'CHOICE': False}
+    
+def command_choose_player_trade_with(x,y):
+    if 620 <= x <= 620+183 and 430 <= y <= 430+75:
+                        return {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 0}
+    elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
+                        return {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 1}
+    elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
+                        return {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 2}
+    elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
+                        return {'TYPE': 'prog',
+                           'COMMAND': 'trade with player',
+                           'INDEX': 3}
+
+def command_development_screen(x,y):
                     if 307 <= x <= 307+240 and 360 <= y <= 360+75:
                         return {'TYPE': 'prog',
                            'COMMAND': 'play knight'}
@@ -777,37 +799,46 @@ def command(currentScreen):
                         return {'TYPE': 'prog',
                            'COMMAND': 'play monopoly',
                            'RESOURCE': 'ore'}
-
                     elif 450 <= x <= 476 and 719 <= y <= 745: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add wood'}
+                           'COMMAND': 'year of plenty add',
+                           'RESOURCE': 'wood'}
                     elif 450 <= x <= 476 and 760 <= y <= 760+26: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add brick'}
+                           'COMMAND': 'year of plenty add',
+                           'RESOURCE': 'brick'}
                     elif 450 <= x <= 476 and 801 <= y <= 801+26: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add sheep'}
+                           'COMMAND': 'year of plenty add',
+                           'RESOURCE': 'sheep'}
                     elif 450 <= x <= 476 and 842 <= y <= 842+26: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add hay'}
+                           'COMMAND': 'year of plenty add',
+                           'RESOURCE': 'hay'}
                     elif 450 <= x <= 476 and 883 <= y <= 883+26: #up
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add ore'}
+                           'COMMAND': 'year of plenty add',
+                           'RESOURCE': 'ore'}
                     elif 378 <= x <= 404 and 719 <= y <= 719+26: #down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove wood'}
+                           'COMMAND': 'year of plenty remove',
+                           'RESOURCE': 'wood'}
                     elif 378 <= x <= 404 and 760 <= y <= 760+26: #down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove brick'}
+                           'COMMAND': 'year of plenty remove',
+                           'RESOURCE': 'brick'}
                     elif 378 <= x <= 404 and 801 <= y <= 801+26: #down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove sheep'}
+                           'COMMAND': 'year of plenty remove',
+                           'RESOURCE': 'sheep'}
                     elif 378 <= x <= 404 and 842 <= y <= 842+26: #down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove hay'}
+                           'COMMAND': 'year of plenty remove',
+                           'RESOURCE': 'hay'}
                     elif 378 <= x <= 404 and 883 <= y <= 883+26: #down
                         return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove ore'}
+                           'COMMAND': 'year of plenty remove',
+                           'RESOURCE': 'ore'}
                     elif 488 <= x <= 506+54 and 883 <= y <= 883+36: #'use' button
                         return {'TYPE': 'prog',
                            'COMMAND': 'play year of plenty'}
@@ -818,9 +849,9 @@ def command(currentScreen):
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         return {'TYPE': 'prog',
                            'COMMAND': 'load game screen'}
-                
-                elif currentScreen == 'robber':
-                    #HEX NUMBER selected for robber placement
+                    
+def command_robber_screen(x,y):
+     #HEX NUMBER selected for robber placement
                     if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
                         return {'TYPE': 'prog',
                            'COMMAND': 'choose where to play knight',
@@ -914,9 +945,9 @@ def command(currentScreen):
                         return {'TYPE': 'prog',
                            'COMMAND': 'steal from player',
                            'INDEX': 3}
-                
-                elif currentScreen == 'place starting resources':
-                    # hex node buttons:
+                    
+def command_starting_pieces(x,y):
+     # hex node buttons:
                         if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
                             return {'TYPE': 'visual',
                                 'COMMAND': 'node selected',
@@ -1134,8 +1165,8 @@ def command(currentScreen):
                                 'COMMAND': 'node selected',
                                 'NODE': (858 , 960)}
 
-
-                elif currentScreen == 'game':
+def command_game_screen(x,y):
+    #side buttons
                         if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
                             return {'TYPE': 'prog',
                                 'COMMAND': 'roll dice'}
@@ -1153,7 +1184,7 @@ def command(currentScreen):
                                 'COMMAND': 'quit'}
                         
                     # hex NODE buttons:
-                        if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
+                        elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
                             return {'TYPE': 'visual',
                                 'COMMAND': 'node selected',
                                 'NODE': (619.94 , 285)}
@@ -1368,12 +1399,50 @@ def command(currentScreen):
                         elif  848 <= x <= 868 and 950 <= y <= 970 :
                             return {'TYPE': 'visual',
                                 'COMMAND': 'node selected',
-                                'NODE': (858 , 960)}
+                                'NODE': (858 , 960)}    
+
+def command(currentScreen):
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                print('main quit')
+                return {'TYPE': 'prog',
+                        'COMMAND': 'quit'}
+                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse = pygame.mouse.get_pos()
+                x = mouse[0]
+                y = mouse[1]
+                what_to_print = [currentScreen, x, y]
+                print(what_to_print)
+                # all screens 
+                if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
+                        return {'TYPE': 'visual',
+                           'COMMAND': 'exit rules'}
+                elif 34 <= x <= 34+183 and 992 <= y <= 992+75: #rules button
+                        return {'TYPE': 'visual',
+                           'COMMAND': 'rules'}
+                elif currentScreen == 'main menu':
+                    return command_main_menu(x,y)        
+                elif currentScreen == 'end':
+                    return command_end_screen(x,y)                
+                elif currentScreen == 'discard':
+                    return command_discard_screen(x,y)
+                elif currentScreen == 'trade':
+                    return command_trade(x,y)
+                elif currentScreen == 'ask player about trade':
+                    return command_ask_player_about_trade(x,y)
+                elif currentScreen == 'choose player to trade with':
+                    return command_choose_player_trade_with(x,y)
+                elif currentScreen == 'development':
+                    return command_development_screen(x,y)
+                elif currentScreen == 'robber':
+                    return command_robber_screen(x,y)
+                elif currentScreen == 'place starting pieces':
+                    return command_starting_pieces(x,y)
+                elif currentScreen == 'game':
+                    return command_game_screen(x,y)
+                        
                     
 
 # ---------- INIT ----------
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Catan Board")
-
-board = generate_catan_layout(WIDTH // 2, HEIGHT // 2)
