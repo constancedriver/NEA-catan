@@ -135,7 +135,8 @@ class Game:
         for player in players:
             gui.screen.fill(gui.get_colour(player.colour))
             rolls.append([self.roll_dice(),player])
-            time.sleep(1)
+            gui.pygame.display.update(1149, 850, 251, 143)
+            time.sleep(0.1)
         highestRoll=0
         for i in range (0,len(players),1):
             highestRoll = max(rolls[i][0], highestRoll)
@@ -153,40 +154,6 @@ class Game:
         self.state.currentScreen = 'place starting pieces'
         self.load_starting_screen()
 
-    def place_starting_settlement(self,node:tuple):
-        legal = False
-        if len(self.outposts) == len(self.roads): # for game set up outposts must be played before roads
-            legal = True
-            for outpost in self.outposts:
-                if self.is_adjacent(outpost.location, node):
-                    legal = False
-        if legal:
-            self.outposts.append(self.players[self.turnIndex].build_settlement)
-        if 4 < len(self.outposts) <= 8:
-            # get starting resources for the second settlement you place
-            self.give_starting_resources(node)
-        
-    def place_starting_road(self, nodes:list):
-        legal = False
-        if self.edge_empty(nodes):
-            for node in nodes: # road must be attached to settlement 
-                for outpost in self.players[self.turnIndex].outposts:
-                    if outpost.location == node:
-                        legal = True
-        if legal:
-            self.outposts.append(self.players[self.turnIndex].build_road(nodes))
-            # first do a round of placing settlements going forward
-            # then do a round of placing going backwards 
-            # such that the last preson places their settlements and roads directly after eachother
-            # after this the game set up is done
-            if len(self.roads) < 4:
-                self.next_turn()
-            elif len(self.roads) > 5: 
-                self.previous_turn()
-            elif len(self.roads) >= 8:
-                self.state.currentScreen = 'game'
-                self.load_game_screen()
-    
     def start_game(self):
         self.make_tiles()
         self.make_harbours()
@@ -228,8 +195,7 @@ class Game:
             self.create_outpost(selectedNodes[0])
         elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
             self.create_road(selectedNodes)
-        self.load_game_screen()
-
+        
     def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
@@ -245,14 +211,14 @@ class Game:
             self.players[self.turnIndex].build_city(node)
             gui.update_vp(self.players[self.turnIndex], self.turnIndex)
         
-    def create_outpost(self,node:tuple):
+    def create_outpost(self, node:tuple):
         if self.node_empty(node):
             self.create_settlement(node)
         else:
             self.create_city(node)
 
     def create_road(self,nodes:list):
-        if self.edge_empty(nodes) and self.players[self.turnIndex].sufficent_resources(['wood', 'brick']):
+        if self.edge_empty(nodes) and self.sufficent_resources(self.players[self.turnIndex],['wood', 'brick']):
             if self.state.currentScreen == 'place starting pieces':
                 connectedToSettlement = False
                 for outpost in self.players[self.turnIndex].outposts:
@@ -294,7 +260,7 @@ class Game:
         if self.players[self.turnIndex].playerLongestRoad > self.longestRoad:
             self.steal_longest_road()
 
-    def get_nodes(self, roads:list):
+    def get_road_nodes(self, roads:list):
         nodes = []
         for road in roads:
             nodes.append(road[0])
@@ -303,7 +269,7 @@ class Game:
     
     def find_end_nodes(self, blocked:list):
         endNodes = []
-        nodes = self.get_nodes()
+        nodes = self.get_road_nodes()
         for node in nodes:
             if nodes.count(node) == 1 and node not in blocked:
                 endNodes.append(node)
@@ -318,7 +284,7 @@ class Game:
             return adjacentNodes
     
     def create_tree(self, roads:list, blocks:list):
-        nodes = self.get_nodes(roads)
+        nodes = self.get_road_nodes(roads)
         tree = {}
         for node in nodes:
             if node in blocks:
@@ -597,6 +563,7 @@ class Game:
 
     def load_starting_screen(self):
         self.load_board()
+        gui.draw_player_banners(self.players)
         gui.starting_screen()
         gui.new_turn(self.players[self.turnIndex])
 

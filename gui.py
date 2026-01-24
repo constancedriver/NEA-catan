@@ -179,7 +179,7 @@ def update_vp(player, turnIndex):
 
 def update_devs(player, turnIndex):
     pygame.draw.rect(screen, get_colour(player.colour), (1315,110+(turnIndex*213), 50, 20))
-    screen.blit((SMALLFONT.render(str(player.development) , True , (0,0,0))), (1318,110+(turnIndex*213)))
+    screen.blit((SMALLFONT.render(str(len(player.development)) , True , (0,0,0))), (1318,110+(turnIndex*213)))
     pygame.display.update(1315, 110+(turnIndex*213), 50, 20)
 
 def update_knights(player, turnIndex):
@@ -245,12 +245,12 @@ def draw_road(road):
     pygame.display.flip()
 
 def draw_settlement(settlement):
-    location = settlement[0]
-    colour = settlement[1]
+    location = settlement.location
+    colour = get_colour(settlement.colour)
     x = convert_coordinates(location)[0]
     y = convert_coordinates(location)[1]
-    pygame.draw.rect(screen, get_colour(colour), (x-15, y-15, 30, 30))
-    pygame.draw.polygon(screen, get_colour(colour), ((x-15,y-15),(x+15,y-15),(x,y-22.5)))
+    pygame.draw.rect(screen, colour, (x-15, y-15, 30, 30))
+    pygame.draw.polygon(screen, colour, ((x-15,y-15),(x+15,y-15),(x,y-22.5)))
     create_hex_node_buttons()
     pygame.display.update(x-15, y-22.5, 30, 37.5)
 
@@ -529,8 +529,8 @@ def select_player_to_steal_resource_from(playerIndexs, players=PLAYER_COLOURS):
     pygame.display.update(1150,0, 250, 1200)
 
 def starting_screen():
-    pygame.draw.rect(screen, (204, 173, 96), (0,0, 250, 1200))
-    pygame.draw.rect(screen, (204, 173, 96), (1150,0, 250, 1200))
+    pygame.draw.rect(screen, (get_colour('none')), (0,0, 250, 1200))
+    pygame.draw.rect(screen, (get_colour('none')), (1183, 992, 183, 75))
     screen.blit((SMALLFONT.render('first select where' , True , (0,0,0))), (10,50))
     screen.blit((SMALLFONT.render('you want to place' , True , (0,0,0))), (10,80))
     screen.blit((SMALLFONT.render('your settlement ' , True , (0,0,0))), (10,110))

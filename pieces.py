@@ -1,3 +1,5 @@
+import gui
+
 class Piece:
     def __init__ (self, location:list, colour:str):
         self.location = location
@@ -6,11 +8,13 @@ class Piece:
 class Road(Piece):
     def __init__ (self, colour:str, location):
         super.__innit__(location, colour)
+        gui.draw_road(self)
 
 class Outpost(Piece):
     def __init__ (self, colour:str, location, isCity:bool=False):
         super().__init__(location, colour)
         self.isCity = isCity
+        gui.draw_settlement(self)
     def upgrade(self):
         self.isCity = True
         

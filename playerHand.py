@@ -46,7 +46,7 @@ class PlayerHand:
             self.resources.remove('hay')
             self.resources.remove('sheep')
             self.resources.remove('brick')
-            settlement = pieces.Outpost(self,node)
+            settlement = pieces.Outpost(self.colour,node)
             self.outposts.append(settlement)
             self.VP += 1
             self.settlementsLeft -=1
@@ -66,7 +66,7 @@ class PlayerHand:
         if self.roadsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('brick')
-            road = pieces.Road(self,nodes)
+            road = pieces.Road(self.colour,nodes)
             self.roads.append(road) 
             self.roadsLeft -= 1
             return road
