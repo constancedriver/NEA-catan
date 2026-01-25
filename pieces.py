@@ -7,7 +7,7 @@ class Piece:
 
 class Road(Piece):
     def __init__ (self, colour:str, location):
-        super.__innit__(location, colour)
+        super().__init__(location, colour)
         gui.draw_road(self)
 
 class Outpost(Piece):
@@ -17,6 +17,7 @@ class Outpost(Piece):
         gui.draw_settlement(self)
     def upgrade(self):
         self.isCity = True
+        gui.draw_city(self)
         
 class Harbour:
     def __init__ (self, type:str, position):

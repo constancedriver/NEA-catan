@@ -120,7 +120,7 @@ class Game:
     def edge_empty(self,nodes:list):
         edgeEmpty = True 
         for road in self.roads:
-            if road.nodes == nodes:
+            if road.location == nodes:
                 edgeEmpty = False
         return edgeEmpty
     
@@ -155,11 +155,12 @@ class Game:
         self.load_starting_screen()
 
     def start_game(self):
-        self.make_tiles()
-        self.make_harbours()
-        self.make_players()
-        self.set_development_cards()
-        self.game_set_up()
+        if self.state.bots + self.state.humans == 4:
+            self.make_tiles()
+            self.make_harbours()
+            self.make_players()
+            self.set_development_cards()
+            self.game_set_up()
 
     def get_producing_tiles(self):
         diceTotal = self.roll_dice()
@@ -203,6 +204,11 @@ class Game:
         if (self.state.currentScreen == 'place starting pieces' or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
             gui.update_vp(self.players[self.turnIndex], self.turnIndex)
+            gui.update_banner_resources(self.players)
+            # for their second starting settlement, players get starting resources
+            if self.state.currentScreen == 'place starting pieces' and 4 < len(self.outposts) <= 8:
+                self.give_starting_resources(node)
+           
 
     def create_city(self,node:tuple):
         #cities are upgraded settlements 
@@ -210,6 +216,7 @@ class Game:
         if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
             self.players[self.turnIndex].build_city(node)
             gui.update_vp(self.players[self.turnIndex], self.turnIndex)
+            gui.update_banner_resources(self.players)
         
     def create_outpost(self, node:tuple):
         if self.node_empty(node):
@@ -222,14 +229,26 @@ class Game:
             if self.state.currentScreen == 'place starting pieces':
                 connectedToSettlement = False
                 for outpost in self.players[self.turnIndex].outposts:
-                    if self.is_adjacent(nodes[0], outpost) or self.is_adjacent(nodes[1], outpost):
+                    if self.is_adjacent(nodes[0], outpost.location) or self.is_adjacent(nodes[1], outpost.location):
                         connectedToSettlement = True
                 if connectedToSettlement:
                     self.roads.append(self.players[self.turnIndex].build_road(nodes))
-                    self.check_longest_road(self)
+                    self.check_longest_road()
+                    gui.update_banner_resources(self.players)
+                    # when placing starting roads and settlements,
+                    #go one round in forwards order each placer placing 1 road and 1 settlement
+                    #then go in reverse order so that the last person to play places their second road nd settleemnt directly after their first
+                    if len(self.roads) < 4:
+                        self.next_turn()
+                    elif len(self.roads) > 5:
+                        self.previous_turn()
+                    elif len(self.roads) >= 8:
+                        self.state.currentScreen = 'game'
+                        self.load_game_screen()
             elif self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1]):
                 self.roads.append(self.players[self.turnIndex].build_road(nodes))
-                self.check_longest_road(self)
+                self.check_longest_road()
+                gui.update_banner_resources(self.players)
 
     def steal_longest_road(self):
         #update VP
@@ -267,14 +286,15 @@ class Game:
             nodes.append(road[1])
         return nodes
     
-    def find_end_nodes(self, blocked:list):
+    def find_end_nodes(self, blocked:list, roads:list):
         endNodes = []
-        nodes = self.get_road_nodes()
+        nodes = self.get_road_nodes(roads)
         for node in nodes:
             if nodes.count(node) == 1 and node not in blocked:
                 endNodes.append(node)
+        return endNodes
 
-    def get_current_adjacent_nodes(self,node, roads:list):
+    def get_current_adjacent_nodes(self,node:tuple, roads:list):
             adjacentNodes = []
             for road in roads:
                 if road[0] == node:
@@ -290,10 +310,10 @@ class Game:
             if node in blocks:
                 tree.update({node: []})
             else:
-                tree.update({node: self.get_current_adjacent_nodes(node)})
+                tree.update({node: self.get_current_adjacent_nodes(node, roads)})
         return tree
         
-    def dfs_max_length_one_chain(self, tree:dict, node, visited:list=None, depth:int=0, maxDepth:int=0):
+    def dfs_max_length_one_chain(self, tree:dict, node:tuple, visited:list=None, depth:int=0, maxDepth:int=0):
         if not visited:
             visited = []
         visited.append(node) # mark node as visited
@@ -307,7 +327,7 @@ class Game:
     def dfs_max_length(self, roads:list, blocked:list):
         tree = self.create_tree(roads, blocked)
         longestPlayerRoad = 0
-        endNodes = self.find_end_nodes(blocked)
+        endNodes = self.find_end_nodes(blocked,roads)
         for node in endNodes:
             longestPlayerRoad = max(longestPlayerRoad, self.dfs_max_length_one_chain(tree, node))
         return longestPlayerRoad
@@ -318,7 +338,7 @@ class Game:
         if self.players[self.turnIndex].sufficent_resources(['sheep', 'ore', 'hay']):
             self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
 
-    def sufficent_resources(self,player,resourcesNeeded:list):
+    def sufficent_resources(self,player:object,resourcesNeeded:list):
         sufficent = True
         resources = ['wood', 'brick', 'sheep', 'hay', 'ore']
         for resource in resources:
@@ -397,10 +417,8 @@ class Game:
                     ableToUse = True
         return ableToUse
     
-    def play_knight(self,tile):
+    def play_knight(self):
         if self.check_able_to_use('knight'):
-            self.move_robber(tile)
-            self.steal_card()
             self.players[self.turnIndex].use_knight()
             if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
                 self.steal_largest_army()
@@ -512,7 +530,7 @@ class Game:
         hasWon = False
         # can only win on your turn because that is the only time you can gain VP
         player = self.players[self.turnIndex]
-        if (player.VP + player.developments.count('victory points')) >= 10:
+        if (player.VP + player.development.count('victory points')) >= 10:
             hasWon = True
         return hasWon
 
@@ -594,6 +612,7 @@ class Game:
                   'trade with bank'     : lambda:self.trade_with_bank(),
                   'quit'                : lambda:self.quit()
                   }
+        #returns the function but doesnt complete the function
         return action[command['COMMAND']]
 
 # main game loop

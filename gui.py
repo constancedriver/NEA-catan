@@ -1414,7 +1414,7 @@ def command(currentScreen):
                 x = mouse[0]
                 y = mouse[1]
                 what_to_print = [currentScreen, x, y]
-                print(what_to_print)
+                #print(what_to_print)
                 # all screens 
                 if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
                         return {'TYPE': 'visual',
