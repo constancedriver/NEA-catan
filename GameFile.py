@@ -1,54 +1,54 @@
 import random
 import time
-import resourceTiles
-import playerHand
-import pieces
-import gameState
-import gui
+import ResourceTilesFile
+import PlayerHandFile
+import PiecesFile
+import GameVisualsFile
+import GuiFile
 
 class Game:
-    def __init__(self, running:bool=True, tiles:list=[], harbours:list=[], players:list=[], roads:list=[], outposts:list=[], longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=[], state=gameState.GameState(), askToTrade:list=[], acceptedTrade:list=[]):
+    def __init__(self, running:bool=True, tiles:list=None, harbours:list=None, players:list=None, roads:list=None, outposts:list=None, longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=None, state=GameVisualsFile.GameVisuals(), askToTrade:list=None, acceptedTrade:list=None):
         self.running = running
-        self.tiles = tiles
-        self.harbours = harbours
-        self.players = players
-        self.roads = roads
-        self.outposts = outposts
+        self.tiles = tiles if tiles is not None else []
+        self.harbours = harbours if harbours is not None else []
+        self.players = players if players is not None else []
+        self.roads = roads if roads is not None else []
+        self.outposts = outposts if outposts is not None else []
         self.longestRoad = longestRoad
         self.largestArmy = largestArmy
         self.turnIndex = turnIndex
-        self.developmentCards = developmentCards
+        self.developmentCards = developmentCards if developmentCards is not None else []
         self.state = state
-        self.askToTrade = askToTrade
-        self.acceptedTrade = acceptedTrade
+        self.askToTrade = askToTrade if askToTrade is not None else []
+        self.acceptedTrade = acceptedTrade if acceptedTrade is not None else []
 
     def make_tiles(self):
         terrains = ['ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep', 'hay', 'hay', 'hay', 'hay', 'wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick']
         resNum = [5,6,11,8,3,4,5,9,11,3,8,12,6,4,10,10,2,9]
         random.shuffle(terrains)
-        self.tiles = [resourceTiles.Tile(x, resNum[i],resourceTiles.get_node_from_tile_num(i+1)) for i,x in enumerate(terrains)]
-        self.tiles.insert(9, resourceTiles.Tile('none', 0, [(2,2,0), (2,2,1), (3,2,1), (3,3,1), (3,3,0), (2,3,0)], True))
+        self.tiles = [ResourceTilesFile.Tile(x, resNum[i],ResourceTilesFile.get_node_from_tile_num(i+1)) for i,x in enumerate(terrains)]
+        self.tiles.insert(9, ResourceTilesFile.Tile('none', 0, [(2,2,0), (2,2,1), (3,2,1), (3,3,1), (3,3,0), (2,3,0)], True))
 
     def make_harbours(self):
         types = ['any', 'any','brick', 'brick', 'wood', 'wood', 'any', 'any', 'hay', 'hay', 'ore', 'ore', 'any', 'any', 'sheep', 'sheep', 'any', 'any']
-        self.harbours = [pieces.Harbour(x, pieces.get_node_from_harbour_num(i)) for i, x in enumerate(types)]
+        self.harbours = [PiecesFile.Harbour(x, PiecesFile.get_node_from_harbour_num(i)) for i, x in enumerate(types)]
 
     def set_development_cards(self):
         for i in range (14):
-            self.developmentCards.append(pieces.DevelopmentCards('knight'))
+            self.developmentCards.append(PiecesFile.DevelopmentCards('knight'))
         for i in range (5):
-            self.developmentCards.append(pieces.DevelopmentCards('victory point', True))
+            self.developmentCards.append(PiecesFile.DevelopmentCards('victory point', True))
         for i in range(2):
-            self.developmentCards.append(pieces.DevelopmentCards('monopoly'))
-            self.developmentCards.append(pieces.DevelopmentCards('year of plenty'))
-            self.developmentCards.append(pieces.DevelopmentCards('road building'))
+            self.developmentCards.append(PiecesFile.DevelopmentCards('monopoly'))
+            self.developmentCards.append(PiecesFile.DevelopmentCards('year of plenty'))
+            self.developmentCards.append(PiecesFile.DevelopmentCards('road building'))
         random.shuffle(self.developmentCards)
 
     def make_players(self):
-        white = playerHand.PlayerHand('white')
-        blue = playerHand.PlayerHand('blue')
-        red = playerHand.PlayerHand('red')
-        orange = playerHand.PlayerHand('orange')
+        white = PlayerHandFile.PlayerHand('white')
+        blue = PlayerHandFile.PlayerHand('blue')
+        red = PlayerHandFile.PlayerHand('red')
+        orange = PlayerHandFile.PlayerHand('orange')
         self.players.append(white)
         self.players.append(blue)
         self.players.append(red)
@@ -61,18 +61,18 @@ class Game:
             self.turnIndex = 0 
         for card in self.players[self.turnIndex].development:
             card.able_to_play()
-        gui.new_turn(self.players[self.turnIndex])
+        GuiFile.new_turn(self.players[self.turnIndex])
 
     def previous_turn(self):
         self.turnIndex -= 1
         if self.turnIndex < 0:
             self.turnIndex = 3 
-        gui.new_turn(self.players[self.turnIndex])
+        GuiFile.new_turn(self.players[self.turnIndex])
 
     def roll_dice(self):
         dice1 = random.randint(1,6)
         dice2 = random.randint(1,6)
-        gui.display_dice(dice1,dice2)
+        GuiFile.display_dice(dice1,dice2)
         return (dice1+dice2)
     
     def get_adjacent_nodes (self, node:tuple):
@@ -94,6 +94,7 @@ class Game:
         for tile in self.tiles:
             if node in tile.nodes:
                 tilesAdjacent.append(tile)
+        return tilesAdjacent
 
     def find_players_on_tile(self,tile):
         playersOnTile = []
@@ -128,14 +129,14 @@ class Game:
         player = self.players[self.turnIndex]
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.resource)
-        gui.update_banner_resources([self.players[0].resources, self.players[1].resources, self.players[2].resources, self.players[3].resources])
+        GuiFile.update_banner_resources(self.players)
 
     def dice_roll_winner(self, players:list):
         rolls = []
         for player in players:
-            gui.screen.fill(gui.get_colour(player.colour))
+            GuiFile.screen.fill(GuiFile.get_colour(player.colour))
             rolls.append([self.roll_dice(),player])
-            gui.pygame.display.update(1149, 850, 251, 143)
+            GuiFile.pygame.display.update(1149, 850, 251, 143)
             time.sleep(0.1)
         highestRoll=0
         for i in range (0,len(players),1):
@@ -148,8 +149,8 @@ class Game:
             return self.dice_roll_winner(highestPlayer)
 
     def game_set_up(self):
-        gui.screen.fill((gui.get_colour('none')))
-        gui.pygame.display.flip()
+        GuiFile.screen.fill((GuiFile.get_colour('none')))
+        GuiFile.pygame.display.flip()
         self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
         self.state.currentScreen = 'place starting pieces'
         self.load_starting_screen()
@@ -196,6 +197,9 @@ class Game:
             self.create_outpost(selectedNodes[0])
         elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
             self.create_road(selectedNodes)
+        GuiFile.create_hex_node_buttons()
+        GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.update_banner_resources(self.players)
         
     def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
@@ -203,8 +207,7 @@ class Game:
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
         if (self.state.currentScreen == 'place starting pieces' or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
-            gui.update_vp(self.players[self.turnIndex], self.turnIndex)
-            gui.update_banner_resources(self.players)
+            GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
             # for their second starting settlement, players get starting resources
             if self.state.currentScreen == 'place starting pieces' and 4 < len(self.outposts) <= 8:
                 self.give_starting_resources(node)
@@ -215,8 +218,7 @@ class Game:
         #cities cost: 'ore', 'ore', 'ore', 'hay', 'hay'
         if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
             self.players[self.turnIndex].build_city(node)
-            gui.update_vp(self.players[self.turnIndex], self.turnIndex)
-            gui.update_banner_resources(self.players)
+            GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
         
     def create_outpost(self, node:tuple):
         if self.node_empty(node):
@@ -228,27 +230,32 @@ class Game:
         if self.edge_empty(nodes) and self.sufficent_resources(self.players[self.turnIndex],['wood', 'brick']):
             if self.state.currentScreen == 'place starting pieces':
                 connectedToSettlement = False
+                attachedToCorrectSettlement = True
+                # check connected to settlement 
                 for outpost in self.players[self.turnIndex].outposts:
-                    if self.is_adjacent(nodes[0], outpost.location) or self.is_adjacent(nodes[1], outpost.location):
+                    if nodes[0] == outpost.location or nodes[1] == outpost.location:
                         connectedToSettlement = True
-                if connectedToSettlement:
+                        for road in self.players[self.turnIndex].roads:
+                            if road.location[1] == outpost.location or road.location[0] == outpost.location:
+                                attachedToCorrectSettlement = False
+                                #ensures not building a road attached to the previous settlement built
+                if connectedToSettlement and attachedToCorrectSettlement:
                     self.roads.append(self.players[self.turnIndex].build_road(nodes))
                     self.check_longest_road()
-                    gui.update_banner_resources(self.players)
                     # when placing starting roads and settlements,
                     #go one round in forwards order each placer placing 1 road and 1 settlement
                     #then go in reverse order so that the last person to play places their second road nd settleemnt directly after their first
                     if len(self.roads) < 4:
                         self.next_turn()
-                    elif len(self.roads) > 5:
+                    elif 4 < len(self.roads) < 8:
                         self.previous_turn()
-                    elif len(self.roads) >= 8:
+                    elif len(self.roads) == 8:
+                        # end of game set up 
                         self.state.currentScreen = 'game'
                         self.load_game_screen()
             elif self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1]):
                 self.roads.append(self.players[self.turnIndex].build_road(nodes))
                 self.check_longest_road()
-                gui.update_banner_resources(self.players)
 
     def steal_longest_road(self):
         #update VP
@@ -261,8 +268,8 @@ class Game:
         #update new comparison value 
         self.longestRoad = self.players[self.turnIndex].playerLongestRoad
         #update visuals
-        gui.update_vp(self.players[self.turnIndex], self.turnIndex)
-        gui.update_longest_road(self.players[self.turnIndex].colour)
+        GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
+        GuiFile.update_longest_road(self.players[self.turnIndex].colour)
 
     def check_longest_road(self):
         # get all locations to calculate the players longest road
@@ -362,11 +369,11 @@ class Game:
             if len(player.resources) > 6:
                 needToDiscard.append(player)
         if len(needToDiscard) == 0:
-            gui.select_robber_placement_screen()
+            GuiFile.select_robber_placement_screen()
             self.state.currentScreen = 'robber'
         else:
             self.state.currentScreen = 'discard'
-            gui.discard_cards_screen(player)
+            GuiFile.discard_cards_screen(player)
             return needToDiscard[0]
 
     def move_robber(self, tileNum:int):
@@ -377,7 +384,7 @@ class Game:
                 if resourceTile.robberIsOn == True:
                     resourceTile.robberIsOn = False
             tile.robberIsOn = True
-            gui.move_robber(tileNum)
+            GuiFile.move_robber(tileNum)
             self.choose_player_to_steal_from()
 
     def players_on_robber_tile(self):
@@ -389,7 +396,7 @@ class Game:
     
     def choose_player_to_steal_from(self):
         self.state.currentScreen = 'robber'
-        gui.select_player_to_steal_resource_from(self.players_on_robber_tile())
+        GuiFile.select_player_to_steal_resource_from(self.players_on_robber_tile())
 
     def steal_card(self, chosenPlayerNum:int):
         possiblePlayers = self.players_on_robber_tile()
@@ -406,8 +413,8 @@ class Game:
         self.players[self.turnIndex].hasLargestArmy = True
         self.players[self.turnIndex].VP += 2
         self.largestArmy = self.players[self.turnIndex].knightsPlayed
-        gui.update_vp(self.players[self.turnIndex], self.turnIndex)
-        gui.update_largest_army(self.players[self.turnIndex].colour)
+        GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
+        GuiFile.update_largest_army(self.players[self.turnIndex].colour)
     
     def check_able_to_use(self, typeWanted:str):
         ableToUse = False
@@ -423,7 +430,7 @@ class Game:
             if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
                 self.steal_largest_army()
             self.load_board()
-            gui.select_robber_placement_screen()
+            GuiFile.select_robber_placement_screen()
             self.draw_robber()
             self.state.currentScreen = 'robber'
     
@@ -519,12 +526,12 @@ class Game:
         
     def trade_with_players(self):
         if len(self.askToTrade) != 0:
-            gui.ask_others_for_trade(self.askToTrade[0].colour)
+            GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
         elif len(self.acceptedTrade) == 1:
             self.complete_trade()
         elif len(self.acceptedTrade) > 1:
             self.state.currentScreen = 'choose player to trade with'
-            gui.select_player_to_trade_with(self.acceptedTrade)
+            GuiFile.select_player_to_trade_with(self.acceptedTrade)
 
     def won(self):
         hasWon = False
@@ -536,7 +543,7 @@ class Game:
 
     def game_end(self):
         if self.won():
-            gui.game_end_screen(self.players[self.turnIndex].colour)
+            GuiFile.game_end_screen(self.players[self.turnIndex].colour)
             self.state.currentScreen = 'end'
     
     def draw_robber(self):
@@ -546,44 +553,44 @@ class Game:
             if tile.robberIsOn:
                 robberTile = i
             i +=1
-        gui.move_robber(self.tiles[robberTile].getNodes()[0])
+        GuiFile.move_robber(self.tiles[robberTile].getNodes()[0])
 
     def load_board(self):
-        gui.screen.fill((gui.get_colour('water')))
-        gui.draw_harbours(self.harbours)
+        GuiFile.screen.fill((GuiFile.get_colour('water')))
+        GuiFile.draw_harbours(self.harbours)
         resourceTypes = []
         for tile in self.tiles:
             resourceTypes.append(tile.resource)
-        gui.create_game_screen(resourceTypes)
+        GuiFile.create_game_screen(resourceTypes)
         for road in self.roads:
-            gui.draw_road(road)
+            GuiFile.draw_road(road)
         for outpost in self.outposts:
             if outpost.isCity:
-                gui.draw_city(outpost)
+                GuiFile.draw_city(outpost)
             else: 
-                gui.draw_settlement(outpost)
+                GuiFile.draw_settlement(outpost)
         self.draw_robber()
         
     def load_game_screen(self):
         self.load_board()
-        gui.draw_building_key()
+        GuiFile.draw_building_key()
         if self.largestArmy >= 3:
             for player in self.players:
                 if player.hasLargestArmy:
-                    gui.update_largest_army(player.colour)
+                    GuiFile.update_largest_army(player.colour)
         if self.longestRoad >=5: 
             for player in self.players:
                 if player.hasLongestRoad:
-                    gui.update_longest_road(player.colour)
-        gui.draw_player_banners(self.players)
-        gui.new_turn(self.players[self.turnIndex])
-        gui.pygame.display.flip()
+                    GuiFile.update_longest_road(player.colour)
+        GuiFile.draw_player_banners(self.players)
+        GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.pygame.display.flip()
 
     def load_starting_screen(self):
         self.load_board()
-        gui.draw_player_banners(self.players)
-        gui.starting_screen()
-        gui.new_turn(self.players[self.turnIndex])
+        GuiFile.draw_player_banners(self.players)
+        GuiFile.starting_screen()
+        GuiFile.new_turn(self.players[self.turnIndex])
 
     def cancel_trade(self):
         self.state.tradeOfferOthers.clear()
@@ -592,8 +599,8 @@ class Game:
 
     def quit(self):
         self.running = False
-        gui.pygame.quit()
-        gui.sys.exit()
+        GuiFile.pygame.quit()
+        GuiFile.sys.exit()
         
     def carry_out_command(self,command):
         action = {'roll dice'           : lambda:self.give_producing_resources(),
@@ -618,11 +625,13 @@ class Game:
 # main game loop
 def main_loop(game):
     while game.running:
-        command = gui.command(game.state.currentScreen)
+        command = GuiFile.command(game.state.currentScreen)
         if command != None:
             if command['TYPE'] == 'visual':
                 if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':
-                    game.load_game_screen()
+                    action = game.load_game_screen()
+                elif command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'place starting pieces':
+                    action = game.load_starting_screen()
                 else:
                     #handel in game state
                     action = game.state.get_command(command)
@@ -636,10 +645,10 @@ def main_loop(game):
             if len(game.state.pressedNodes) == 2:
                 game.build()
     
-    gui.pygame.quit()
-    gui.sys.exit()
+    GuiFile.pygame.quit()
+    GuiFile.sys.exit()
 
 #calling game 
 game =  Game()    
-gui.start_menu()
+GuiFile.start_menu()
 main_loop(game)

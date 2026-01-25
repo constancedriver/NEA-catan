@@ -1,4 +1,4 @@
-import gui
+import GuiFile
 
 class Piece:
     def __init__ (self, location:list, colour:str):
@@ -8,16 +8,16 @@ class Piece:
 class Road(Piece):
     def __init__ (self, colour:str, location):
         super().__init__(location, colour)
-        gui.draw_road(self)
+        GuiFile.draw_road(self)
 
 class Outpost(Piece):
     def __init__ (self, colour:str, location, isCity:bool=False):
         super().__init__(location, colour)
         self.isCity = isCity
-        gui.draw_settlement(self)
+        GuiFile.draw_settlement(self)
     def upgrade(self):
         self.isCity = True
-        gui.draw_city(self)
+        GuiFile.draw_city(self)
         
 class Harbour:
     def __init__ (self, type:str, position):

@@ -83,7 +83,8 @@ def get_colour(colourName):
     'red':  (255, 0, 0),
     'blue': (0, 0, 255),
     'white':(255,255,255),
-    'orange':(255, 147, 0)}
+    'orange':(255, 147, 0),
+    'button': (145, 105, 2)}
     return colourDef[colourName]
 
 def get_resource_colours(): # add tiles as parameter
@@ -146,7 +147,8 @@ def display_dice(dice1, dice2):
 def create_hex_node_buttons():
     hex_node_coordinates = [(619.94,285),(619.94,375),(542,420),(464.06,375),(464.06,285),(542,240),(777.94,285),(777.94,375),(700,420),(700,240),(935.94,285),(935.94,375),(858,420),(858,240),(541.94,510),(464,555),(386.06,510),(386.06,420),(699.94,510),(622,555),(857.94,510),(780,555),(1015.94,420),(1015.94,510),(938,555),(462.94,645),(385,690),(307.06,645), (307.06,555),(620.94,645), (543,690),(778.94,645), (701,690),(936.94,645), (859,690),(1094.94,555), (1094.94,645),(1017,690),(541.94,780),(464,825), (386.06,780),(699.94,780), (622,825),(857.94,780), (780,825),(1015.94,780),(938,825), (619.94,915),(542,960),(464.06,915),(777.94,915),(700,960),(935.94,915), (858,960)]
     for node in hex_node_coordinates:
-        pygame.draw.circle(screen, (0,0,0), node, 10, 2)
+        pygame.draw.circle(screen, (get_colour('button')), node, 10)
+        pygame.draw.circle(screen, (0,0,0), node, 10, 2)    
     pygame.display.flip()
 
 def draw_player_banners(players:list):
@@ -342,7 +344,7 @@ def rules_screen():
     pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
     screen.blit((SMALLFONT.render('back to game' , True , (0,0,0))), (1233,25))
     y = 80
-    rules = open(r'rules.txt').read()
+    rules = open(r'Rules.txt').read()
     for line in wrap_text(rules, SMALLFONT, 1400):
         text_surface = SMALLFONT.render(line, True, (0,0,0))
         screen.blit(text_surface, (20, y))
@@ -512,7 +514,7 @@ def select_robber_placement_screen(): # create buttons for this
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center in board:
-        pygame.draw.circle(screen, (145, 105, 2), hex_center, 35)
+        pygame.draw.circle(screen, (get_colour('button')), hex_center, 35)
         screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
         i += 1
     pygame.display.flip()

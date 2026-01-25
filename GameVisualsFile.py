@@ -1,6 +1,6 @@
-import gui
+import GuiFile
 
-class GameState:
+class GameVisuals:
     def __init__ (self, currentScreen:str='main menu', pressedNodes:list=[], rolled:bool=False, tradeOfferTurn:list=[], tradeOfferOthers:list=[], acceptedTrade:list=[], yoPlenty:list=[], discardCards:list=[], humans:int=4, bots:int=0, playerAsking:str='none', numberAsked:int=0):
         self.currentScreen = currentScreen
         self.pressedNodes = pressedNodes
@@ -85,94 +85,94 @@ class GameState:
         if self.numberAsked > 3:
             colours = ['white', 'blue', 'red', 'orange']
             colours.remove(self.playerAsking)
-            gui.ask_others_for_trade(colours[self.numberAsked])
+            GuiFile.ask_others_for_trade(colours[self.numberAsked])
         else:
             return self.acceptedTrade
         
     def exit_rules(self):
         if self.currentScreen == 'trade':
-            gui.trade_screen()
+            GuiFile.trade_screen()
         elif self.currentScreen == 'development':
-            gui.development_screen()
+            GuiFile.development_screen()
         elif self.currentScreen == 'main menu':
-            gui.start_menu()
-            gui.update_bots(self.bots)
-            gui.update_humans(self.humans)
+            GuiFile.start_menu()
+            GuiFile.update_bots(self.bots)
+            GuiFile.update_humans(self.humans)
 
     def add_human(self):
         if self.humans + self.bots < 4:
             self.humans += 1
-            gui.update_humans(self.humans)
+            GuiFile.update_humans(self.humans)
 
     def add_bot(self):
         if self.humans + self.bots < 4:
             self.bots += 1
-            gui.update_bots(self.bots)
+            GuiFile.update_bots(self.bots)
 
     def remove_human(self):
         if self.humans > 0:
             self.humans -=1
-            gui.update_humans(self.humans)
+            GuiFile.update_humans(self.humans)
 
     def remove_bot(self):
         if self.bots > 0:
             self.bots -=1
-            gui.update_bots(self.bots)
+            GuiFile.update_bots(self.bots)
 
     def trade(self):
         self.currentScreen = 'trade'
         self.tradeOfferOthers.clear()
         self.tradeOfferTurn.clear()
-        gui.trade_screen()
+        GuiFile.trade_screen()
 
     def development(self):
         self.currentScreen = 'development'
         self.yoPlenty.clear()
-        gui.development_screen()
+        GuiFile.development_screen()
         
     def year_of_plenty_add(self,resource:str):
         if len(self.yoPlenty) < 2:
             self.yoPlenty.append(resource)
-            gui.update_year_of_plenty(self.yoPlenty)
+            GuiFile.update_year_of_plenty(self.yoPlenty)
 
     def year_of_plenty_remove(self, resource:str):
         if resource in self.yoPlenty:
                 self.yoPlenty.remove(resource)
-                gui.update_year_of_plenty(self.yoPlenty)
+                GuiFile.update_year_of_plenty(self.yoPlenty)
 
     def discard_remove(self, resource:str):
         if resource in self.discardCards:
             self.discardCards.remove(resource)
-            gui.redraw_discard_cards(self.discardCards)
+            GuiFile.redraw_discard_cards(self.discardCards)
 
     def discard_add(self, resource:str):
         self.discardCards.append(resource)
-        gui.redraw_discard_cards(self.discardCards)
+        GuiFile.redraw_discard_cards(self.discardCards)
 
     def trade_turn_remove(self, resource:str):
         if resource in self.tradeOfferTurn:
             self.tradeOfferTurn.remove(resource)
-            gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
+            GuiFile.redraw_trade_offer_you(self.tradeOfferTurn, False)
 
     def trade_turn_add(self, resource:str):
         self.tradeOfferTurn.append(resource)
-        gui.redraw_trade_offer_you(self.tradeOfferTurn, False)
+        GuiFile.redraw_trade_offer_you(self.tradeOfferTurn, False)
 
     def trade_others_remove(self, resource:str):
         if resource in self.tradeOfferOthers:
             self.tradeOfferOthers.remove(resource)
-            gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
+            GuiFile.redraw_trade_offer_you(self.tradeOfferOthers, True)
 
     def trade_others_add(self, resource:str):
         self.tradeOfferOthers.append(resource)
-        gui.redraw_trade_offer_you(self.tradeOfferOthers, True)
+        GuiFile.redraw_trade_offer_you(self.tradeOfferOthers, True)
 
     def node_selected(self, node):
         self.pressedNodes.append(self.convert_gui_coordinates_back(node))
-        gui.node_pressed(node)
+        GuiFile.node_pressed(node)
 
     def get_command(self,command):
-        action = {'rules' : lambda:gui.rules_screen(),
+        action = {'rules' : lambda:GuiFile.rules_screen(),
                   'exit rules': lambda:self.exit_rules(),
                   'add human': lambda:self.add_human(),
                   'add bot': lambda:self.add_bot(),

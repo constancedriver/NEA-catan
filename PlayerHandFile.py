@@ -1,21 +1,28 @@
-import pieces
+import PiecesFile
 
 class PlayerHand:
-    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources:list=['wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick', 'brick', 'sheep', 'sheep', 'hay', 'hay'], development:list=[], knightsPlayed:int=0, roads:list=[], outposts:list=[], hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False, playerLongestRoad:int=0):
+    defaultResources = [
+                'wood','wood','wood','wood',
+                'brick','brick','brick','brick',
+                'sheep','sheep',
+                'hay','hay'
+            ]
+    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0, roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False, playerLongestRoad:int=0):
+        self.colour = colour
         self.VP = VP
         self.roadsLeft = roadsLeft
         self.settlementsLeft = settlementsLeft
         self.citiesLeft = citiesLeft
-        self.resources = resources
-        self.development = development 
         self.knightsPlayed = knightsPlayed
-        self.roads = roads
-        self.outposts = outposts
         self.hasLargestArmy = hasLargestArmy
         self.hasLongestRoad = hasLongestRoad
         self.isBot = isBot
-        self.colour = colour
         self.playerLongestRoad = playerLongestRoad
+        # avoid all players sharing the same lists
+        self.resources = resources.copy() if resources is not None else self.defaultResources.copy()
+        self.development = development.copy() if development is not None else []
+        self.roads = roads.copy() if roads is not None else []
+        self.outposts = outposts.copy() if outposts is not None else []
 
     def sufficient_resources(self,resourcesNeeded):
         sufficient = True
@@ -46,7 +53,7 @@ class PlayerHand:
             self.resources.remove('hay')
             self.resources.remove('sheep')
             self.resources.remove('brick')
-            settlement = pieces.Outpost(self.colour,node)
+            settlement = PiecesFile.Outpost(self.colour,node)
             self.outposts.append(settlement)
             self.VP += 1
             self.settlementsLeft -=1
@@ -66,7 +73,7 @@ class PlayerHand:
         if self.roadsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('brick')
-            road = pieces.Road(self.colour,nodes)
+            road = PiecesFile.Road(self.colour,nodes)
             self.roads.append(road) 
             self.roadsLeft -= 1
             return road
