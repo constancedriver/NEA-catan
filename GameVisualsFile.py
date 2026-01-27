@@ -1,7 +1,10 @@
 import GuiFile
 
 class GameVisuals:
-    def __init__ (self, currentScreen:str='main menu', pressedNodes:list=[], rolled:bool=False, tradeOfferTurn:list=[], tradeOfferOthers:list=[], acceptedTrade:list=[], yoPlenty:list=[], discardCards:list=[], humans:int=4, bots:int=0, playerAsking:str='none', numberAsked:int=0):
+    def __init__ (self, currentScreen:str='main menu', pressedNodes:list=[], rolled:bool=False,
+                  tradeOfferTurn:list=[], tradeOfferOthers:list=[], acceptedTrade:list=[],
+                  yoPlenty:list=[], discardCards:list=[], humans:int=4, bots:int=0,
+                  playerAsking:str='none', numberAsked:int=0):
         self.currentScreen = currentScreen
         self.pressedNodes = pressedNodes
         self.rolled = rolled
@@ -120,15 +123,17 @@ class GameVisuals:
             GuiFile.update_bots(self.bots)
 
     def trade(self):
-        self.currentScreen = 'trade'
-        self.tradeOfferOthers.clear()
-        self.tradeOfferTurn.clear()
-        GuiFile.trade_screen()
+        if self.rolled:
+            self.currentScreen = 'trade'
+            self.tradeOfferOthers.clear()
+            self.tradeOfferTurn.clear()
+            GuiFile.trade_screen()
 
     def development(self):
-        self.currentScreen = 'development'
-        self.yoPlenty.clear()
-        GuiFile.development_screen()
+        if self.rolled: 
+            self.currentScreen = 'development'
+            self.yoPlenty.clear()
+            GuiFile.development_screen()
         
     def year_of_plenty_add(self,resource:str):
         if len(self.yoPlenty) < 2:
@@ -168,8 +173,9 @@ class GameVisuals:
         GuiFile.redraw_trade_offer_you(self.tradeOfferOthers, True)
 
     def node_selected(self, node):
-        self.pressedNodes.append(self.convert_gui_coordinates_back(node))
-        GuiFile.node_pressed(node)
+        if self.rolled or self.currentScreen == 'place starting pieces':
+            self.pressedNodes.append(self.convert_gui_coordinates_back(node))
+            GuiFile.node_pressed(node)
 
     def get_command(self,command):
         action = {'rules' : lambda:GuiFile.rules_screen(),

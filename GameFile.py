@@ -7,20 +7,23 @@ import GameVisualsFile
 import GuiFile
 
 class Game:
-    def __init__(self, running:bool=True, tiles:list=None, harbours:list=None, players:list=None, roads:list=None, outposts:list=None, longestRoad:int=4, largestArmy:int=2, turnIndex:int=0, developmentCards=None, state=GameVisualsFile.GameVisuals(), askToTrade:list=None, acceptedTrade:list=None):
+    def __init__(self, running:bool=True, tiles:list=None, harbours:list=None, players:list=None,
+                roads:list=None, outposts:list=None, longestRoad:int=4, largestArmy:int=2,
+                turnIndex:int=0, developmentCards:list=None, state=GameVisualsFile.GameVisuals(),
+                askToTrade:list=None, acceptedTrade:list=None):
         self.running = running
-        self.tiles = tiles if tiles is not None else []
-        self.harbours = harbours if harbours is not None else []
-        self.players = players if players is not None else []
-        self.roads = roads if roads is not None else []
-        self.outposts = outposts if outposts is not None else []
+        self.tiles = tiles.copy() if tiles is not None else []
+        self.harbours = harbours.copy() if harbours is not None else []
+        self.players = players.copy() if players is not None else []
+        self.roads = roads.copy() if roads is not None else []
+        self.outposts = outposts.copy() if outposts is not None else []
         self.longestRoad = longestRoad
         self.largestArmy = largestArmy
         self.turnIndex = turnIndex
-        self.developmentCards = developmentCards if developmentCards is not None else []
+        self.developmentCards = developmentCards.copy() if developmentCards is not None else []
         self.state = state
-        self.askToTrade = askToTrade if askToTrade is not None else []
-        self.acceptedTrade = acceptedTrade if acceptedTrade is not None else []
+        self.askToTrade = askToTrade.copy() if askToTrade is not None else []
+        self.acceptedTrade = acceptedTrade.copy() if acceptedTrade is not None else []
 
     def make_tiles(self):
         terrains = ['ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep', 'hay', 'hay', 'hay', 'hay', 'wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick']
@@ -55,13 +58,15 @@ class Game:
         self.players.append(orange)
 
     def next_turn(self):
-        self.game_end()
-        self.turnIndex += 1
-        if self.turnIndex > 3:
-            self.turnIndex = 0 
-        for card in self.players[self.turnIndex].development:
-            card.able_to_play()
-        GuiFile.new_turn(self.players[self.turnIndex])
+        if self.state.rolled or self.state.currentScreen == 'place starting pieces':
+            self.game_end()
+            self.turnIndex += 1
+            if self.turnIndex > 3:
+                self.turnIndex = 0 
+            for card in self.players[self.turnIndex].development:
+                card.able_to_play()
+            self.state.rolled = False
+            GuiFile.new_turn(self.players[self.turnIndex])
 
     def previous_turn(self):
         self.turnIndex -= 1
@@ -70,10 +75,12 @@ class Game:
         GuiFile.new_turn(self.players[self.turnIndex])
 
     def roll_dice(self):
-        dice1 = random.randint(1,6)
-        dice2 = random.randint(1,6)
-        GuiFile.display_dice(dice1,dice2)
-        return (dice1+dice2)
+        if self.state.rolled == False or self.state.currentScreen == 'main menu':
+            dice1 = random.randint(1,6)
+            dice2 = random.randint(1,6)
+            GuiFile.display_dice(dice1,dice2)
+            self.state.rolled = True
+            return (dice1+dice2)
     
     def get_adjacent_nodes (self, node:tuple):
         total = sum(node)
@@ -178,15 +185,15 @@ class Game:
         tilesProducing = self.get_producing_tiles()
         #the players who have an outpost on a producing tile get a resource of the type the tile produces
         for tile in tilesProducing:
-            for node in tile.nodes: # go through all nodes to find the outposts on it 
-                for outpost in self.outposts:
-                    if outpost.location == node:
-                        for player in self.players:
-                            if player.colour == outpost.colour:
-                                player.resources.append(tile.resource)
-                                # cities get an extra resource 
-                                if outpost.isCity:
+                for node in tile.nodes: # go through all nodes to find the outposts on it 
+                    for outpost in self.outposts:
+                        if outpost.location == node:
+                            for player in self.players:
+                                if player.colour == outpost.colour:
                                     player.resources.append(tile.resource)
+                                    # cities get an extra resource 
+                                    if outpost.isCity:
+                                        player.resources.append(tile.resource)
 
     def build(self):
         selectedNodes = []
@@ -342,7 +349,7 @@ class Game:
     def create_development_card(self):
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
-        if self.players[self.turnIndex].sufficent_resources(['sheep', 'ore', 'hay']):
+        if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']):
             self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
 
     def sufficent_resources(self,player:object,resourcesNeeded:list):
@@ -584,6 +591,7 @@ class Game:
                     GuiFile.update_longest_road(player.colour)
         GuiFile.draw_player_banners(self.players)
         GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.display_dice(0,0)
         GuiFile.pygame.display.flip()
 
     def load_starting_screen(self):
@@ -609,7 +617,7 @@ class Game:
                   'load game screen'    : lambda:self.load_game_screen(),
                   'play knight'         : lambda:self.play_knight(),
                   'play road building'  : lambda:self.play_road_building(),
-                  'play monopoly wood'  : lambda:self.play_monopoly(command['RESOURCE']),
+                  'play monopoly'  : lambda:self.play_monopoly(command['RESOURCE']),
                   'buy development'     : lambda:self.create_development_card(),
                   'trade choice'        : lambda:self.answered_trade(command['CHOICE']),
                   'steal from player'   : lambda:self.steal_card(command['INDEX']),
