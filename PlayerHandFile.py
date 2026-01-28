@@ -39,7 +39,7 @@ class PlayerHand:
         connectedToRoadChain = False
         # makes sure it is connected to one of the players existing roads
         for road in self.roads:
-            if (road.getLoaction()[0] == node or road.getLoaction()[1] == node):
+            if (road.getLocation()[0] == node or road.getLocation()[1] == node):
                 connectedToRoadChain = True
         return connectedToRoadChain
     

@@ -365,10 +365,10 @@ def redraw_discard_cards(discardCards):
             screen.blit((SMALLFONT.render(str(discardCards.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),280))
     pygame.display.flip()
 
-def discard_cards_screen(player):
+def discard_cards_screen(playerColour):
     screen.fill(get_colour('none'))
-    pygame.draw.rect(screen, (get_colour(player)), (0, 0, 1400, 225))
-    pygame.draw.rect(screen, (get_colour(player)), (0, 900, 1400, 300))
+    pygame.draw.rect(screen, (get_colour(playerColour)), (0, 0, 1400, 225))
+    pygame.draw.rect(screen, (get_colour(playerColour)), (0, 900, 1400, 300))
     pygame.draw.rect(screen, (0,255,0), (0, 0, 230, 75))
     screen.blit((SMALLFONT.render('selected resources' , True , (0,0,0))), (6,25))
     screen.blit((SMALLFONT.render('DISCARD CARD MENU' , True , (0,0,0))), (550,25))
@@ -388,15 +388,15 @@ def discard_cards_screen(player):
 
 def trade_screen():
     screen.fill((get_colour('none')))
-    pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
-    screen.blit((SMALLFONT.render('cancel trade' , True , (0,0,0))), (1233,25))
-    pygame.draw.rect(screen, (0,255,0), (0, 0, 183, 75))
-    screen.blit((SMALLFONT.render('complete trade' , True , (0,0,0))), (6,25))
+    pygame.draw.rect(screen, (255,0,0), (0, 0, 183, 75))
+    screen.blit((SMALLFONT.render('cancel trade' , True , (0,0,0))), (6,25))
     screen.blit((SMALLFONT.render('TRADE MENU' , True , (0,0,0))), (620,25))
     pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
     screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
     pygame.draw.rect(screen, get_colour('any'), (800, 992, 203, 75))
     screen.blit((SMALLFONT.render('trade with bank' , True , (0,0,0))), (810,1017))
+    pygame.draw.rect(screen, (0,255,0), (1092, 992, 203, 75))
+    screen.blit((SMALLFONT.render('trade with player' , True , (0,0,0))), (1095,1017))
     #creating cards
     pygame.draw.rect(screen, (get_colour('wood')), (34, 360, 240, 480))
     pygame.draw.rect(screen, (get_colour('brick')), (307, 360, 240, 480))
@@ -499,8 +499,8 @@ def development_screen():
 
     pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
     screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
-    pygame.draw.rect(screen, (255,0,0), (1217, 0, 183, 75))
-    screen.blit((SMALLFONT.render('back to game' , True , (0,0,0))), (1233,25))
+    pygame.draw.rect(screen, (255,0,0), (0, 0, 183, 75))
+    screen.blit((SMALLFONT.render('back to game' , True , (0,0,0))), (10,25))
     pygame.display.flip()
 
 def select_robber_placement_screen(): # create buttons for this
@@ -513,8 +513,8 @@ def select_robber_placement_screen(): # create buttons for this
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center in board:
-        pygame.draw.circle(screen, (get_colour('button')), hex_center[i], 35)
-        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[i][0]-8,hex_center[i][1]-10))
+        pygame.draw.circle(screen, (get_colour('button')), hex_center[0], 35)
+        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0][0]-8,hex_center[0][1]-10))
         i += 1
     pygame.display.flip()
     
@@ -649,15 +649,18 @@ def command_discard_screen(x,y):
     
 def command_trade(x,y):
                     print([x,y])
-                    if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
+                    if 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'cancel trade'
+                        print('cancel trade')
                         return {'TYPE': 'prog',
                            'COMMAND': 'cancel trade'}
-                    elif 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'complete trade'
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'complete trade'}
-                    elif 800 <= x <= 800+203 and 992 <= y <=75:
+                    elif 800 <= x <= 800+203 and 992 <= y <=992+75:
+                        print('trade with bank')
                         return {'TYPE': 'prog',
                            'COMMAND': 'trade with bank'}
+                    elif 1092 <= x <= 1092+203 and 992 <= y <=992+75:
+                        print('trade with player')
+                        return {'TYPE': 'prog',
+                           'COMMAND': 'trade with player'}
 
                     #trade arrows - up arrows increase the number of that resourse involved in the trade by 1
                     #down arrown decrease the number of that resource by 1 
@@ -758,19 +761,19 @@ def command_ask_player_about_trade(x,y):
 def command_choose_player_trade_with(x,y):
     if 620 <= x <= 620+183 and 430 <= y <= 430+75:
                         return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
+                           'COMMAND': 'choose player trade',
                            'INDEX': 0}
     elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
                         return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
+                           'COMMAND': 'choose player trade',
                            'INDEX': 1}
     elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
                         return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
+                           'COMMAND': 'choose player trade',
                            'INDEX': 2}
     elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
                         return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player',
+                           'COMMAND': 'choose player trade',
                            'INDEX': 3}
 
 def command_development_screen(x,y):
@@ -848,7 +851,7 @@ def command_development_screen(x,y):
                     elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
                         return {'TYPE': 'prog',
                            'COMMAND': 'buy development'}
-                    elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
+                    elif 0 <= x <= 0+240 and 0 <= y <= 0+75:
                         return {'TYPE': 'prog',
                            'COMMAND': 'load game screen'}
                     

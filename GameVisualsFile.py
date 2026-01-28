@@ -123,7 +123,6 @@ class GameVisuals:
             GuiFile.update_bots(self.bots)
 
     def trade(self):
-        print(self.rolled)
         if self.rolled:
             self.currentScreen = 'trade'
             self.tradeOfferOthers.clear()

@@ -368,7 +368,7 @@ class Game:
         if len(chosenCards) == (len(player.resources)//2) and self.sufficent_resources(player, chosenCards):
             for resource in chosenCards:
                 player.resources.remove(resource)
-        self.state.discardCards = []
+        self.state.discardCards.clear()
         self.robber_turn()
 
     def robber_turn(self):
@@ -382,16 +382,16 @@ class Game:
             self.state.currentScreen = 'robber'
         else:
             self.state.currentScreen = 'discard'
-            GuiFile.discard_cards_screen(player)
+            GuiFile.discard_cards_screen(player.colour)
             return needToDiscard[0]
 
-    def move_robber(self, tileNum:int):
+    def move_knight(self, tileNum:int):
         tile = self.tiles[tileNum]
         if tile.getIsRobberOn() == False:
             #the robber cannot be placed on the same tile it was just on
             for resourceTile in self.tiles:
                 if resourceTile.getIsRobberOn() == True:
-                    resourceTile.remove_robber()
+                    resourceTile.remove_knight()
             tile.add_robber()
             GuiFile.move_robber(tileNum)
             self.choose_player_to_steal_from()
@@ -464,22 +464,23 @@ class Game:
             self.players[self.turnIndex].developments.remove('road building')
             self.load_game_screen()
 
-    def trade_with_bank(self,resourceInput, resourceOutput):
-        possibleResources = self.trade_with_harbour()
-        #having an outpost on a harbour reduces the number of required resources
-        if resourceInput in possibleResources:
-            numberRequired = 2 
-        elif 'any' in possibleResources:
-            numberRequired = 3
-        else: 
-            numberRequired = 4
-        if self.players[self.turnIndex].resources.count(resourceInput) >= numberRequired:
-            for i in range (numberRequired):
-                self.players[self.turnIndex].resources.remove(resourceInput)
-            self.players[self.turnIndex].resources.append(resourceOutput)
-            self.state.tradeOfferTurn.clear()
-            self.state.tradeOfferOthers.clear()
-            self.load_game_screen()
+    def trade_with_bank(self,resourceInput:list, resourceOutput:list):
+        if self.state.all_same_type(resourceOutput) and self.state.all_same_type(resourceInput):
+            possibleResources = self.trade_with_harbour()
+            #having an outpost on a harbour reduces the number of required resources
+            if resourceInput in possibleResources:
+                numberRequired = 2 
+            elif 'any' in possibleResources:
+                numberRequired = 3
+            else: 
+                numberRequired = 4
+            if self.players[self.turnIndex].resources.count(resourceInput) >= numberRequired:
+                for i in range (numberRequired):
+                    self.players[self.turnIndex].resources.remove(resourceInput)
+                self.players[self.turnIndex].resources.append(resourceOutput[0])
+                self.state.tradeOfferTurn.clear()
+                self.state.tradeOfferOthers.clear()
+                self.load_game_screen()
     
     def trade_with_harbour(self):
         possibleResources = []
@@ -490,7 +491,7 @@ class Game:
                     possibleResources.append(harbour.getType())
         return possibleResources
 
-    def complete_trade(self):
+    def complete_trade_player(self):
         #give resources from player whos turn it is to other player
         for resourceTurn in self.state.tradeOfferTurn:
             self.players[self.turnIndex].resources.remove(resourceTurn)
@@ -501,6 +502,7 @@ class Game:
             self.players[self.turnIndex].resource.append(resourceOther)
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
+        self.askToTrade.clear()
         self.acceptedTrade.clear()
         self.load_game_screen()
 
@@ -508,15 +510,12 @@ class Game:
         chosenPlayer = self.acceptedTrade(index)
         self.acceptedTrade.clear()
         self.acceptedTrade.append(chosenPlayer)
-        self.complete_trade()
+        self.complete_trade_player()
 
     def can_trade_with(self):
-        canTradeWith = []
-        if self.sufficent_resources(self.players[self.turnIndex], self.state.tradeOfferTurn):
-            for player in self.players:
-                if self.sufficent_resources(player, self.state.tradeOfferOthers) and player != self.players[self.turnIndex]:
-                    canTradeWith.append(player)
-        self.askToTrade = canTradeWith
+        for player in self.players:
+            if self.sufficent_resources(player, self.state.tradeOfferOthers) and player != self.players[self.turnIndex]:
+                self.askToTrade.append(player)
         self.trade_with_players()
 
     def answered_trade(self,accepted:bool):
@@ -527,13 +526,15 @@ class Game:
         self.trade_with_players()
         
     def trade_with_players(self):
-        if len(self.askToTrade) != 0:
-            GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
-        elif len(self.acceptedTrade) == 1:
-            self.complete_trade()
-        elif len(self.acceptedTrade) > 1:
-            self.state.currentScreen = 'choose player to trade with'
-            GuiFile.select_player_to_trade_with(self.acceptedTrade)
+        if self.sufficent_resources(self.players[self.turnIndex], self.state.tradeOfferTurn):
+            self.can_trade_with()
+            if len(self.askToTrade) != 0:
+                GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
+            elif len(self.acceptedTrade) == 1:
+                self.complete_trade_player()
+            elif len(self.acceptedTrade) > 1:
+                self.state.currentScreen = 'choose player to trade with'
+                GuiFile.select_player_to_trade_with(self.acceptedTrade)
 
     def won(self):
         hasWon = False
@@ -588,6 +589,7 @@ class Game:
         GuiFile.new_turn(self.players[self.turnIndex])
         GuiFile.display_dice(0,0)
         GuiFile.pygame.display.flip()
+        self.state.currentScreen = 'game'
 
     def load_starting_screen(self):
         self.load_board()
@@ -598,7 +600,7 @@ class Game:
     def cancel_trade(self):
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
-        self.load_board()
+        self.load_game_screen()
 
     def quit(self):
         self.running = False
@@ -611,15 +613,18 @@ class Game:
                   'end turn'            : lambda:self.next_turn(),
                   'load game screen'    : lambda:self.load_game_screen(),
                   'play knight'         : lambda:self.play_knight(),
+                  'steal from player'   : lambda:self.steal_card(command['INDEX']),
                   'play road building'  : lambda:self.play_road_building(),
                   'play monopoly'       : lambda:self.play_monopoly(command['RESOURCE']),
+                  'play year of plenty' : lambda:self.play_year_of_plenty(),
                   'buy development'     : lambda:self.create_development_card(),
                   'trade choice'        : lambda:self.answered_trade(command['CHOICE']),
-                  'steal from player'   : lambda:self.steal_card(command['INDEX']),
-                  'trade with player'   : lambda:self.choose_player_to_trade_with(command['INDEX']),
-                  'play year of plenty' : lambda:self.play_year_of_plenty(),
                   'cancel trade'        : lambda:self.cancel_trade(),
-                  'trade with bank'     : lambda:self.trade_with_bank(),
+                  'trade with bank'     : lambda:self.trade_with_bank(self.state.tradeOfferTurn, self.state.tradeOfferOthers),
+                  'trade with player'   : lambda:self.trade_with_players(),
+                  'choose player trade' : lambda:self.choose_player_to_trade_with(command['INDEX']),
+                  'discard cards'       : lambda:self.discard_cards(self.state.discardCards),
+                  'choose where to play knight' : lambda:self.move_knight(command['HEX NUMBER']),
                   'quit'                : lambda:self.quit()
                   }
         #returns the function but doesnt complete the function
@@ -629,6 +634,7 @@ class Game:
 def main_loop(game):
     while game.running:
         command = GuiFile.command(game.state.currentScreen)
+        print(command)
         if command != None: # only compares commad type if a command is returned
             if command['TYPE'] == 'visual':
                 if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':

@@ -1,2 +1,1 @@
-# NEA-catan
-settlers of catan 
+run from GameFile

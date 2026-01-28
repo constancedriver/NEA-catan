@@ -18,7 +18,7 @@ VP (which is played automatically when it would cause you to have 10 or more VP)
 
 To trade press the 'trade' button then use the arrows to selects which resources you are inputtining into the trade
 and which resources you want in return. If you want to trade with other players after selecting the resources press
-'complete trade'. If you want to trade with the bank press 'trade with bank' instead. For a normal bank trade you must
+'trade with player'. If you want to trade with the bank press 'trade with bank' instead. For a normal bank trade you must
 input in 4 of the same type in return for 1 of another. If you have an outpost on a purple harbour you only input 3.
 If you have another harbour then you input 2 of that specific resource for 1 of another. You can only trade with resurces you currently have.
 
