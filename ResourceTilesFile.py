@@ -1,16 +1,28 @@
 import random
 class Tile:
     def __init__ (self, resource:str, resourceNumber:int, nodes, robberIsOn:bool=False):
-        self.resource = resource
-        self.resourceNumber = resourceNumber
-        self.nodes = nodes
-        self.robberIsOn = robberIsOn
+        self._resource = resource
+        self._resourceNumber = resourceNumber
+        self._nodes = nodes
+        self._robberIsOn = robberIsOn
 
     def getNodes(self):
-        nodeList=[]
-        for node in self.nodes:
-            nodeList.append(node)
-        return nodeList
+        return self._nodes
+    
+    def getTileResource(self):
+        return self._resource
+    
+    def getTileNum(self):
+        return self._resourceNumber
+    
+    def getIsRobberOn(self):
+        return self._robberIsOn
+    
+    def remove_robber(self):
+        self._robberIsOn = False
+
+    def add_robber(self):
+        self._robberIsOn = True
     
 def get_node_from_tile_num(n):
     a = {1 : [(0,0,0), (0,1,0), (1,1,0), (1,1,1), (0,0,1), (1,0,1)],

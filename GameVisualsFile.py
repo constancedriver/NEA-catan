@@ -123,6 +123,7 @@ class GameVisuals:
             GuiFile.update_bots(self.bots)
 
     def trade(self):
+        print(self.rolled)
         if self.rolled:
             self.currentScreen = 'trade'
             self.tradeOfferOthers.clear()
@@ -184,7 +185,7 @@ class GameVisuals:
                   'add bot': lambda:self.add_bot(),
                   'remove human': lambda:self.remove_human(),
                   'remove bot': lambda:self.remove_bot(),
-                  'trade': lambda:self.trade_choice(),
+                  'trade': lambda:self.trade(),
                   'development' : lambda:self.development(),
                   'year of plenty add': lambda:self.year_of_plenty_add(command['RESOURCE']),
                   'year of plenty remove': lambda:self.year_of_plenty_remove(command['RESOURCE']),

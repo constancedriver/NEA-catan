@@ -2,8 +2,14 @@ import GuiFile
 
 class Piece:
     def __init__ (self, location:list, colour:str):
-        self.location = location
-        self.colour = colour
+        self._location = location
+        self._colour = colour
+
+    def getLocation(self):
+        return self._location
+    
+    def getColour(self):
+        return self._colour
 
 class Road(Piece):
     def __init__ (self, colour:str, location):
@@ -11,23 +17,40 @@ class Road(Piece):
         GuiFile.draw_road(self)
 
 class Outpost(Piece):
-    def __init__ (self, colour:str, location, isCity:bool=False):
+    def __init__ (self, colour:str, location:tuple, isCity:bool=False):
         super().__init__(location, colour)
-        self.isCity = isCity
+        self._isCity = isCity
         GuiFile.draw_settlement(self)
+
+    def getisCity(self):
+        return self._isCity
+    
     def upgrade(self):
         self.isCity = True
         GuiFile.draw_city(self)
         
 class Harbour:
     def __init__ (self, type:str, position):
-        self.position = position
-        self.type = type 
+        self._position = position
+        self._type = type 
+
+    def getType(self):
+        return self._type
+    
+    def getPosition(self):
+        return self._position
 
 class DevelopmentCards:
     def __init__(self, type:str, canPlay:bool=False):
-        self.type = type
-        self.canPlay = canPlay
+        self._type = type
+        self._canPlay = canPlay
+    
+    def getCardType(self):
+        return self._type
+    
+    def getCanPlay(self):
+        return self._canPlay
+    
     def able_to_play(self):
         self.canPlay = True
 

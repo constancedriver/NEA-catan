@@ -90,12 +90,12 @@ def get_colour(colourName):
 def get_resource_colours(): # add tiles as parameter
     resources = []
     #for tile in tiles:
-    #    resources.append(tile.resource)
+    #    resources.append(tile.getTileResource())
     resources = ['ore', 'sheep', 'wood', 'hay', 'brick', 'sheep', 'brick', 'hay', 'wood', 'none', 'wood', 'ore', 'wood', 'ore', 'hay', 'sheep', 'brick', 'hay', 'sheep']
     colours = []
     for resource in resources:
         colours.append(get_colour(resource))
-        #colours.append(get_colour(tile.resource))
+        #colours.append(get_colour(tile.getTileResource()))
     return colours
 
 def draw_hex(surface, color, center, radius=HEX_RADIUS):
@@ -109,25 +109,24 @@ def draw_hex(surface, color, center, radius=HEX_RADIUS):
     pygame.draw.polygon(surface, color, points)
     pygame.draw.polygon(surface, (0, 0, 0), points, 3)  
 
-def generate_catan_layout(center_x, center_y, hexRadius=HEX_RADIUS): # add tiles as parameter
-    colours = get_resource_colours() # add tiles as parameter
+def generate_catan_layout(center_x, center_y, hexRadius=HEX_RADIUS):
+    colours = get_resource_colours()
     layout = []
     rows = [3, 4, 5, 4, 3]
     h_spacing = hexRadius * 1.75
     v_spacing = hexRadius * 1.5
-
-    y_offset = center_y - v_spacing * 2
+    # start at bottom row
+    y_offset = center_y + v_spacing * 2
     j = 0
-    for count in rows:
+    for count in reversed(rows):  # bottom → top
         x_offset = center_x - (count - 1) * h_spacing / 2
-        for i in range(count):
+        for i in range(count):  # left → right
             layout.append((
                 (int(x_offset + i * h_spacing), int(y_offset)),
                 colours[j]
             ))
             j += 1
-        y_offset += v_spacing
-
+        y_offset -= v_spacing  # move upward
     return layout
 
 pygame.init()
@@ -241,14 +240,14 @@ def node_pressed(node):
     pygame.display.flip()
 
 def draw_road(road):
-    locations = road.location
-    pygame.draw.lines(screen, get_colour(road.colour), False, (convert_coordinates(locations[0]),convert_coordinates(locations[1])), 10)
+    locations = road.getLocation()
+    pygame.draw.lines(screen, get_colour(road.getColour()), False, (convert_coordinates(locations[0]),convert_coordinates(locations[1])), 10)
     create_hex_node_buttons()
     pygame.display.flip()
 
 def draw_settlement(settlement):
-    location = settlement.location
-    colour = get_colour(settlement.colour)
+    location = settlement.getLocation()
+    colour = get_colour(settlement.getColour())
     x = convert_coordinates(location)[0]
     y = convert_coordinates(location)[1]
     pygame.draw.rect(screen, colour, (x-15, y-15, 30, 30))
@@ -267,8 +266,8 @@ def draw_city(city):
 
 def draw_harbours(harbours:list):
     for harbour in harbours:
-        colour = get_colour(harbour.type)
-        node = convert_coordinates(harbour.position)
+        colour = get_colour(harbour.getType())
+        node = convert_coordinates(harbour.getPosition())
         pygame.draw.circle(screen, colour, node, 25)
 
 def draw_building_key():
@@ -514,8 +513,8 @@ def select_robber_placement_screen(): # create buttons for this
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center in board:
-        pygame.draw.circle(screen, (get_colour('button')), hex_center, 35)
-        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0]-8,hex_center[1]-10))
+        pygame.draw.circle(screen, (get_colour('button')), hex_center[i], 35)
+        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[i][0]-8,hex_center[i][1]-10))
         i += 1
     pygame.display.flip()
     
@@ -649,6 +648,7 @@ def command_discard_screen(x,y):
                            'RESOURCE': 'ore'}
     
 def command_trade(x,y):
+                    print([x,y])
                     if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #'cancel trade'
                         return {'TYPE': 'prog',
                            'COMMAND': 'cancel trade'}

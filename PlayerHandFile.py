@@ -1,4 +1,5 @@
 import PiecesFile
+import GuiFile
 
 class PlayerHand:
     defaultResources = [
@@ -7,7 +8,10 @@ class PlayerHand:
                 'sheep','sheep',
                 'hay','hay'
             ]
-    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5, citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0, roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False, isBot:bool=False, playerLongestRoad:int=0):
+    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
+                citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
+                roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
+                isBot:bool=False, playerLongestRoad:int=0):
         self.colour = colour
         self.VP = VP
         self.roadsLeft = roadsLeft
@@ -35,14 +39,14 @@ class PlayerHand:
         connectedToRoadChain = False
         # makes sure it is connected to one of the players existing roads
         for road in self.roads:
-            if (road.nodes[0] == node or road.nodes[1] == node):
+            if (road.getLoaction()[0] == node or road.getLoaction()[1] == node):
                 connectedToRoadChain = True
         return connectedToRoadChain
     
     def settlement_at_node(self,node):
         settlementAtNode = False
         for outpost in self.outposts:
-            if outpost.location == node and outpost.isCity == False:
+            if outpost.getLocation() == node and outpost.getisCity() == False:
                 settlementAtNode = True 
         return settlementAtNode       
 
@@ -83,6 +87,7 @@ class PlayerHand:
         self.resources.remove('hay')
         self.resources.remove('ore')
         self.development.append(developmentCard)
+        GuiFile.new_turn(self)
 
     def discard_resources(self):
         needToDiscard = self.resources // 2
@@ -93,5 +98,23 @@ class PlayerHand:
                 needToDiscard -= 1
         
     def use_knight(self):
-        self.development.remove('knight')
-        self.knightsPlayed +=1
+        removed = False
+        while not removed:
+            for card in self.development:
+                if card.getCardType() == 'knight':
+                    self.development.remove(card)
+                    self.knightsPlayed +=1
+                    removed = True
+
+    def updateDevelopmentsAbleToUse(self):
+        #after having the card for one turn, the player is able to play it 
+        for card in self.development:
+            if not card.getCanPlay():
+                card.able_to_play()
+
+    def getDevelopments(self):
+        developments = []
+        for card in self.development:
+            if card.getCanPlay():
+                developments.append(card.getCardType())
+        return developments

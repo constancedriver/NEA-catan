@@ -63,8 +63,7 @@ class Game:
             self.turnIndex += 1
             if self.turnIndex > 3:
                 self.turnIndex = 0 
-            for card in self.players[self.turnIndex].development:
-                card.able_to_play()
+            self.players[self.turnIndex].updateDevelopmentsAbleToUse()
             self.state.rolled = False
             GuiFile.new_turn(self.players[self.turnIndex])
 
@@ -75,12 +74,11 @@ class Game:
         GuiFile.new_turn(self.players[self.turnIndex])
 
     def roll_dice(self):
-        if self.state.rolled == False or self.state.currentScreen == 'main menu':
-            dice1 = random.randint(1,6)
-            dice2 = random.randint(1,6)
-            GuiFile.display_dice(dice1,dice2)
-            self.state.rolled = True
-            return (dice1+dice2)
+        dice1 = random.randint(1,6)
+        dice2 = random.randint(1,6)
+        GuiFile.display_dice(dice1,dice2)
+        self.state.rolled = True
+        return (dice1+dice2)
     
     def get_adjacent_nodes (self, node:tuple):
         total = sum(node)
@@ -99,43 +97,43 @@ class Game:
     def find_tiles_at_node(self, node:tuple):
         tilesAdjacent = []
         for tile in self.tiles:
-            if node in tile.nodes:
+            if node in tile.getNodes():
                 tilesAdjacent.append(tile)
         return tilesAdjacent
 
     def find_players_on_tile(self,tile):
         playersOnTile = []
         for outpost in self.outposts:
-            if outpost.location in tile.nodes and outpost.colour not in playersOnTile:
-                playersOnTile.append(outpost.colour)
+            if outpost.getLocation() in tile.getNodes() and outpost.getColour() not in playersOnTile:
+                playersOnTile.append(outpost.getColour())
         return playersOnTile
     
     def adjacent_to_settlement(self,node:tuple):
         adjacentToSettlement = False
         #makes sure at least 2 edges (one node) away from another settlement
         for outpost in self.outposts:
-            if self.is_adjacent(node, outpost.location):
+            if self.is_adjacent(node, outpost.getLocation()):
                 adjacentToSettlement = True
         return adjacentToSettlement
     
     def node_empty(self,node:tuple):
         nodeEmpty = True
         for outpost in self.outposts:
-            if outpost.location == node:
+            if outpost.getLocation() == node:
                 nodeEmpty = False
         return nodeEmpty
     
     def edge_empty(self,nodes:list):
         edgeEmpty = True 
         for road in self.roads:
-            if road.location == nodes:
+            if road.getLocation() == nodes:
                 edgeEmpty = False
         return edgeEmpty
     
     def give_starting_resources(self,node:tuple):
         player = self.players[self.turnIndex]
         for tile in self.find_tiles_at_node(node):
-            player.resources.append(tile.resource)
+            player.resources.append(tile.getTileResource())
         GuiFile.update_banner_resources(self.players)
 
     def dice_roll_winner(self, players:list):
@@ -174,26 +172,30 @@ class Game:
         diceTotal = self.roll_dice()
         if diceTotal == 7:
             self.robber_turn()
-        tilesProducing =[]
-        # tiles produce resources when the dice add to their number
-        for tile in self.tiles:
-            if tile.resourceNumber == diceTotal:
-                tilesProducing.append(tile)
-        return (tilesProducing)
+            return []
+        else: 
+            tilesProducing =[]
+            # tiles produce resources when the dice add to their number
+            for tile in self.tiles:
+                if tile.getTileNum() == diceTotal:
+                    tilesProducing.append(tile)
+            return (tilesProducing)
     
     def give_producing_resources(self):
-        tilesProducing = self.get_producing_tiles()
-        #the players who have an outpost on a producing tile get a resource of the type the tile produces
-        for tile in tilesProducing:
-                for node in tile.nodes: # go through all nodes to find the outposts on it 
-                    for outpost in self.outposts:
-                        if outpost.location == node:
-                            for player in self.players:
-                                if player.colour == outpost.colour:
-                                    player.resources.append(tile.resource)
-                                    # cities get an extra resource 
-                                    if outpost.isCity:
-                                        player.resources.append(tile.resource)
+        if self.state.rolled == False:
+        #can only roll the dice once per turn
+            tilesProducing = self.get_producing_tiles()
+            #the players who have an outpost on a producing tile get a resource of the type the tile produces
+            for tile in tilesProducing:
+                for outpost in self.outposts:
+                    if outpost.getLocation() in tile.getNodes():
+                        for player in self.players:
+                            if player.colour == outpost.getColour():
+                                player.resources.append(tile.getTileResource())
+                                if outpost.getisCity():
+                                    player.resources.append(tile.getTileResource())
+            GuiFile.update_banner_resources(self.players)
+            GuiFile.new_turn(self.players[self.turnIndex])
 
     def build(self):
         selectedNodes = []
@@ -240,10 +242,10 @@ class Game:
                 attachedToCorrectSettlement = True
                 # check connected to settlement 
                 for outpost in self.players[self.turnIndex].outposts:
-                    if nodes[0] == outpost.location or nodes[1] == outpost.location:
+                    if nodes[0] == outpost.getLocation() or nodes[1] == outpost.getLocation():
                         connectedToSettlement = True
                         for road in self.players[self.turnIndex].roads:
-                            if road.location[1] == outpost.location or road.location[0] == outpost.location:
+                            if road.getLocation()[1] == outpost.getLocation() or road.getLocation()[0] == outpost.getLocation():
                                 attachedToCorrectSettlement = False
                                 #ensures not building a road attached to the previous settlement built
                 if connectedToSettlement and attachedToCorrectSettlement:
@@ -283,11 +285,11 @@ class Game:
         roads = []
         blocks =[]
         for road in self.players[self.turnIndex].roads:
-            roads.append(road.location)
+            roads.append(road.getLocation())
         for player in self.players:
             if player != self.players[self.turnIndex]:
                 for outpost in self.players[self.turnIndex].outposts:
-                    blocks.append(outpost.location)
+                    blocks.append(outpost.getLocation())
         #calculate players longest road and if new longest road update longest road
         self.players[self.turnIndex].playerLongestRoad = self.dfs_max_length(roads, blocks)
         if self.players[self.turnIndex].playerLongestRoad > self.longestRoad:
@@ -385,19 +387,19 @@ class Game:
 
     def move_robber(self, tileNum:int):
         tile = self.tiles[tileNum]
-        if tile.robberIsOn() == False:
+        if tile.getIsRobberOn() == False:
             #the robber cannot be placed on the same tile it was just on
             for resourceTile in self.tiles:
-                if resourceTile.robberIsOn == True:
-                    resourceTile.robberIsOn = False
-            tile.robberIsOn = True
+                if resourceTile.getIsRobberOn() == True:
+                    resourceTile.remove_robber()
+            tile.add_robber()
             GuiFile.move_robber(tileNum)
             self.choose_player_to_steal_from()
 
     def players_on_robber_tile(self):
         playersOnRobberTile = []
         for tile in self.tiles:
-            if tile.robberIsOn == True:
+            if tile.getIsRobberOn() == True:
                 playersOnRobberTile.append(self.find_players_on_tile(tile))
         return playersOnRobberTile
     
@@ -423,17 +425,10 @@ class Game:
         GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
         GuiFile.update_largest_army(self.players[self.turnIndex].colour)
     
-    def check_able_to_use(self, typeWanted:str):
-        ableToUse = False
-        if typeWanted in self.players[self.turnIndex].development:
-            for card in self.players[self.turnIndex].development:
-                if card.type == typeWanted and card.canPlay:
-                    ableToUse = True
-        return ableToUse
-    
     def play_knight(self):
-        if self.check_able_to_use('knight'):
+        if 'knight' in self.players[self.turnIndex].getDevelopments():
             self.players[self.turnIndex].use_knight()
+            GuiFile.update_knights()
             if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
                 self.steal_largest_army()
             self.load_board()
@@ -442,7 +437,7 @@ class Game:
             self.state.currentScreen = 'robber'
     
     def play_monopoly(self,resourceType:str):
-        if self.check_able_to_use('monopoly'):
+        if 'monopoly' in self.players[self.turnIndex].getDevelopments():
             resourceTypeCount = 0
             for player in self.players:
                 resourceTypeCount += player.resources.count(resourceType)
@@ -454,7 +449,7 @@ class Game:
             self.load_game_screen()
         
     def play_year_of_plenty(self):
-        if self.check_able_to_use('year of plenty') and len(self.state.yoPlenty) == 2:
+        if 'year of plenty' in self.players[self.turnIndex].getDevelopments() and len(self.state.yoPlenty) == 2:
             resources = self.state.yoPlenty
             self.players[self.turnIndex].resources.append(resources[0])
             self.players[self.turnIndex].resources.append(resources[1])
@@ -462,7 +457,7 @@ class Game:
             self.load_game_screen()
 
     def play_road_building(self):
-        if self.check_able_to_use('road building'):
+        if 'road building' in self.players[self.turnIndex].getDevelopments():
             for i in range(2):
                 self.players[self.turnIndex].resources.append('brick')
                 self.players[self.turnIndex].resources.append('wood')
@@ -491,8 +486,8 @@ class Game:
         # in order to get the benifit of a harbour, you must have an outpost on it
         for outpost in self.players[self.turnIndex].outposts:
             for harbour in self.harbours:
-                if harbour.position == outpost.location:
-                    possibleResources.append(harbour.type)
+                if harbour.getPosition() == outpost.getLocation():
+                    possibleResources.append(harbour.getType())
         return possibleResources
 
     def complete_trade(self):
@@ -557,7 +552,7 @@ class Game:
         robberTile = 9
         i = 0
         for tile in self.tiles:
-            if tile.robberIsOn:
+            if tile.getIsRobberOn():
                 robberTile = i
             i +=1
         GuiFile.move_robber(self.tiles[robberTile].getNodes()[0])
@@ -567,12 +562,12 @@ class Game:
         GuiFile.draw_harbours(self.harbours)
         resourceTypes = []
         for tile in self.tiles:
-            resourceTypes.append(tile.resource)
+            resourceTypes.append((tile.getTileResource()))
         GuiFile.create_game_screen(resourceTypes)
         for road in self.roads:
             GuiFile.draw_road(road)
         for outpost in self.outposts:
-            if outpost.isCity:
+            if outpost.getisCity():
                 GuiFile.draw_city(outpost)
             else: 
                 GuiFile.draw_settlement(outpost)
@@ -617,7 +612,7 @@ class Game:
                   'load game screen'    : lambda:self.load_game_screen(),
                   'play knight'         : lambda:self.play_knight(),
                   'play road building'  : lambda:self.play_road_building(),
-                  'play monopoly'  : lambda:self.play_monopoly(command['RESOURCE']),
+                  'play monopoly'       : lambda:self.play_monopoly(command['RESOURCE']),
                   'buy development'     : lambda:self.create_development_card(),
                   'trade choice'        : lambda:self.answered_trade(command['CHOICE']),
                   'steal from player'   : lambda:self.steal_card(command['INDEX']),
@@ -634,7 +629,7 @@ class Game:
 def main_loop(game):
     while game.running:
         command = GuiFile.command(game.state.currentScreen)
-        if command != None:
+        if command != None: # only compares commad type if a command is returned
             if command['TYPE'] == 'visual':
                 if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':
                     action = game.load_game_screen()
