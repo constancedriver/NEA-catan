@@ -178,7 +178,8 @@ class Game:
             # tiles produce resources when the dice add to their number
             for tile in self.tiles:
                 if tile.getTileNum() == diceTotal:
-                    tilesProducing.append(tile)
+                    if (not tile.getIsRobberOn()):
+                        tilesProducing.append(tile)
             return (tilesProducing)
     
     def give_producing_resources(self):
@@ -214,7 +215,7 @@ class Game:
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if (self.state.currentScreen == 'place starting pieces' or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
+        if ((self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
             GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
             # for their second starting settlement, players get starting resources
@@ -375,14 +376,17 @@ class Game:
         needToDiscard = []
         for player in self.players:
             #must discard cards if have 7 or more cards
-            if len(player.resources) > 6:
+            if len(player.resources) >=7:
                 needToDiscard.append(player)
         if len(needToDiscard) == 0:
+            self.load_game_screen()
             GuiFile.select_robber_placement_screen()
+            self.draw_robber()
             self.state.currentScreen = 'robber'
         else:
             self.state.currentScreen = 'discard'
-            GuiFile.discard_cards_screen(player.colour)
+            GuiFile.discard_cards_screen(needToDiscard[0].colour)
+            GuiFile.new_turn(needToDiscard[0])
             return needToDiscard[0]
 
     def move_knight(self, tileNum:int):
@@ -391,17 +395,16 @@ class Game:
             #the robber cannot be placed on the same tile it was just on
             for resourceTile in self.tiles:
                 if resourceTile.getIsRobberOn() == True:
-                    resourceTile.remove_knight()
+                    resourceTile.remove_robber()
             tile.add_robber()
+            GuiFile.select_robber_placement_screen()
             GuiFile.move_robber(tileNum)
             self.choose_player_to_steal_from()
 
     def players_on_robber_tile(self):
-        playersOnRobberTile = []
         for tile in self.tiles:
             if tile.getIsRobberOn() == True:
-                playersOnRobberTile.append(self.find_players_on_tile(tile))
-        return playersOnRobberTile
+                return (self.find_players_on_tile(tile))
     
     def choose_player_to_steal_from(self):
         self.state.currentScreen = 'robber'
@@ -409,8 +412,11 @@ class Game:
 
     def steal_card(self, chosenPlayerNum:int):
         possiblePlayers = self.players_on_robber_tile()
-        chosenPlayer = possiblePlayers[chosenPlayerNum]
-        self.players[self.turnIndex].resources.append(chosenPlayer.resources.pop(random.randint(0,len(chosenPlayer.resources))))
+        chosenPlayerColour = possiblePlayers[chosenPlayerNum]
+        for player in self.players:
+            if player.colour == chosenPlayerColour:
+                stolenResource = player.resources.pop(random.randint(0,len(player.resources)-1))
+                self.players[self.turnIndex].resources.append(stolenResource)
         self.state.currentScreen = 'game'
         self.load_game_screen()
 
@@ -465,7 +471,7 @@ class Game:
             self.load_game_screen()
 
     def trade_with_bank(self,resourceInput:list, resourceOutput:list):
-        if self.state.all_same_type(resourceOutput) and self.state.all_same_type(resourceInput):
+        if len(resourceInput) != 0 and len(resourceOutput) != 0 and self.state.all_same_type(resourceOutput) and self.state.all_same_type(resourceInput):
             possibleResources = self.trade_with_harbour()
             #having an outpost on a harbour reduces the number of required resources
             if resourceInput in possibleResources:
@@ -512,25 +518,41 @@ class Game:
         self.acceptedTrade.append(chosenPlayer)
         self.complete_trade_player()
 
-    def can_trade_with(self):
-        for player in self.players:
-            if self.sufficent_resources(player, self.state.tradeOfferOthers) and player != self.players[self.turnIndex]:
-                self.askToTrade.append(player)
-        self.trade_with_players()
-
+    def can_trade_with(self,resourceInput:list, resourceOutput:list):
+        if len(resourceInput) != 0 and len(resourceOutput) != 0 and self.sufficent_resources(self.players[self.turnIndex], resourceInput):
+            for player in self.players:
+                if self.sufficent_resources(player, resourceOutput) and player != self.players[self.turnIndex]:
+                    self.askToTrade.append(player)
+            if len(self.askToTrade) != 0:
+                self.state.currentScreen == 'ask player about trade'
+                GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
+            else:
+                self.load_game_screen()
+               
     def answered_trade(self,accepted:bool):
         if accepted:
             self.acceptedTrade.append(self.askToTrade.pop(0))
         else:
             del self.askToTrade[0]
-        self.trade_with_players()
+        if len(self.askToTrade) == 0:
+            self.trade_with_players()
+        else:
+            self.state.currentScreen = 'ask player about trade'
+            GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
+
+    def trade_with_players(self):
+        if len(self.acceptedTrade) == 1:
+            self.complete_trade_player()
+        elif len(self.acceptedTrade) > 1:
+            self.state.currentScreen = 'choose player to trade with'
+            GuiFile.select_player_to_trade_with(self.acceptedTrade)
+        else: 
+            self.state.tradeOfferOthers.clear()
+            self.state.tradeOfferTurn.clear()
         
     def trade_with_players(self):
-        if self.sufficent_resources(self.players[self.turnIndex], self.state.tradeOfferTurn):
-            self.can_trade_with()
-            if len(self.askToTrade) != 0:
-                GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
-            elif len(self.acceptedTrade) == 1:
+        if len(self.askToTrade) == 0:
+            if len(self.acceptedTrade) == 1:
                 self.complete_trade_player()
             elif len(self.acceptedTrade) > 1:
                 self.state.currentScreen = 'choose player to trade with'
@@ -550,13 +572,12 @@ class Game:
             self.state.currentScreen = 'end'
     
     def draw_robber(self):
-        robberTile = 9
         i = 0
         for tile in self.tiles:
             if tile.getIsRobberOn():
-                robberTile = i
+                GuiFile.move_robber(i)
             i +=1
-        GuiFile.move_robber(self.tiles[robberTile].getNodes()[0])
+        
 
     def load_board(self):
         GuiFile.screen.fill((GuiFile.get_colour('water')))
@@ -621,7 +642,7 @@ class Game:
                   'trade choice'        : lambda:self.answered_trade(command['CHOICE']),
                   'cancel trade'        : lambda:self.cancel_trade(),
                   'trade with bank'     : lambda:self.trade_with_bank(self.state.tradeOfferTurn, self.state.tradeOfferOthers),
-                  'trade with player'   : lambda:self.trade_with_players(),
+                  'trade with player'   : lambda:self.can_trade_with(self.state.tradeOfferTurn, self.state.tradeOfferOthers),
                   'choose player trade' : lambda:self.choose_player_to_trade_with(command['INDEX']),
                   'discard cards'       : lambda:self.discard_cards(self.state.discardCards),
                   'choose where to play knight' : lambda:self.move_knight(command['HEX NUMBER']),

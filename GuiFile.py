@@ -69,6 +69,28 @@ def convert_coordinates(n:tuple):
          (0, 2, -2): (858,960)}
     return a[n]
 
+def convert_hex_bottom_coordinate(index:int):
+    a = {0: (542,960),
+         1: (700,960),
+         2: (858,960),
+         3: (464,825),
+         4: (622,825),
+         5: (780,825),
+         6: (938,825),
+         7: (385,690),
+         8: (543,690),
+         9: (701,690),
+         10:(859,690),
+         11:(1017,690),
+         12:(464,555),
+         13:(622,555),
+         14:(780,555),
+         15:(938,555),
+         16:(542,420),
+         17:(700,420),
+         18:(858,420)}
+    return a[index]
+
 #  Resource colors 
 def get_colour(colourName):
     colourDef = {
@@ -189,13 +211,7 @@ def update_knights(player, turnIndex):
     pygame.display.update(1315, 150+(turnIndex*213), 50, 20)
 
 def move_robber(hex):
-    resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
-    i = 0
-    for hex_center in board:
-        pygame.draw.circle(screen, (204, 173, 96), hex_center[0], 35)
-        screen.blit((SMALLFONT.render(str(resNum[i]) , True , (0,0,0))), (hex_center[0][0]-8,hex_center[0][1]-10))
-        i += 1
-    hex_bottom_coord = convert_coordinates(hex)
+    hex_bottom_coord = convert_hex_bottom_coordinate(hex)
     pygame.draw.circle(screen, (100,100,100), (hex_bottom_coord[0], hex_bottom_coord[1]-105), 15)
     pygame.draw.rect(screen, (100,100,100), (hex_bottom_coord[0]-10, hex_bottom_coord[1]-95,20,30))
     pygame.display.flip()       
@@ -413,7 +429,7 @@ def trade_screen():
             pygame.draw.polygon(screen, (0,0,0), (((195+(i*273)),(327+(j*621))),((195+(i*273)),(252+(j*621))),((267+(i*273)),(289.5+(j*621))))) # up
     pygame.display.flip()
 
-def ask_others_for_trade(player):
+def ask_others_for_trade(player:str):
         pygame.draw.rect(screen, get_colour(player), (427,360,546,480))
         pygame.draw.rect(screen, (0,255,0), (460,393,223.5,414))
         pygame.draw.rect(screen, (255,0,0), (716.5,393,223.5,414))
@@ -518,14 +534,14 @@ def select_robber_placement_screen(): # create buttons for this
         i += 1
     pygame.display.flip()
     
-def select_player_to_steal_resource_from(playerIndexs, players=PLAYER_COLOURS):
+def select_player_to_steal_resource_from(playerColours:list):
     screen.blit((SMALLFONT.render('select the player' , True , (0,0,0))), (1160,50))
     screen.blit((SMALLFONT.render('you want to ' , True , (0,0,0))), (1160,80))
     screen.blit((SMALLFONT.render('steal a random ' , True , (0,0,0))), (1160,110))
     screen.blit((SMALLFONT.render('resource from ' , True , (0,0,0))), (1160,140))
     i = 0 
-    for index in playerIndexs:
-        pygame.draw.rect(screen, get_colour(players[index]), (1160, (170+i*108), 183, 75))
+    for colour in playerColours:
+        pygame.draw.rect(screen, get_colour(colour), (1160, (170+i*108), 183, 75))
         i +=1
     pygame.display.update(1150,0, 250, 1200)
 
@@ -648,17 +664,13 @@ def command_discard_screen(x,y):
                            'RESOURCE': 'ore'}
     
 def command_trade(x,y):
-                    print([x,y])
                     if 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'cancel trade'
-                        print('cancel trade')
                         return {'TYPE': 'prog',
                            'COMMAND': 'cancel trade'}
                     elif 800 <= x <= 800+203 and 992 <= y <=992+75:
-                        print('trade with bank')
                         return {'TYPE': 'prog',
                            'COMMAND': 'trade with bank'}
                     elif 1092 <= x <= 1092+203 and 992 <= y <=992+75:
-                        print('trade with player')
                         return {'TYPE': 'prog',
                            'COMMAND': 'trade with player'}
 
@@ -749,6 +761,7 @@ def command_trade(x,y):
                            'RESOURCE': 'ore'}
 
 def command_ask_player_about_trade(x,y):
+    print([x,y])
     if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
         return {'TYPE': 'prog',
                 'COMMAND': 'trade choice',
@@ -1410,7 +1423,6 @@ def command(currentScreen):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                print('main quit')
                 return {'TYPE': 'prog',
                         'COMMAND': 'quit'}
                 
@@ -1418,9 +1430,6 @@ def command(currentScreen):
                 mouse = pygame.mouse.get_pos()
                 x = mouse[0]
                 y = mouse[1]
-                what_to_print = [currentScreen, x, y]
-                #print(what_to_print)
-                # all screens 
                 if 1217 <= x <= 1217+183 and 0 <= y <= 0+75: #back to game
                         return {'TYPE': 'visual',
                            'COMMAND': 'exit rules'}
@@ -1434,10 +1443,13 @@ def command(currentScreen):
                 elif currentScreen == 'discard':
                     return command_discard_screen(x,y)
                 elif currentScreen == 'trade':
+                    print('still on trade screen')
                     return command_trade(x,y)
                 elif currentScreen == 'ask player about trade':
+                    print('ask players about trade')
                     return command_ask_player_about_trade(x,y)
                 elif currentScreen == 'choose player to trade with':
+                    print('choose player to trade wiht')
                     return command_choose_player_trade_with(x,y)
                 elif currentScreen == 'development':
                     return command_development_screen(x,y)
