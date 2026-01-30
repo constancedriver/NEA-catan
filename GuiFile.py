@@ -449,7 +449,7 @@ def select_player_to_trade_with(playersToChooseFrom:list):
     screen.blit((SMALLFONT.render('select player to trade with:' , True , (0,0,0))), (470,400))
     i = 0 
     for player in playersToChooseFrom:
-        pygame.draw.rect(screen, get_colour(player), (620, (430+i*108), 183, 75))
+        pygame.draw.rect(screen, get_colour(player.colour), (620, (430+i*108), 183, 75))
         i +=1
     pygame.display.update(427,360,546,480)
 
@@ -761,7 +761,6 @@ def command_trade(x,y):
                            'RESOURCE': 'ore'}
 
 def command_ask_player_about_trade(x,y):
-    print([x,y])
     if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
         return {'TYPE': 'prog',
                 'COMMAND': 'trade choice',
@@ -1443,13 +1442,10 @@ def command(currentScreen):
                 elif currentScreen == 'discard':
                     return command_discard_screen(x,y)
                 elif currentScreen == 'trade':
-                    print('still on trade screen')
                     return command_trade(x,y)
                 elif currentScreen == 'ask player about trade':
-                    print('ask players about trade')
                     return command_ask_player_about_trade(x,y)
                 elif currentScreen == 'choose player to trade with':
-                    print('choose player to trade wiht')
                     return command_choose_player_trade_with(x,y)
                 elif currentScreen == 'development':
                     return command_development_screen(x,y)

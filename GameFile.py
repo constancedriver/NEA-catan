@@ -177,8 +177,7 @@ class Game:
             tilesProducing =[]
             # tiles produce resources when the dice add to their number
             for tile in self.tiles:
-                if tile.getTileNum() == diceTotal:
-                    if (not tile.getIsRobberOn()):
+                if tile.getTileNum() == diceTotal and not tile.getIsRobberOn():
                         tilesProducing.append(tile)
             return (tilesProducing)
     
@@ -408,7 +407,11 @@ class Game:
     
     def choose_player_to_steal_from(self):
         self.state.currentScreen = 'robber'
-        GuiFile.select_player_to_steal_resource_from(self.players_on_robber_tile())
+        if len(self.players_on_robber_tile()) != 0:
+            GuiFile.select_player_to_steal_resource_from(self.players_on_robber_tile())
+        else:
+            self.state.currentScreen = 'game'
+            self.load_game_screen
 
     def steal_card(self, chosenPlayerNum:int):
         possiblePlayers = self.players_on_robber_tile()
@@ -480,7 +483,8 @@ class Game:
                 numberRequired = 3
             else: 
                 numberRequired = 4
-            if self.players[self.turnIndex].resources.count(resourceInput) >= numberRequired:
+            playerResources = self.players[self.turnIndex].resources
+            if playerResources.count(resourceInput) >= numberRequired:
                 for i in range (numberRequired):
                     self.players[self.turnIndex].resources.remove(resourceInput)
                 self.players[self.turnIndex].resources.append(resourceOutput[0])
@@ -505,7 +509,7 @@ class Game:
         #give resources from other player to players whos turn it is
         for resourceOther in self.state.tradeOfferOthers:
             self.acceptedTrade[0].resources.remove(resourceOther)
-            self.players[self.turnIndex].resource.append(resourceOther)
+            self.players[self.turnIndex].resources.append(resourceOther)
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
         self.askToTrade.clear()
@@ -513,7 +517,7 @@ class Game:
         self.load_game_screen()
 
     def choose_player_to_trade_with(self,index:int):
-        chosenPlayer = self.acceptedTrade(index)
+        chosenPlayer = self.acceptedTrade[index]
         self.acceptedTrade.clear()
         self.acceptedTrade.append(chosenPlayer)
         self.complete_trade_player()
@@ -524,7 +528,7 @@ class Game:
                 if self.sufficent_resources(player, resourceOutput) and player != self.players[self.turnIndex]:
                     self.askToTrade.append(player)
             if len(self.askToTrade) != 0:
-                self.state.currentScreen == 'ask player about trade'
+                self.state.currentScreen = 'ask player about trade'
                 GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
             else:
                 self.load_game_screen()
@@ -533,14 +537,17 @@ class Game:
         if accepted:
             self.acceptedTrade.append(self.askToTrade.pop(0))
         else:
-            del self.askToTrade[0]
+            self.askToTrade.pop(0)
         if len(self.askToTrade) == 0:
+            print('end of asking')
+            self.state.currentScreen = 'trade'
             self.trade_with_players()
         else:
             self.state.currentScreen = 'ask player about trade'
             GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
 
     def trade_with_players(self):
+        print(str(len(self.acceptedTrade)))
         if len(self.acceptedTrade) == 1:
             self.complete_trade_player()
         elif len(self.acceptedTrade) > 1:
@@ -549,14 +556,8 @@ class Game:
         else: 
             self.state.tradeOfferOthers.clear()
             self.state.tradeOfferTurn.clear()
-        
-    def trade_with_players(self):
-        if len(self.askToTrade) == 0:
-            if len(self.acceptedTrade) == 1:
-                self.complete_trade_player()
-            elif len(self.acceptedTrade) > 1:
-                self.state.currentScreen = 'choose player to trade with'
-                GuiFile.select_player_to_trade_with(self.acceptedTrade)
+            self.state.currentScreen = 'game'
+            self.load_game_screen()
 
     def won(self):
         hasWon = False
