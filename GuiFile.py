@@ -246,7 +246,7 @@ def new_turn(player):
     i = 1
     screen.blit((SMALLFONT.render(('dev:') , True , (0,0,0))), (316,80))
     for card in player.development: # write out each unplayed development card
-        screen.blit((SMALLFONT.render((card) , True , (0,0,0))), (316+100*i,80))
+        screen.blit((SMALLFONT.render(str(card.getCardType()) , True , (0,0,0))), (316+100*i,80))
         i+=1
     pygame.display.update(283,1000, 834, 100)
     pygame.display.update(283,0, 834, 200)

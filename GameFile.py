@@ -142,7 +142,7 @@ class Game:
             GuiFile.screen.fill(GuiFile.get_colour(player.colour))
             rolls.append([self.roll_dice(),player])
             GuiFile.pygame.display.update(1149, 850, 251, 143)
-            time.sleep(0.1)
+            time.sleep(0.5)
         highestRoll=0
         for i in range (0,len(players),1):
             highestRoll = max(rolls[i][0], highestRoll)
@@ -353,6 +353,7 @@ class Game:
         # cost: 'sheep', 'ore', 'hay'
         if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']):
             self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
+            self.load_game_screen()
 
     def sufficent_resources(self,player:object,resourcesNeeded:list):
         sufficent = True
@@ -407,11 +408,12 @@ class Game:
     
     def choose_player_to_steal_from(self):
         self.state.currentScreen = 'robber'
-        if len(self.players_on_robber_tile()) != 0:
+        numberOfPlayers = (self.players_on_robber_tile())
+        if len(numberOfPlayers) != 0:
             GuiFile.select_player_to_steal_resource_from(self.players_on_robber_tile())
         else:
             self.state.currentScreen = 'game'
-            self.load_game_screen
+            self.load_game_screen()
 
     def steal_card(self, chosenPlayerNum:int):
         possiblePlayers = self.players_on_robber_tile()
@@ -437,7 +439,7 @@ class Game:
     def play_knight(self):
         if 'knight' in self.players[self.turnIndex].getDevelopments():
             self.players[self.turnIndex].use_knight()
-            GuiFile.update_knights()
+            GuiFile.update_knights(self.players[self.turnIndex], self.turnIndex)
             if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
                 self.steal_largest_army()
             self.load_board()
@@ -454,7 +456,7 @@ class Game:
                 player.resources = list(filter(lambda a: a != resourceType, player.resources))
             for i in range(0,resourceTypeCount,1):
                 self.players[self.turnIndex].resources.append(resourceType)
-            self.players[self.turnIndex].developments.remove('monopoly')
+            self.players[self.turnIndex].remove_development('monopoly')
             self.load_game_screen()
         
     def play_year_of_plenty(self):
@@ -462,7 +464,7 @@ class Game:
             resources = self.state.yoPlenty
             self.players[self.turnIndex].resources.append(resources[0])
             self.players[self.turnIndex].resources.append(resources[1])
-            self.players[self.turnIndex].developments.remove('year of plenty')
+            self.players[self.turnIndex].remove_development('year of plenty')
             self.load_game_screen()
 
     def play_road_building(self):
@@ -470,7 +472,7 @@ class Game:
             for i in range(2):
                 self.players[self.turnIndex].resources.append('brick')
                 self.players[self.turnIndex].resources.append('wood')
-            self.players[self.turnIndex].developments.remove('road building')
+            self.players[self.turnIndex].remove_development('road building')
             self.load_game_screen()
 
     def trade_with_bank(self,resourceInput:list, resourceOutput:list):
@@ -539,7 +541,6 @@ class Game:
         else:
             self.askToTrade.pop(0)
         if len(self.askToTrade) == 0:
-            print('end of asking')
             self.state.currentScreen = 'trade'
             self.trade_with_players()
         else:
@@ -547,7 +548,6 @@ class Game:
             GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
 
     def trade_with_players(self):
-        print(str(len(self.acceptedTrade)))
         if len(self.acceptedTrade) == 1:
             self.complete_trade_player()
         elif len(self.acceptedTrade) > 1:
@@ -656,7 +656,6 @@ class Game:
 def main_loop(game):
     while game.running:
         command = GuiFile.command(game.state.currentScreen)
-        print(command)
         if command != None: # only compares commad type if a command is returned
             if command['TYPE'] == 'visual':
                 if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':

@@ -87,7 +87,6 @@ class PlayerHand:
         self.resources.remove('hay')
         self.resources.remove('ore')
         self.development.append(developmentCard)
-        GuiFile.new_turn(self)
 
     def discard_resources(self):
         needToDiscard = self.resources // 2
@@ -98,13 +97,8 @@ class PlayerHand:
                 needToDiscard -= 1
         
     def use_knight(self):
-        removed = False
-        while not removed:
-            for card in self.development:
-                if card.getCardType() == 'knight':
-                    self.development.remove(card)
-                    self.knightsPlayed +=1
-                    removed = True
+        self.remove_development('knight')
+        self.knightsPlayed +=1
 
     def updateDevelopmentsAbleToUse(self):
         #after having the card for one turn, the player is able to play it 
@@ -118,3 +112,11 @@ class PlayerHand:
             if card.getCanPlay():
                 developments.append(card.getCardType())
         return developments
+    
+    def remove_development(self, type:str):
+        removed = False
+        while not removed:
+            for card in self.development:
+                if card.getCardType() == type:
+                    self.development.remove(card)
+                    removed = True

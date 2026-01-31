@@ -52,7 +52,7 @@ class DevelopmentCards:
         return self._canPlay
     
     def able_to_play(self):
-        self.canPlay = True
+        self._canPlay = True
 
 def get_node_from_harbour_num(n):
     a = {0:(0,0,0),
