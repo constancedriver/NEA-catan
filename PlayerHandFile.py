@@ -69,9 +69,12 @@ class PlayerHand:
                 self.resources.remove('ore')
             for i in range (1,2):
                 self.resources.remove('hay')
-            node.upgrade()
+            for outpost in self.outposts:
+                if outpost.getLocation() == node:
+                    outpost.upgrade()
             self.VP += 1
             self.citiesLeft -= 1
+            self.settlementsLeft += 1
     
     def build_road(self, nodes):
         if self.roadsLeft > 0:

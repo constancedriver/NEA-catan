@@ -92,7 +92,7 @@ def convert_hex_bottom_coordinate(index:int):
     return a[index]
 
 #  Resource colors 
-def get_colour(colourName):
+def get_colour(colourName:str):
     colourDef = {
     'water': (135, 206, 235),
     'wood' :(0, 105, 0),     
@@ -109,10 +109,8 @@ def get_colour(colourName):
     'button': (145, 105, 2)}
     return colourDef[colourName]
 
-def get_resource_colours(): # add tiles as parameter
+def get_resource_colours(): 
     resources = []
-    #for tile in tiles:
-    #    resources.append(tile.getTileResource())
     resources = ['ore', 'sheep', 'wood', 'hay', 'brick', 'sheep', 'brick', 'hay', 'wood', 'none', 'wood', 'ore', 'wood', 'ore', 'hay', 'sheep', 'brick', 'hay', 'sheep']
     colours = []
     for resource in resources:
@@ -158,7 +156,7 @@ pygame.display.set_caption("Catan Board")
 board = generate_catan_layout(WIDTH // 2, HEIGHT // 2)
 
 
-def display_dice(dice1, dice2):
+def display_dice(dice1:int, dice2:int):
     pygame.draw.rect(screen, (255,255,255), (1183, 884, 75, 75))
     pygame.draw.rect(screen, (255,255,255), (1291, 884, 75, 75))
     screen.blit((SMALLFONT.render(str(dice1) , True , (0,0,0))), (1214,909))
@@ -195,17 +193,17 @@ def update_banner_resources(players:list):
         i += 1
     pygame.display.update(1315, 20, 50, 1150)
 
-def update_vp(player, turnIndex):
+def update_vp(player:object, turnIndex:int):
     pygame.draw.rect(screen, get_colour(player.colour), (1315,30+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(player.VP) , True , (0,0,0))), (1318,30+(turnIndex*213)))
     pygame.display.update(1315, 30+(turnIndex*213), 50, 20)
 
-def update_devs(player, turnIndex):
+def update_devs(player:object, turnIndex:int):
     pygame.draw.rect(screen, get_colour(player.colour), (1315,110+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(len(player.development)) , True , (0,0,0))), (1318,110+(turnIndex*213)))
     pygame.display.update(1315, 110+(turnIndex*213), 50, 20)
 
-def update_knights(player, turnIndex):
+def update_knights(player:object, turnIndex:int):
     pygame.draw.rect(screen, get_colour(player.colour), (1315,150+(turnIndex*213), 50, 20))
     screen.blit((SMALLFONT.render(str(player.knightsPlayed) , True , (0,0,0))), (1318,150+(turnIndex*213)))
     pygame.display.update(1315, 150+(turnIndex*213), 50, 20)
@@ -220,11 +218,11 @@ def update_longest_road(player:str):
     pygame.draw.rect(screen, get_colour(player), (34,510,149,30))
     pygame.display.update(34,510,149,30)
 
-def update_largest_army(colour):
+def update_largest_army(colour:str):
     pygame.draw.rect(screen, get_colour(colour), (34,580,149,30))
     pygame.display.update(34,580,149,30)
 
-def new_turn(player): 
+def new_turn(player:object): 
     colour = player.colour
     resources = player.resources
     pygame.draw.rect(screen, get_colour(colour), (283,1000, 834, 100))
@@ -255,13 +253,13 @@ def node_pressed(node):
     pygame.draw.circle(screen, (0,0,0), (node[0] ,node[1]), 10, )
     pygame.display.flip()
 
-def draw_road(road):
+def draw_road(road:object):
     locations = road.getLocation()
     pygame.draw.lines(screen, get_colour(road.getColour()), False, (convert_coordinates(locations[0]),convert_coordinates(locations[1])), 10)
     create_hex_node_buttons()
     pygame.display.flip()
 
-def draw_settlement(settlement):
+def draw_settlement(settlement:object):
     location = settlement.getLocation()
     colour = get_colour(settlement.getColour())
     x = convert_coordinates(location)[0]
@@ -271,9 +269,9 @@ def draw_settlement(settlement):
     create_hex_node_buttons()
     pygame.display.update(x-15, y-22.5, 30, 37.5)
 
-def draw_city(city):
-    location = city[0]
-    colour = city[1]
+def draw_city(city:object):
+    location = city.getLocation()
+    colour = city.getColour()
     x = convert_coordinates(location)[0]
     y = convert_coordinates(location)[1]
     draw_settlement(city)
@@ -312,7 +310,7 @@ def draw_building_key():
     screen.blit((SMALLFONT.render('unless it is a VP' , True , (0,0,0))), (10,420))
     pygame.display.update(0,0,250,460)
 
-def create_game_screen(resourceTypes):
+def create_game_screen(resourceTypes:list):
     resNum = ['5','6','11','8','3','4','5','9','11','','3','8','12','6','4','10','10','2','9']
     i = 0
     for hex_center, colour in board:
@@ -367,21 +365,21 @@ def rules_screen():
 
     pygame.display.flip()
  
-def game_end_screen(colour):
+def game_end_screen(colour:str):
     screen.fill((get_colour(colour)))
     screen.blit((SMALLFONT.render('GAME END' , True , (0,0,0))), (620,550))
     pygame.draw.rect(screen, (255,0,0), (1183, 992, 183, 75))
     screen.blit((SMALLFONT.render('quit' , True , (0,0,0))), (1249,1017))
     pygame.display.flip()
 
-def redraw_discard_cards(discardCards):
+def redraw_discard_cards(discardCards:list):
     resourceOrder = ['wood', 'brick', 'sheep', 'hay', 'ore']
     for i in range (0,5,1):
             pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),252, 75,75))
             screen.blit((SMALLFONT.render(str(discardCards.count(resourceOrder[i])) , True , (0,0,0))), ((149+(i*273)),280))
     pygame.display.flip()
 
-def discard_cards_screen(playerColour):
+def discard_cards_screen(playerColour:str):
     screen.fill(get_colour('none'))
     pygame.draw.rect(screen, (get_colour(playerColour)), (0, 0, 1400, 225))
     pygame.draw.rect(screen, (get_colour(playerColour)), (0, 900, 1400, 300))
@@ -437,7 +435,7 @@ def ask_others_for_trade(player:str):
         screen.blit((SMALLFONT.render('decline trade' , True , (0,0,0))), (726.5,400))
         pygame.display.update(427,360,546,480)
             
-def redraw_trade_offer_you(tradeOffer, others=bool):
+def redraw_trade_offer_you(tradeOffer:list, others:bool):
     resourceOrder = ['wood', 'brick', 'sheep', 'hay', 'ore']
     for i in range (0,5,1):
             pygame.draw.rect(screen, get_colour('none'), ((116.5+(i*273)),(252+(others*621)), 75,75))
