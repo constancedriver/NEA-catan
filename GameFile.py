@@ -419,7 +419,7 @@ class Game:
         possiblePlayers = self.players_on_robber_tile()
         chosenPlayerColour = possiblePlayers[chosenPlayerNum]
         for player in self.players:
-            if player.colour == chosenPlayerColour:
+            if player.colour == chosenPlayerColour and len(player.resources) != 0:
                 stolenResource = player.resources.pop(random.randint(0,len(player.resources)-1))
                 self.players[self.turnIndex].resources.append(stolenResource)
         self.state.currentScreen = 'game'
@@ -478,17 +478,18 @@ class Game:
     def trade_with_bank(self,resourceInput:list, resourceOutput:list):
         if len(resourceInput) != 0 and len(resourceOutput) != 0 and self.state.all_same_type(resourceOutput) and self.state.all_same_type(resourceInput):
             possibleResources = self.trade_with_harbour()
+            inputResource = resourceInput[0]
             #having an outpost on a harbour reduces the number of required resources
-            if resourceInput in possibleResources:
+            if inputResource in possibleResources:
                 numberRequired = 2 
             elif 'any' in possibleResources:
                 numberRequired = 3
             else: 
                 numberRequired = 4
             playerResources = self.players[self.turnIndex].resources
-            if playerResources.count(resourceInput) >= numberRequired:
+            if playerResources.count(inputResource) >= numberRequired:
                 for i in range (numberRequired):
-                    self.players[self.turnIndex].resources.remove(resourceInput)
+                    self.players[self.turnIndex].resources.remove(inputResource)
                 self.players[self.turnIndex].resources.append(resourceOutput[0])
                 self.state.tradeOfferTurn.clear()
                 self.state.tradeOfferOthers.clear()
