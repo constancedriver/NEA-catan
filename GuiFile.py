@@ -135,18 +135,15 @@ def generate_catan_layout(center_x, center_y, hexRadius=HEX_RADIUS):
     rows = [3, 4, 5, 4, 3]
     h_spacing = hexRadius * 1.75
     v_spacing = hexRadius * 1.5
-    # start at bottom row
+    # start at bottom left
     y_offset = center_y + v_spacing * 2
     j = 0
-    for count in reversed(rows):  # bottom → top
-        x_offset = center_x - (count - 1) * h_spacing / 2
-        for i in range(count):  # left → right
-            layout.append((
-                (int(x_offset + i * h_spacing), int(y_offset)),
-                colours[j]
-            ))
+    for count in (rows): 
+        x_offset = center_x - (count-1) * (h_spacing/2)
+        for i in range(count): #right
+            layout.append(((int(x_offset + i * h_spacing), int(y_offset)), colours[j]))
             j += 1
-        y_offset -= v_spacing  # move upward
+        y_offset -= v_spacing  #up
     return layout
 
 pygame.init()
@@ -546,11 +543,12 @@ def select_player_to_steal_resource_from(playerColours:list):
 def starting_screen():
     pygame.draw.rect(screen, (get_colour('none')), (0,0, 250, 1200))
     pygame.draw.rect(screen, (get_colour('none')), (1183, 992, 183, 75))
-    screen.blit((SMALLFONT.render('first select where' , True , (0,0,0))), (10,50))
-    screen.blit((SMALLFONT.render('you want to place' , True , (0,0,0))), (10,80))
-    screen.blit((SMALLFONT.render('your settlement ' , True , (0,0,0))), (10,110))
-    screen.blit((SMALLFONT.render('then your road then' , True , (0,0,0))), (10,140))
-    screen.blit((SMALLFONT.render('press \'next turn\'' , True , (0,0,0))), (10,170))
+    draw_building_key()
+    screen.blit((SMALLFONT.render('INSTRUCTIONS:' , True , (0,0,0))), (10,620))
+    screen.blit((SMALLFONT.render('first select where' , True , (0,0,0))), (10,650))
+    screen.blit((SMALLFONT.render('you want to place' , True , (0,0,0))), (10,680))
+    screen.blit((SMALLFONT.render('your settlement ' , True , (0,0,0))), (10,710))
+    screen.blit((SMALLFONT.render('then your road' , True , (0,0,0))), (10,740))
     pygame.draw.rect(screen, (255,255,255), (34, 992, 183, 75))
     screen.blit((SMALLFONT.render('rules' , True , (0,0,0))), (95,1017))
     pygame.display.flip()

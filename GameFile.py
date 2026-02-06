@@ -101,7 +101,7 @@ class Game:
                 tilesAdjacent.append(tile)
         return tilesAdjacent
 
-    def find_players_on_tile(self,tile):
+    def find_players_on_tile(self,tile:object):
         playersOnTile = []
         for outpost in self.outposts:
             if outpost.getLocation() in tile.getNodes() and outpost.getColour() not in playersOnTile:
@@ -126,7 +126,8 @@ class Game:
     def edge_empty(self,nodes:list):
         edgeEmpty = True 
         for road in self.roads:
-            if road.getLocation() == nodes:
+            # nodes could be stores in either order
+            if road.getLocation() == nodes or (road.getLocation()[0] == nodes[1] and road.getLocation()[1] == nodes[0]):
                 edgeEmpty = False
         return edgeEmpty
     
@@ -268,10 +269,13 @@ class Game:
 
     def steal_longest_road(self):
         #update VP
+        i = 0
         for player in self.players:
             if player.hasLongestRoad == True:
                 player.hasLongestRoad = False
                 player.VP -= 2
+                GuiFile.update_vp(self.players[i], i)
+            i += 1
         self.players[self.turnIndex].hasLongestRoad = True
         self.players[self.turnIndex].VP += 2
         #update new comparison value 
@@ -286,10 +290,9 @@ class Game:
         blocks =[]
         for road in self.players[self.turnIndex].roads:
             roads.append(road.getLocation())
-        for player in self.players:
-            if player != self.players[self.turnIndex]:
-                for outpost in self.players[self.turnIndex].outposts:
-                    blocks.append(outpost.getLocation())
+        for outpost in self.outposts:
+            if outpost.getColour() != self.players[self.turnIndex].colour:
+                blocks.append(outpost.getLocation())
         #calculate players longest road and if new longest road update longest road
         self.players[self.turnIndex].playerLongestRoad = self.dfs_max_length(roads, blocks)
         if self.players[self.turnIndex].playerLongestRoad > self.longestRoad:
