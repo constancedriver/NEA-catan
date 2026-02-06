@@ -354,7 +354,7 @@ class Game:
     def create_development_card(self):
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
-        if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']):
+        if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
             self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
             self.load_game_screen()
 

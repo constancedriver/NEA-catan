@@ -133,15 +133,15 @@ def generate_catan_layout(center_x, center_y, hexRadius=HEX_RADIUS):
     colours = get_resource_colours()
     layout = []
     rows = [3, 4, 5, 4, 3]
-    h_spacing = hexRadius * 1.75
-    v_spacing = hexRadius * 1.5
+    h_spacing = (hexRadius * 1.75)
+    v_spacing = (hexRadius * 1.5)
     # start at bottom left
     y_offset = center_y + v_spacing * 2
     j = 0
     for count in (rows): 
         x_offset = center_x - (count-1) * (h_spacing/2)
         for i in range(count): #right
-            layout.append(((int(x_offset + i * h_spacing), int(y_offset)), colours[j]))
+            layout.append(((int(x_offset + (i * h_spacing)), int(y_offset)), colours[j]))
             j += 1
         y_offset -= v_spacing  #up
     return layout
