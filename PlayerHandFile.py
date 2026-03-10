@@ -1,5 +1,5 @@
 import PiecesFile
-import GuiFile
+import random
 
 class PlayerHand:
     defaultResources = [
@@ -9,9 +9,9 @@ class PlayerHand:
                 'hay','hay'
             ]
     def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
-                citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
-                roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
-                isBot:bool=False, playerLongestRoad:int=0):
+                 citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
+                 roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
+                 isBot:bool=False, playerLongestRoad:int=0):
         self.colour = colour
         self.VP = VP
         self.roadsLeft = roadsLeft
@@ -123,3 +123,33 @@ class PlayerHand:
                 if card.getCardType() == type:
                     self.development.remove(card)
                     removed = True
+
+class Bot(PlayerHand):
+    def __init__(self, colour:str, ownIndex:int, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
+                 citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
+                 roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
+                 isBot:bool=True, playerLongestRoad:int=0, playerFavour:list=None):
+        super().__init__(colour, VP, roadsLeft, settlementsLeft, citiesLeft, resources, development,
+                         knightsPlayed, roads, outposts, hasLargestArmy, hasLongestRoad,
+                         isBot, playerLongestRoad)
+        self.playerFavour = [4,4,4]
+        self.ownIndex = ownIndex
+        # []
+        
+    def accept_trade(self, playerIndex):
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        chosenNum = random.randint(0, self.playerFavour[playerIndex]*2+2, 1)
+        if chosenNum >= 6:
+            return {'TYPE': 'prog',
+                'COMMAND': 'trade choice',
+                'CHOICE': True}
+        else: 
+            return {'TYPE': 'prog',
+                'COMMAND': 'trade choice',
+                'CHOICE': False}
+    
+    def decrease_player_favour(self, playerIndex):
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        if self.playerFavour>
