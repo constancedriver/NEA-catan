@@ -12,7 +12,7 @@ class Piece:
         return self._colour
 
 class Road(Piece):
-    def __init__ (self, colour:str, location):
+    def __init__ (self, colour:str, location:list):
         super().__init__(location, colour)
         GuiFile.draw_road(self)
 

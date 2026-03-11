@@ -48,14 +48,12 @@ class Game:
         random.shuffle(self.developmentCards)
 
     def make_players(self):
-        white = PlayerHandFile.PlayerHand('white')
-        blue = PlayerHandFile.PlayerHand('blue')
-        red = PlayerHandFile.PlayerHand('red')
-        orange = PlayerHandFile.PlayerHand('orange')
-        self.players.append(white)
-        self.players.append(blue)
-        self.players.append(red)
-        self.players.append(orange)
+        NumBots = self.state.bots
+        colours = ['white', 'blue', 'red', 'orange']
+        for i in range (0,NumBots, 1):
+            self.players.append(PlayerHandFile.PlayerHand(colours.pop(0), True))
+        for i in range (NumBots, 4, 1):
+            self.players.append(PlayerHandFile.PlayerHand(colours.pop(0)))
 
     def next_turn(self):
         if self.state.rolled or self.state.currentScreen == 'place starting pieces':
@@ -147,7 +145,6 @@ class Game:
         highestRoll=0
         for i in range (0,len(players),1):
             highestRoll = max(rolls[i][0], highestRoll)
-        #highestPlayer = [k for k, item in rolls if item[0] == highestRoll]
         highestPlayer = [player for roll, player in rolls if roll == highestRoll]
         if len(highestPlayer) == 1:
             return highestPlayer[0]
@@ -651,38 +648,9 @@ class Game:
                   'choose player trade' : lambda:self.choose_player_to_trade_with(command['INDEX']),
                   'discard cards'       : lambda:self.discard_cards(self.state.discardCards),
                   'choose where to play knight' : lambda:self.move_knight(command['HEX NUMBER']),
+                  'build'               : lambda:self.build(),
                   'quit'                : lambda:self.quit()
                   }
         #returns the function but doesnt complete the function
         return action[command['COMMAND']]
 
-# main game loop
-def main_loop(game):
-    while game.running:
-        command = GuiFile.command(game.state.currentScreen)
-        if command != None: # only compares commad type if a command is returned
-            if command['TYPE'] == 'visual':
-                if command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'game':
-                    action = game.load_game_screen()
-                elif command['COMMAND'] == 'exit rules' and game.state.currentScreen == 'place starting pieces':
-                    action = game.load_starting_screen()
-                else:
-                    #handel in game state
-                    action = game.state.get_command(command)
-            elif command['TYPE'] == 'prog':
-                #handel in game file
-                action = game.carry_out_command(command)
-            if action is None:
-                print('ERROR: couldnt find command')
-            else: 
-                action()
-            if len(game.state.pressedNodes) == 2:
-                game.build()
-    
-    GuiFile.pygame.quit()
-    GuiFile.sys.exit()
-
-#calling game 
-game =  Game()    
-GuiFile.start_menu()
-main_loop(game)

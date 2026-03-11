@@ -1,6 +1,6 @@
 import PiecesFile
 import random
-
+import GameVisualsFile
 class PlayerHand:
     defaultResources = [
                 'wood','wood','wood','wood',
@@ -8,10 +8,10 @@ class PlayerHand:
                 'sheep','sheep',
                 'hay','hay'
             ]
-    def __init__(self, colour:str, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
+    def __init__(self, colour:str, isBot:bool=False, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
                  citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
                  roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
-                 isBot:bool=False, playerLongestRoad:int=0):
+                  playerLongestRoad:int=0):
         self.colour = colour
         self.VP = VP
         self.roadsLeft = roadsLeft
@@ -28,14 +28,14 @@ class PlayerHand:
         self.roads = roads.copy() if roads is not None else []
         self.outposts = outposts.copy() if outposts is not None else []
 
-    def sufficient_resources(self,resourcesNeeded):
+    def sufficient_resources(self,resourcesNeeded:list):
         sufficient = True
         for resource in resourcesNeeded:
             if self.resources.count(resource) < resourcesNeeded.count(resource):
                 sufficient = False
         return sufficient
     
-    def connected_to_road(self,node):
+    def connected_to_road(self,node:tuple):
         connectedToRoadChain = False
         # makes sure it is connected to one of the players existing roads
         for road in self.roads:
@@ -43,7 +43,7 @@ class PlayerHand:
                 connectedToRoadChain = True
         return connectedToRoadChain
     
-    def settlement_at_node(self,node):
+    def settlement_at_node(self,node:tuple):
         settlementAtNode = False
         for outpost in self.outposts:
             if outpost.getLocation() == node and outpost.getisCity() == False:
@@ -51,7 +51,7 @@ class PlayerHand:
         return settlementAtNode       
 
 #before called in game check location     
-    def build_settlement(self,node):
+    def build_settlement(self,node:tuple):
         if self.settlementsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('hay')
@@ -63,7 +63,7 @@ class PlayerHand:
             self.settlementsLeft -=1
             return settlement
      
-    def build_city(self,node):
+    def build_city(self,node:tuple):
         if self.citiesLeft>0:
             for i in range(1,3):
                 self.resources.remove('ore')
@@ -76,7 +76,7 @@ class PlayerHand:
             self.citiesLeft -= 1
             self.settlementsLeft += 1
     
-    def build_road(self, nodes):
+    def build_road(self, nodes:list):
         if self.roadsLeft > 0:
             self.resources.remove('wood')
             self.resources.remove('brick')
@@ -85,7 +85,7 @@ class PlayerHand:
             self.roadsLeft -= 1
             return road
      
-    def buy_development_card(self, developmentCard):
+    def buy_development_card(self, developmentCard:object):
         self.resources.remove('sheep')
         self.resources.remove('hay')
         self.resources.remove('ore')
@@ -124,32 +124,3 @@ class PlayerHand:
                     self.development.remove(card)
                     removed = True
 
-class Bot(PlayerHand):
-    def __init__(self, colour:str, ownIndex:int, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
-                 citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
-                 roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
-                 isBot:bool=True, playerLongestRoad:int=0, playerFavour:list=None):
-        super().__init__(colour, VP, roadsLeft, settlementsLeft, citiesLeft, resources, development,
-                         knightsPlayed, roads, outposts, hasLargestArmy, hasLongestRoad,
-                         isBot, playerLongestRoad)
-        self.playerFavour = [4,4,4]
-        self.ownIndex = ownIndex
-        # []
-        
-    def accept_trade(self, playerIndex):
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
-        chosenNum = random.randint(0, self.playerFavour[playerIndex]*2+2, 1)
-        if chosenNum >= 6:
-            return {'TYPE': 'prog',
-                'COMMAND': 'trade choice',
-                'CHOICE': True}
-        else: 
-            return {'TYPE': 'prog',
-                'COMMAND': 'trade choice',
-                'CHOICE': False}
-    
-    def decrease_player_favour(self, playerIndex):
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
-        if self.playerFavour>

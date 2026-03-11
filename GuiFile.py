@@ -614,147 +614,147 @@ def command_end_screen(x,y):
     
 def command_discard_screen(x,y):
     if 0 <= x <= 0+230 and 0 <= y <= 0+75: # 'selected resources'
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'discard cards'}
-                    #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
-                    #down arrown decrease the number of that resource by 1 
+        return {'TYPE': 'prog',
+            'COMMAND': 'discard cards'}
+    #trade arrows - up arrows increase the number of that resourse that will be discarded by 1
+    #down arrown decrease the number of that resource by 1 
     elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove',
-                           'RESOURCE': 'wood'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: remove',
+                'RESOURCE': 'wood'}
     elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add',
-                           'RESOURCE': 'wood'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: add',
+                'RESOURCE': 'wood'}
     elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove',
-                           'RESOURCE': 'brick'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: remove',
+                'RESOURCE': 'brick'}
     elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add',
-                           'RESOURCE': 'brick'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: add',
+                'RESOURCE': 'brick'}
     elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove',
-                           'RESOURCE': 'sheep'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: remove',
+                'RESOURCE': 'sheep'}
     elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add',
-                           'RESOURCE': 'sheep'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: add',
+                'RESOURCE': 'sheep'}
     elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove',
-                           'RESOURCE': 'hay'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: remove',
+                'RESOURCE': 'hay'}
     elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add',
-                           'RESOURCE': 'hay'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: add',
+                'RESOURCE': 'hay'}
     elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: remove',
-                           'RESOURCE': 'ore'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: remove',
+                'RESOURCE': 'ore'}
     elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'discard: add',
-                           'RESOURCE': 'ore'}
+        return {'TYPE': 'visual',
+                'COMMAND': 'discard: add',
+                'RESOURCE': 'ore'}
     
 def command_trade(x,y):
-                    if 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'cancel trade'
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'cancel trade'}
-                    elif 800 <= x <= 800+203 and 992 <= y <=992+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with bank'}
-                    elif 1092 <= x <= 1092+203 and 992 <= y <=992+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'trade with player'}
+    if 0 <= x <= 0+183 and 0 <= y <= 0+75: # 'cancel trade'
+        return {'TYPE': 'prog',
+            'COMMAND': 'cancel trade'}
+    elif 800 <= x <= 800+203 and 992 <= y <=992+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'trade with bank'}
+    elif 1092 <= x <= 1092+203 and 992 <= y <=992+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'trade with player'}
 
-                    #trade arrows - up arrows increase the number of that resourse involved in the trade by 1
-                    #down arrown decrease the number of that resource by 1 
-                    #you put in - the players whos turn it is 
-                    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove',
-                           'RESOURCE': 'wood'}
-                    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add',
-                           'RESOURCE': 'wood'}
-                    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove',
-                           'RESOURCE': 'brick'}
-                    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add',
-                           'RESOURCE': 'brick'}
-                    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                            'COMMAND': 'turn player: remove',
-                           'RESOURCE': 'sheep'}
-                    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add',
-                           'RESOURCE': 'sheep'}
-                    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove',
-                           'RESOURCE': 'hay'}
-                    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add',
-                           'RESOURCE': 'hay'}
-                    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: remove',
-                           'RESOURCE': 'ore'}
-                    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'turn player: add',
-                           'RESOURCE': 'ore'}
+    #trade arrows - up arrows increase the number of that resourse involved in the trade by 1
+    #down arrown decrease the number of that resource by 1 
+    #you put in - the players whos turn it is 
+    elif 41 <= x <= 41 +75 and 252 <= y <= 252 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: remove',
+            'RESOURCE': 'wood'}
+    elif 195 <= x <= 195 +75 and 252 <= y <= 252 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: add',
+            'RESOURCE': 'wood'}
+    elif 314 <= x <= 314 +75 and 252 <= y <= 252 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: remove',
+            'RESOURCE': 'brick'}
+    elif 468 <= x <= 468 +75 and 252 <= y <= 252 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: add',
+            'RESOURCE': 'brick'}
+    elif 587 <= x <= 587 +75 and 252 <= y <= 252 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: remove',
+            'RESOURCE': 'sheep'}
+    elif 741 <= x <= 741 +75 and 252 <= y <= 252 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: add',
+            'RESOURCE': 'sheep'}
+    elif 860 <= x <= 860 +75 and 252 <= y <= 252 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: remove',
+            'RESOURCE': 'hay'}
+    elif 1014 <= x <= 1014 +75 and 252 <= y <= 252 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: add',
+            'RESOURCE': 'hay'}
+    elif 1133 <= x <= 1133 +75 and 252 <= y <= 252 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: remove',
+            'RESOURCE': 'ore'}
+    elif 1287 <= x <= 1287 +75 and 252 <= y <= 252 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'turn player: add',
+            'RESOURCE': 'ore'}
 
-                    #other players put in - what the player whos turn it is wants from other players 
-                    elif 41 <= x <= 41 +75 and 873 <= y <= 873 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove',
-                           'RESOURCE': 'wood'}
-                    elif 195 <= x <= 195 +75 and 873 <= y <= 873 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add',
-                           'RESOURCE': 'wood'}
-                    elif 314 <= x <= 314 +75 and 873 <= y <= 873 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove',
-                           'RESOURCE': 'brick'}
-                    elif 468 <= x <= 468 +75 and 873 <= y <= 873 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add',
-                           'RESOURCE': 'brick'}
-                    elif 587 <= x <= 587 +75 and 873 <= y <= 873 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove',
-                           'RESOURCE': 'sheep'}
-                    elif 741 <= x <= 741 +75 and 873 <= y <= 873 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add',
-                           'RESOURCE': 'sheep'}
-                    elif 860 <= x <= 860 +75 and 873 <= y <= 873 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove',
-                           'RESOURCE': 'hay'}
-                    elif 1014 <= x <= 1014 +75 and 873 <= y <= 873 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add',
-                           'RESOURCE': 'hay'}
-                    elif 1133 <= x <= 1133 +75 and 873 <= y <= 873 +75: # down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: remove',
-                           'RESOURCE': 'ore'}
-                    elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'other players: add',
-                           'RESOURCE': 'ore'}
+    #other players put in - what the player whos turn it is wants from other players 
+    elif 41 <= x <= 41 +75 and 873 <= y <= 873 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: remove',
+            'RESOURCE': 'wood'}
+    elif 195 <= x <= 195 +75 and 873 <= y <= 873 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: add',
+            'RESOURCE': 'wood'}
+    elif 314 <= x <= 314 +75 and 873 <= y <= 873 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: remove',
+            'RESOURCE': 'brick'}
+    elif 468 <= x <= 468 +75 and 873 <= y <= 873 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: add',
+            'RESOURCE': 'brick'}
+    elif 587 <= x <= 587 +75 and 873 <= y <= 873 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: remove',
+            'RESOURCE': 'sheep'}
+    elif 741 <= x <= 741 +75 and 873 <= y <= 873 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: add',
+            'RESOURCE': 'sheep'}
+    elif 860 <= x <= 860 +75 and 873 <= y <= 873 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: remove',
+            'RESOURCE': 'hay'}
+    elif 1014 <= x <= 1014 +75 and 873 <= y <= 873 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: add',
+            'RESOURCE': 'hay'}
+    elif 1133 <= x <= 1133 +75 and 873 <= y <= 873 +75: # down
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: remove',
+            'RESOURCE': 'ore'}
+    elif 1287 <= x <= 1287 +75 and 873 <= y <= 873 +75: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'other players: add',
+            'RESOURCE': 'ore'}
 
 def command_ask_player_about_trade(x,y):
     if 460 <= x <= 460+223.5 and 393 <= y <= 393+414: #accept trade
@@ -768,651 +768,651 @@ def command_ask_player_about_trade(x,y):
     
 def command_choose_player_trade_with(x,y):
     if 620 <= x <= 620+183 and 430 <= y <= 430+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose player trade',
-                           'INDEX': 0}
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose player trade',
+            'INDEX': 0}
     elif 620 <= x <= 620+183 and 538 <= y <= 538+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose player trade',
-                           'INDEX': 1}
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose player trade',
+            'INDEX': 1}
     elif 620 <= x <= 620+183 and 646 <= y <= 646+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose player trade',
-                           'INDEX': 2}
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose player trade',
+            'INDEX': 2}
     elif 620 <= x <= 620+183 and 754 <= y <= 754+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose player trade',
-                           'INDEX': 3}
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose player trade',
+            'INDEX': 3}
 
 def command_development_screen(x,y):
-                    if 307 <= x <= 307+240 and 360 <= y <= 360+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play knight'}
-                    elif 307 <= x <= 307+240 and 468 <= y <= 468+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play road building'}
-                        
-                    elif 310 <= x <= 310+36 and 610 <= y <= 610+36:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play monopoly',
-                           'RESOURCE': 'wood'}
-                    elif 351 <= x <= 351+36 and 610 <= y <= 610+36:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play monopoly',
-                           'RESOURCE': 'brick'}
-                    elif 392 <= x <= 392+36 and 610 <= y <= 610+36:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play monopoly',
-                           'RESOURCE': 'sheep'}
-                    elif 433 <= x <= 433+36 and 610 <= y <= 610+36:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play monopoly',
-                           'RESOURCE': 'hay'}
-                    elif 472 <= x <= 472+36 and 610 <= y <= 610+36:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play monopoly',
-                           'RESOURCE': 'ore'}
-                    elif 450 <= x <= 476 and 719 <= y <= 745: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add',
-                           'RESOURCE': 'wood'}
-                    elif 450 <= x <= 476 and 760 <= y <= 760+26: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add',
-                           'RESOURCE': 'brick'}
-                    elif 450 <= x <= 476 and 801 <= y <= 801+26: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add',
-                           'RESOURCE': 'sheep'}
-                    elif 450 <= x <= 476 and 842 <= y <= 842+26: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add',
-                           'RESOURCE': 'hay'}
-                    elif 450 <= x <= 476 and 883 <= y <= 883+26: #up
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty add',
-                           'RESOURCE': 'ore'}
-                    elif 378 <= x <= 404 and 719 <= y <= 719+26: #down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove',
-                           'RESOURCE': 'wood'}
-                    elif 378 <= x <= 404 and 760 <= y <= 760+26: #down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove',
-                           'RESOURCE': 'brick'}
-                    elif 378 <= x <= 404 and 801 <= y <= 801+26: #down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove',
-                           'RESOURCE': 'sheep'}
-                    elif 378 <= x <= 404 and 842 <= y <= 842+26: #down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove',
-                           'RESOURCE': 'hay'}
-                    elif 378 <= x <= 404 and 883 <= y <= 883+26: #down
-                        return {'TYPE': 'visual',
-                           'COMMAND': 'year of plenty remove',
-                           'RESOURCE': 'ore'}
-                    elif 488 <= x <= 506+54 and 883 <= y <= 883+36: #'use' button
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'play year of plenty'}
+    if 307 <= x <= 307+240 and 360 <= y <= 360+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play knight'}
+    elif 307 <= x <= 307+240 and 468 <= y <= 468+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play road building'}
+        
+    elif 310 <= x <= 310+36 and 610 <= y <= 610+36:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play monopoly',
+            'RESOURCE': 'wood'}
+    elif 351 <= x <= 351+36 and 610 <= y <= 610+36:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play monopoly',
+            'RESOURCE': 'brick'}
+    elif 392 <= x <= 392+36 and 610 <= y <= 610+36:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play monopoly',
+            'RESOURCE': 'sheep'}
+    elif 433 <= x <= 433+36 and 610 <= y <= 610+36:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play monopoly',
+            'RESOURCE': 'hay'}
+    elif 472 <= x <= 472+36 and 610 <= y <= 610+36:
+        return {'TYPE': 'prog',
+            'COMMAND': 'play monopoly',
+            'RESOURCE': 'ore'}
+    elif 450 <= x <= 476 and 719 <= y <= 745: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty add',
+            'RESOURCE': 'wood'}
+    elif 450 <= x <= 476 and 760 <= y <= 760+26: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty add',
+            'RESOURCE': 'brick'}
+    elif 450 <= x <= 476 and 801 <= y <= 801+26: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty add',
+            'RESOURCE': 'sheep'}
+    elif 450 <= x <= 476 and 842 <= y <= 842+26: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty add',
+            'RESOURCE': 'hay'}
+    elif 450 <= x <= 476 and 883 <= y <= 883+26: #up
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty add',
+            'RESOURCE': 'ore'}
+    elif 378 <= x <= 404 and 719 <= y <= 719+26: #down
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty remove',
+            'RESOURCE': 'wood'}
+    elif 378 <= x <= 404 and 760 <= y <= 760+26: #down
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty remove',
+            'RESOURCE': 'brick'}
+    elif 378 <= x <= 404 and 801 <= y <= 801+26: #down
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty remove',
+            'RESOURCE': 'sheep'}
+    elif 378 <= x <= 404 and 842 <= y <= 842+26: #down
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty remove',
+            'RESOURCE': 'hay'}
+    elif 378 <= x <= 404 and 883 <= y <= 883+26: #down
+        return {'TYPE': 'visual',
+            'COMMAND': 'year of plenty remove',
+            'RESOURCE': 'ore'}
+    elif 488 <= x <= 506+54 and 883 <= y <= 883+36: #'use' button
+        return {'TYPE': 'prog',
+            'COMMAND': 'play year of plenty'}
 
-                    elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'buy development'}
-                    elif 0 <= x <= 0+240 and 0 <= y <= 0+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'load game screen'}
+    elif 853 <= x <= 853+240 and 360 <= y <= 360+480:
+        return {'TYPE': 'prog',
+            'COMMAND': 'buy development'}
+    elif 0 <= x <= 0+240 and 0 <= y <= 0+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'load game screen'}
                     
 def command_robber_screen(x,y):
      #HEX NUMBER selected for robber placement
-                    if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 0}
-                    elif 700-35 <= x <= 700+35 and 870-35 <= y <= 870+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 1}
-                    elif 858-35 <= x <= 858+35 and 870-35 <= y <= 870+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 2}
-                    elif 464-35 <= x <= 464+35 and 735-35 <= y <= 735+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 3}
-                    elif 622-35 <= x <= 622+35 and 735-35 <= y <= 735+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 4}
-                    elif 780-35 <= x <= 780+35 and 735-35 <= y <= 735+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 5}
-                    elif 938-35 <= x <= 938+35 and 735-35 <= y <= 735+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 6}
-                    elif 385-35 <= x <= 385+35 and 600-35 <= y <= 600+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 7}
-                    elif 543-35 <= x <= 543+35 and 600-35 <= y <= 600+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 8}
-                    elif 701-35 <= x <= 701+35 and 600-35 <= y <= 600+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 9}
-                    elif 859-35 <= x <= 859+35 and 600-35 <= y <= 600+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 10}
-                    elif 1017-35 <= x <= 1017+35 and 600-35 <= y <= 600+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 11}
-                    elif 464-35 <= x <= 464+35 and 465-35 <= y <= 465+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 12}
-                    elif 622-35 <= x <= 622+35 and 465-35 <= y <= 465+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 13}
-                    elif 780-35 <= x <= 780+35 and 465-35 <= y <= 465+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 14}
-                    elif 938-35 <= x <= 938+35 and 465-35 <= y <= 465+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 15}
-                    elif 524-35 <= x <= 524+35 and 330-35 <= y <= 330+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 16}
-                    elif 700-35 <= x <= 700+35 and 330-35 <= y <= 330+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 17}
-                    elif 858-35 <= x <= 858+35 and 330-35 <= y <= 330+35:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'choose where to play knight',
-                           'HEX NUMBER': 18}
-                    # choosing player to steal from
-                    elif 1160 <= x <= 1160+183 and 170 <= y <=170+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'steal from player',
-                           'INDEX': 0}
-                    elif 1160 <= x <= 1160+183 and 278 <= y <=278+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'steal from player',
-                           'INDEX': 1}
-                    elif 1160 <= x <= 1160+183 and 386 <= y <=386+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'steal from player',
-                           'INDEX': 2}
-                    elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
-                        return {'TYPE': 'prog',
-                           'COMMAND': 'steal from player',
-                           'INDEX': 3}
+    if 542-35 <= x <= 542+35 and 870-35 <= y <= 870+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 0}
+    elif 700-35 <= x <= 700+35 and 870-35 <= y <= 870+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 1}
+    elif 858-35 <= x <= 858+35 and 870-35 <= y <= 870+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 2}
+    elif 464-35 <= x <= 464+35 and 735-35 <= y <= 735+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 3}
+    elif 622-35 <= x <= 622+35 and 735-35 <= y <= 735+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 4}
+    elif 780-35 <= x <= 780+35 and 735-35 <= y <= 735+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 5}
+    elif 938-35 <= x <= 938+35 and 735-35 <= y <= 735+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 6}
+    elif 385-35 <= x <= 385+35 and 600-35 <= y <= 600+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 7}
+    elif 543-35 <= x <= 543+35 and 600-35 <= y <= 600+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 8}
+    elif 701-35 <= x <= 701+35 and 600-35 <= y <= 600+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 9}
+    elif 859-35 <= x <= 859+35 and 600-35 <= y <= 600+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 10}
+    elif 1017-35 <= x <= 1017+35 and 600-35 <= y <= 600+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 11}
+    elif 464-35 <= x <= 464+35 and 465-35 <= y <= 465+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 12}
+    elif 622-35 <= x <= 622+35 and 465-35 <= y <= 465+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 13}
+    elif 780-35 <= x <= 780+35 and 465-35 <= y <= 465+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 14}
+    elif 938-35 <= x <= 938+35 and 465-35 <= y <= 465+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 15}
+    elif 524-35 <= x <= 524+35 and 330-35 <= y <= 330+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 16}
+    elif 700-35 <= x <= 700+35 and 330-35 <= y <= 330+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 17}
+    elif 858-35 <= x <= 858+35 and 330-35 <= y <= 330+35:
+        return {'TYPE': 'prog',
+            'COMMAND': 'choose where to play knight',
+            'HEX NUMBER': 18}
+    # choosing player to steal from
+    elif 1160 <= x <= 1160+183 and 170 <= y <=170+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'steal from player',
+            'INDEX': 0}
+    elif 1160 <= x <= 1160+183 and 278 <= y <=278+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'steal from player',
+            'INDEX': 1}
+    elif 1160 <= x <= 1160+183 and 386 <= y <=386+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'steal from player',
+            'INDEX': 2}
+    elif 1160 <= x <= 1160+183 and 494 <= y <=494+75:
+        return {'TYPE': 'prog',
+            'COMMAND': 'steal from player',
+            'INDEX': 3}
                     
 def command_starting_pieces(x,y):
      # hex node buttons:
-                        if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 285)}
-                        elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 375)}
-                        elif  532 <= x <= 552 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 420)} 
-                        elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 375 )} 
-                        elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 285)} 
-                        elif  532 <= x <= 552 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 240)} 
-                        elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 285)} 
-                        elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 375)} 
-                        elif  690 <= x <= 710 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 420)} 
-                        elif  690 <= x <= 710 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 240)} 
-                        elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 285)} 
-                        elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 375)} 
-                        elif  848 <= x <= 868 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 420)} 
-                        elif  848 <= x <= 868 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 240)} 
-                        elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (541.94 , 510)} 
-                        elif  454 <= x <= 474 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464 , 555)} 
-                        elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 510)} 
-                        elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 420)} 
-                        elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (699.94 , 510)} 
-                        elif  612 <= x <= 632 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (622 , 555)} 
-                        elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (857.94 , 510)} 
-                        elif  770 <= x <= 790 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (780 , 555)} 
-                        elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 420)} 
-                        elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 510)} 
-                        elif  928 <= x <= 948 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (938 , 555)} 
-                        elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (462.94 , 645)} 
-                        elif  375 <= x <= 395 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (385 , 690)} 
-                        elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (307.06 , 645)}  
-                        elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (307.06 , 555)}  
-                        elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (620.94 , 645)}  
-                        elif  533 <= x <= 553 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (543 , 690)}  
-                        elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (778.94 , 645)}   
-                        elif  691 <= x <= 711 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (701 , 690)} 
-                        elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (936.94 , 645)} 
-                        elif  849 <= x <= 869 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (859 , 690)} 
-                        elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1094.94 , 555)} 
-                        elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1094.94 , 645)}
-                        elif  1007 <= x <= 1027 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1017 , 690)} 
-                        elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (541.94 , 780)}  
-                        elif  454 <= x <= 474 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464 , 825)} 
-                        elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 780)} 
-                        elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (699.94 , 780)}  
-                        elif  612 <= x <= 632 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (622 , 825)}
-                        elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (857.94 , 780)}
-                        elif  770 <= x <= 790 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (780 , 825)} 
-                        elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 780)} 
-                        elif  928 <= x <= 948 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (938 , 825)} 
-                        elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 915)} 
-                        elif  532 <= x <= 552 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 960)}
-                        elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 915)}
-                        elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 915)}
-                        elif  690 <= x <= 710 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 960)}
-                        elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 915)}
-                        elif  848 <= x <= 868 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 960)}
+    if  609.94 <= x <= 629.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 285)}
+    elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 375)}
+    elif  532 <= x <= 552 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 420)} 
+    elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 375 )} 
+    elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 285)} 
+    elif  532 <= x <= 552 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 240)} 
+    elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 285)} 
+    elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 375)} 
+    elif  690 <= x <= 710 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 420)} 
+    elif  690 <= x <= 710 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 240)} 
+    elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 285)} 
+    elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 375)} 
+    elif  848 <= x <= 868 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 420)} 
+    elif  848 <= x <= 868 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 240)} 
+    elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (541.94 , 510)} 
+    elif  454 <= x <= 474 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464 , 555)} 
+    elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 510)} 
+    elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 420)} 
+    elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (699.94 , 510)} 
+    elif  612 <= x <= 632 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (622 , 555)} 
+    elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (857.94 , 510)} 
+    elif  770 <= x <= 790 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (780 , 555)} 
+    elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 420)} 
+    elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 510)} 
+    elif  928 <= x <= 948 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (938 , 555)} 
+    elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (462.94 , 645)} 
+    elif  375 <= x <= 395 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (385 , 690)} 
+    elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (307.06 , 645)}  
+    elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (307.06 , 555)}  
+    elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (620.94 , 645)}  
+    elif  533 <= x <= 553 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (543 , 690)}  
+    elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (778.94 , 645)}   
+    elif  691 <= x <= 711 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (701 , 690)} 
+    elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (936.94 , 645)} 
+    elif  849 <= x <= 869 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (859 , 690)} 
+    elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1094.94 , 555)} 
+    elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1094.94 , 645)}
+    elif  1007 <= x <= 1027 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1017 , 690)} 
+    elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (541.94 , 780)}  
+    elif  454 <= x <= 474 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464 , 825)} 
+    elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 780)} 
+    elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (699.94 , 780)}  
+    elif  612 <= x <= 632 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (622 , 825)}
+    elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (857.94 , 780)}
+    elif  770 <= x <= 790 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (780 , 825)} 
+    elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 780)} 
+    elif  928 <= x <= 948 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (938 , 825)} 
+    elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 915)} 
+    elif  532 <= x <= 552 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 960)}
+    elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 915)}
+    elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 915)}
+    elif  690 <= x <= 710 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 960)}
+    elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 915)}
+    elif  848 <= x <= 868 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 960)}
 
 def command_game_screen(x,y):
     #side buttons
-                        if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
-                            return {'TYPE': 'prog',
-                                'COMMAND': 'roll dice'}
-                        elif 34 <= x <= 34+183 and 776 <= y <= 776+75:#trade button
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'trade'}
-                        elif 34 <= x <= 34+183 and 668 <= y <= 668+75: # developemnt
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'development'}
-                        elif 34 <= x <= 34+183 and 884 <= y <= 884+75: # end turn
-                            return {'TYPE': 'prog',
-                                'COMMAND': 'end turn'}
-                        elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
-                            return {'TYPE': 'prog',
-                                'COMMAND': 'quit'}
-                        
-                    # hex NODE buttons:
-                        elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 285)}
-                        elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 375)}
-                        elif  532 <= x <= 552 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 420)} 
-                        elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 375 )} 
-                        elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 285)} 
-                        elif  532 <= x <= 552 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 240)} 
-                        elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 285)} 
-                        elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 375)} 
-                        elif  690 <= x <= 710 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 420)} 
-                        elif  690 <= x <= 710 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 240)} 
-                        elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 285)} 
-                        elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 375)} 
-                        elif  848 <= x <= 868 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 420)} 
-                        elif  848 <= x <= 868 and 230 <= y <= 250 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 240)} 
-                        elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (541.94 , 510)} 
-                        elif  454 <= x <= 474 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464 , 555)} 
-                        elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 510)} 
-                        elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 420)} 
-                        elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (699.94 , 510)} 
-                        elif  612 <= x <= 632 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (622 , 555)} 
-                        elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (857.94 , 510)} 
-                        elif  770 <= x <= 790 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (780 , 555)} 
-                        elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 420)} 
-                        elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 510)} 
-                        elif  928 <= x <= 948 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (938 , 555)} 
-                        elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (462.94 , 645)} 
-                        elif  375 <= x <= 395 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (385 , 690)} 
-                        elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (307.06 , 645)}  
-                        elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (307.06 , 555)}  
-                        elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (620.94 , 645)}  
-                        elif  533 <= x <= 553 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (543 , 690)}  
-                        elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (778.94 , 645)}   
-                        elif  691 <= x <= 711 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (701 , 690)} 
-                        elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (936.94 , 645)} 
-                        elif  849 <= x <= 869 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (859 , 690)} 
-                        elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1094.94 , 555)} 
-                        elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1094.94 , 645)}
-                        elif  1007 <= x <= 1027 and 680 <= y <= 700 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1017 , 690)} 
-                        elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (541.94 , 780)}  
-                        elif  454 <= x <= 474 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464 , 825)} 
-                        elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (386.06 , 780)} 
-                        elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (699.94 , 780)}  
-                        elif  612 <= x <= 632 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (622 , 825)}
-                        elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (857.94 , 780)}
-                        elif  770 <= x <= 790 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (780 , 825)} 
-                        elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (1015.94 , 780)} 
-                        elif  928 <= x <= 948 and 815 <= y <= 835 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (938 , 825)} 
-                        elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (619.94 , 915)} 
-                        elif  532 <= x <= 552 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (542 , 960)}
-                        elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (464.06 , 915)}
-                        elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (777.94 , 915)}
-                        elif  690 <= x <= 710 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (700 , 960)}
-                        elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (935.94 , 915)}
-                        elif  848 <= x <= 868 and 950 <= y <= 970 :
-                            return {'TYPE': 'visual',
-                                'COMMAND': 'node selected',
-                                'NODE': (858 , 960)}    
+    if 1183 <= x <= 1183+183 and 884 <= y <= 884+75: # roll dice button
+        return {'TYPE': 'prog',
+            'COMMAND': 'roll dice'}
+    elif 34 <= x <= 34+183 and 776 <= y <= 776+75:#trade button
+        return {'TYPE': 'visual',
+            'COMMAND': 'trade'}
+    elif 34 <= x <= 34+183 and 668 <= y <= 668+75: # developemnt
+        return {'TYPE': 'visual',
+            'COMMAND': 'development'}
+    elif 34 <= x <= 34+183 and 884 <= y <= 884+75: # end turn
+        return {'TYPE': 'prog',
+            'COMMAND': 'end turn'}
+    elif 1183 <= x <= 1183+183 and 992 <= y <= 992+75: # quit button
+        return {'TYPE': 'prog',
+            'COMMAND': 'quit'}
+    
+# hex NODE buttons:
+    elif  609.94 <= x <= 629.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 285)}
+    elif  609.94 <= x <= 629.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 375)}
+    elif  532 <= x <= 552 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 420)} 
+    elif  454.06 <= x <= 474.06 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 375 )} 
+    elif  454.06 <= x <= 474.06 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 285)} 
+    elif  532 <= x <= 552 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 240)} 
+    elif  767.94 <= x <= 787.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 285)} 
+    elif  767.94 <= x <= 787.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 375)} 
+    elif  690 <= x <= 710 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 420)} 
+    elif  690 <= x <= 710 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 240)} 
+    elif  925.94 <= x <= 945.94 and 275 <= y <= 295 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 285)} 
+    elif  925.94 <= x <= 945.94 and 365 <= y <= 385 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 375)} 
+    elif  848 <= x <= 868 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 420)} 
+    elif  848 <= x <= 868 and 230 <= y <= 250 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 240)} 
+    elif  531.94 <= x <= 551.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (541.94 , 510)} 
+    elif  454 <= x <= 474 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464 , 555)} 
+    elif  376.06 <= x <= 396.06 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 510)} 
+    elif  376.06 <= x <= 396.06 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 420)} 
+    elif  689.94 <= x <= 709.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (699.94 , 510)} 
+    elif  612 <= x <= 632 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (622 , 555)} 
+    elif  847.94 <= x <= 867.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (857.94 , 510)} 
+    elif  770 <= x <= 790 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (780 , 555)} 
+    elif  1005.94 <= x <= 1025.94 and 410 <= y <= 430 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 420)} 
+    elif  1005.94 <= x <= 1025.94 and 500 <= y <= 520 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 510)} 
+    elif  928 <= x <= 948 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (938 , 555)} 
+    elif  452.94 <= x <= 472.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (462.94 , 645)} 
+    elif  375 <= x <= 395 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (385 , 690)} 
+    elif  297.06 <= x <= 317.06 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (307.06 , 645)}  
+    elif  297.06 <= x <= 317.06 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (307.06 , 555)}  
+    elif  610.94 <= x <= 630.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (620.94 , 645)}  
+    elif  533 <= x <= 553 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (543 , 690)}  
+    elif  768.94 <= x <= 788.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (778.94 , 645)}   
+    elif  691 <= x <= 711 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (701 , 690)} 
+    elif  926.94 <= x <= 946.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (936.94 , 645)} 
+    elif  849 <= x <= 869 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (859 , 690)} 
+    elif  1084.94 <= x <= 1104.94 and 545 <= y <= 565 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1094.94 , 555)} 
+    elif  1084.94 <= x <= 1104.94 and 635 <= y <= 655 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1094.94 , 645)}
+    elif  1007 <= x <= 1027 and 680 <= y <= 700 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1017 , 690)} 
+    elif  531.94 <= x <= 551.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (541.94 , 780)}  
+    elif  454 <= x <= 474 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464 , 825)} 
+    elif  376.06 <= x <= 396.06 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (386.06 , 780)} 
+    elif  689.94 <= x <= 709.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (699.94 , 780)}  
+    elif  612 <= x <= 632 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (622 , 825)}
+    elif  847.94 <= x <= 867.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (857.94 , 780)}
+    elif  770 <= x <= 790 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (780 , 825)} 
+    elif  1005.94 <= x <= 1025.94 and 770 <= y <= 790 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (1015.94 , 780)} 
+    elif  928 <= x <= 948 and 815 <= y <= 835 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (938 , 825)} 
+    elif  609.94 <= x <= 629.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (619.94 , 915)} 
+    elif  532 <= x <= 552 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (542 , 960)}
+    elif  454.06 <= x <= 474.06 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (464.06 , 915)}
+    elif  767.94 <= x <= 787.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (777.94 , 915)}
+    elif  690 <= x <= 710 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (700 , 960)}
+    elif  925.94 <= x <= 945.94 and 905 <= y <= 925 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (935.94 , 915)}
+    elif  848 <= x <= 868 and 950 <= y <= 970 :
+        return {'TYPE': 'visual',
+            'COMMAND': 'node selected',
+            'NODE': (858 , 960)}    
 
 def command(currentScreen):
     while True:
@@ -1451,7 +1451,3 @@ def command(currentScreen):
                     return command_starting_pieces(x,y)
                 elif currentScreen == 'game':
                     return command_game_screen(x,y)
-                        
-                    
-
-# ---------- INIT ----------
