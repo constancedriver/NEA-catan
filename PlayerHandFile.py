@@ -124,3 +124,38 @@ class PlayerHand:
                     self.development.remove(card)
                     removed = True
 
+class BotHand(PlayerHand):
+    defaultPlayerFavour = [4,4,4]
+    def __init__(self, colour:str, ownIndex:int, isBot:bool=True, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
+                 citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
+                 roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
+                  playerLongestRoad:int=0, playerFavour:list=None):
+        super().__init__(colour, isBot, VP, roadsLeft, settlementsLeft,
+                 citiesLeft, resources, development, knightsPlayed,
+                 roads, outposts, hasLargestArmy, hasLongestRoad,
+                  playerLongestRoad)
+        self.playerFavour = playerFavour.copy() if playerFavour is not None else self.defaultPlayerFavour.copy()
+        self.ownIndex = ownIndex
+
+    def decrease_player_favour(self, playerIndex:int):
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        if self.playerFavour[playerIndex] > 0:
+            self.playerFavour[playerIndex] -= 1
+
+    def increase_player_favour(self, playerIndex:int):
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        if self.playerFavour[playerIndex] < 11:
+            self.playerFavour[playerIndex] += 1
+
+    def accept_trade(self, playerIndex:int):
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        favourScore = self.playerFavour[playerIndex]
+        if favourScore >= 2:
+            chosenNum = random.randint(0, 99, 1)
+            if chosenNum >= (-2):
+                return True
+            else: 
+                return False
