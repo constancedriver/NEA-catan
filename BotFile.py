@@ -49,14 +49,36 @@ def turn(game):
             return {'TYPE': 'prog',
                     'COMMAND': 'roll dice'}
 
+def decide_discard_cards(game):
+    numberOfResources = len(game.players[game.turnIndex].resources)
+    numberToDiscard =  numberOfResources // 2
+    dontDiscard = []
+    while len(dontDiscard) <  numberOfResources - numberToDiscard:
+        if can_build_city:
+            for i in range 
+            dontDiscard.append('hay')
+            dontDiscard.append('ore')
+
 def decide_player_steal_from(game): 
     leastFavourableScore = 12
-    leastFavourableScore
+    leastFavourablePlayer = []
     currentBot = game.players[game.turnIndex]
-    for player in game.players_on_robber_tile():
+    # find lowest favour score of players that can steal from
+    players_can_steal_from = game.players_on_robber_tile()
+    for player in players_can_steal_from:
         playerIndex = game.players.index(player)
         leastFavourableScore = min(currentBot.get_favour_score(playerIndex), leastFavourableScore)
-
+    # find which player(s) have this lowest score
+    for player in game.players_on_robber_tile():
+        playerIndex = game.players.index(player)
+        if currentBot.get_favour_score(playerIndex) == leastFavourableScore:
+            leastFavourablePlayer.append(player)
+    # if more than one least favoured, pick a random one of them
+    while len(leastFavourablePlayer) > 1:
+        leastFavourablePlayer.pop(random.randint(0,len(leastFavourablePlayer)-1))
+    return {'TYPE': 'prog',
+            'COMMAND': 'steal from player',
+            'INDEX': players_can_steal_from.index(leastFavourablePlayer)}
 
 def starting_pieces(game):
     if len(game.players[game.turnIndex].outposts) != len(game.players[game.turnIndex].roads):
@@ -70,7 +92,7 @@ def can_build_city(game):
             break
         if outpost.getisCity():
             atLeastOneSettlement = True
-    if atLeastOneSettlement and game.players[game.turnIndex].sufficient_resources(['ore', 'ore', 'wheat', 'wheat', 'wheat']):
+    if atLeastOneSettlement and game.players[game.turnIndex].sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
         return True
     else:
         return False
@@ -83,13 +105,13 @@ def can_build_settlement(game):
         location = road.getLocation()
         if game.node_empty(location[0]) and game.node_empty(location[1]):
             legalNode = True
-    if legalNode and game.players[game.turnIndex].sufficient_resources(['sheep', 'wheat', 'brick', 'wood']):
+    if legalNode and game.players[game.turnIndex].sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
         return True
     else:
         return False
     
 def can_buy_development(game):
-    if len(game.developmentCards) != 0 and game.players[game.turnIndex].sufficient_resources(['sheep', 'wheat', 'ore']):
+    if len(game.developmentCards) != 0 and game.players[game.turnIndex].sufficient_resources(['sheep', 'hay', 'ore']):
         return True
     else:
         return False
