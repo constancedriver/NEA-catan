@@ -1445,7 +1445,7 @@ def command(currentScreen):
                     return command_choose_player_trade_with(x,y)
                 elif currentScreen == 'development':
                     return command_development_screen(x,y)
-                elif currentScreen == 'robber':
+                elif currentScreen == 'robber placement' or currentScreen == 'robber steal':
                     return command_robber_screen(x,y)
                 elif currentScreen == 'place starting pieces':
                     return command_starting_pieces(x,y)

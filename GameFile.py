@@ -51,7 +51,7 @@ class Game:
         NumBots = self.state.bots
         colours = ['white', 'blue', 'red', 'orange']
         for i in range (0,NumBots, 1):
-            self.players.append(PlayerHandFile.PlayerHand(colours.pop(0), True))
+            self.players.append(PlayerHandFile.BotHand(colours.pop(0), i))
         for i in range (NumBots, 4, 1):
             self.players.append(PlayerHandFile.PlayerHand(colours.pop(0)))
 
@@ -114,14 +114,14 @@ class Game:
                 adjacentToSettlement = True
         return adjacentToSettlement
     
-    def node_empty(self,node:tuple):
+    def node_empty(self,node:tuple): # checks if there is an outpost already on the node 
         nodeEmpty = True
         for outpost in self.outposts:
             if outpost.getLocation() == node:
                 nodeEmpty = False
         return nodeEmpty
     
-    def edge_empty(self,nodes:list):
+    def edge_empty(self,nodes:list): # checks if there is a road already on the edge
         edgeEmpty = True 
         for road in self.roads:
             # nodes could be stores in either order
@@ -382,7 +382,7 @@ class Game:
             self.load_game_screen()
             GuiFile.select_robber_placement_screen()
             self.draw_robber()
-            self.state.currentScreen = 'robber'
+            self.state.currentScreen = 'robber placement'
         else:
             self.state.currentScreen = 'discard'
             GuiFile.discard_cards_screen(needToDiscard[0].colour)
@@ -399,6 +399,21 @@ class Game:
             tile.add_robber()
             GuiFile.select_robber_placement_screen()
             GuiFile.move_robber(tileNum)
+            # find bots affected by robber movement 
+            botsAffected = []
+            for player in self.players:
+                if player.isBot:
+                    for node in tile.getNodes():
+                        if player in botsAffected:
+                                break
+                        for outpost in player.outposts:
+                            if player in botsAffected:
+                                break
+                            if outpost.getLocation() == node:
+                                botsAffected.append(player)
+            # decrease player favorability 
+            for bot in botsAffected:
+                bot.decrease_player_favour(self.turnIndex)
             self.choose_player_to_steal_from()
 
     def players_on_robber_tile(self):
@@ -407,7 +422,7 @@ class Game:
                 return (self.find_players_on_tile(tile))
     
     def choose_player_to_steal_from(self):
-        self.state.currentScreen = 'robber'
+        self.state.currentScreen = 'robber steal'
         numberOfPlayers = (self.players_on_robber_tile())
         if len(numberOfPlayers) != 0:
             GuiFile.select_player_to_steal_resource_from(self.players_on_robber_tile())
@@ -422,6 +437,9 @@ class Game:
             if player.colour == chosenPlayerColour and len(player.resources) != 0:
                 stolenResource = player.resources.pop(random.randint(0,len(player.resources)-1))
                 self.players[self.turnIndex].resources.append(stolenResource)
+                # update bot favorability (if stolen from decrease)
+                if player.isBot:
+                    player.decrease_player_favour(self.turnIndex)
         self.state.currentScreen = 'game'
         self.load_game_screen()
 
@@ -445,7 +463,7 @@ class Game:
             self.load_board()
             GuiFile.select_robber_placement_screen()
             self.draw_robber()
-            self.state.currentScreen = 'robber'
+            self.state.currentScreen = 'robber placement'
     
     def play_monopoly(self,resourceType:str):
         if 'monopoly' in self.players[self.turnIndex].getDevelopments():
@@ -513,6 +531,9 @@ class Game:
         for resourceOther in self.state.tradeOfferOthers:
             self.acceptedTrade[0].resources.remove(resourceOther)
             self.players[self.turnIndex].resources.append(resourceOther)
+        # update bot favorability
+        if self.players[self.turnIndex].isBot:
+            self.players[self.turnIndex].increase_player_favour(self.players.index(self.acceptedTrade[0]))
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
         self.askToTrade.clear()
@@ -532,7 +553,13 @@ class Game:
                     self.askToTrade.append(player)
             if len(self.askToTrade) != 0:
                 self.state.currentScreen = 'ask player about trade'
-                GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
+                # if is a bot, run function to see if it accepts the trade
+                if self.askToTrade[0].isBot:
+                    accepted = self.askToTrade[0].accept_trade(self.turnIndex)
+                    self.answered_trade(accepted)
+                else:
+                    #otherise get input from human
+                    GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
             else:
                 self.load_game_screen()
                

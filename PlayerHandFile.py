@@ -137,6 +137,13 @@ class BotHand(PlayerHand):
         self.playerFavour = playerFavour.copy() if playerFavour is not None else self.defaultPlayerFavour.copy()
         self.ownIndex = ownIndex
 
+    def get_favour_score(self, playerIndex:int):
+        if playerIndex == self.ownIndex: # safety precausion 
+            return 12
+        if playerIndex > self.ownIndex:
+            playerIndex -= 1
+        return self.playerFavour[playerIndex]
+
     def decrease_player_favour(self, playerIndex:int):
         if playerIndex > self.ownIndex:
             playerIndex -= 1
@@ -155,7 +162,7 @@ class BotHand(PlayerHand):
         favourScore = self.playerFavour[playerIndex]
         if favourScore >= 2:
             chosenNum = random.randint(0, 99, 1)
-            if chosenNum >= (-2):
+            if chosenNum >=  10*(favourScore-2)+5 :
                 return True
             else: 
                 return False

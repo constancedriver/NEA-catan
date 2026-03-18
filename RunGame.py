@@ -5,7 +5,9 @@ import BotFile
 # main game loop
 def main_loop(game):
     while game.running:
-        if not (game.state.currentScreen != 'main menu' and game.players[game.turnIndex].isBot):
+        if game.state.currentScreen == 'main menu':
+            command = GuiFile.command(game.state.currentScreen)
+        elif not (game.state.currentScreen != 'main menu' and game.players[game.turnIndex].isBot):
             command = GuiFile.command(game.state.currentScreen)
         else:
             command = BotFile.turn(game)
@@ -27,7 +29,8 @@ def main_loop(game):
                 action()
             if len(game.state.pressedNodes) == 2:
                 game.build()
-        
+    BotFile.make_board(game)
+    print(BotFile.board)    
     
     GuiFile.pygame.quit()
     GuiFile.sys.exit()
@@ -36,3 +39,4 @@ def main_loop(game):
 game =  GameFile.Game()    
 GuiFile.start_menu()
 main_loop(game)
+print(BotFile.board)
