@@ -1,12 +1,16 @@
 import random
+resourceTypes = ['sheep', 'hay', 'brick', 'wood', 'ore']
 board = {}
-def make_board(game):
-    for tile in game.tiles:
-        nodes = tile.getNodes()
-        for node in nodes:
-            if board.get(node, None) == None:
-                board.update({node: game.get_adjacent_nodes(node)})
-
+NodeToTiles = {}
+NodeToResourceScore = {}
+NodeToBuildScore = {}
+tradesProposedOnTurn = [] #[get form trade, give into trade]
+#def make_board(game):
+#    for tile in game.tiles:
+#        nodes = tile.getNodes()
+#        for node in nodes:
+#            if board.get(node, None) == None:
+#                board.update({node: game.get_adjacent_nodes(node)})
 
 def get_resource_resource_score(resourceNum:int):
     # the higher the ResourceScore the higher the probability of producing a resource
@@ -21,10 +25,8 @@ def get_resource_resource_score(resourceNum:int):
             2:1,
             12:1}
     return ResourceScore[resourceNum]
-NodeToTiles = {}
-NodeToResourceScore = {}
 
-def find_tiles_at_node(game,node:tuple):
+def find_tiles_at_node(game:object,node:tuple):
     tiles = NodeToTiles.get(node, [])
     if len(tiles) == 0:
         for tile in game.tiles:
@@ -33,7 +35,7 @@ def find_tiles_at_node(game,node:tuple):
         NodeToTiles.update({node: tiles})
     return tiles
 
-def find_harbour_at_node(game, node:tuple):
+def find_harbour_at_node(game:object, node:tuple):
     for harbour in game.harbours:
         if node == harbour.getPosition():
             return harbour 
@@ -41,30 +43,51 @@ def find_harbour_at_node(game, node:tuple):
             #this means it can immedately return when it finds a harbour at a node without loosing any harbours
     return None # if no harbour is found at the node
 
-def find_node_resource_score(game, node:tuple):
-        ResourceScore = NodeToResourceScore.get(node, 0)
-        if ResourceScore == 0:
-            #find each tile at the node
-            for tile in find_tiles_at_node(game, node):
-                #find resource number
-                resNum = tile.getTileNum
-                ResourceScore += get_resource_resource_score(resNum)
-            #finding if there is a harbour at the node
-            harbour = find_harbour_at_node(game, node)
-            if harbour != None:
-                #3:1 (any) are worth 2 and all others are worth 1 point
-                if harbour.getType() == 'any':
-                    ResourceScore += 2
-                else:
-                    ResourceScore += 1
-            NodeToResourceScore.update({node: ResourceScore})
-        return ResourceScore
+def find_node_resource_score(game:object, node:tuple):
+    ResourceScore = NodeToResourceScore.get(node, 0)
+    if ResourceScore == 0:
+        #find each tile at the node
+        for tile in find_tiles_at_node(game, node):
+            #find resource number
+            resNum = tile.getTileNum
+            ResourceScore += get_resource_resource_score(resNum)
+        #finding if there is a harbour at the node
+        harbour = find_harbour_at_node(game, node)
+        if harbour != None:
+            #3:1 (any) are worth 2 and all others are worth 1 point
+            if harbour.getType() == 'any':
+                ResourceScore += 2
+            else:
+                ResourceScore += 1
+        NodeToResourceScore.update({node: ResourceScore})
+    return ResourceScore
 
-def turn(game):
+def already_have_access(game:object):
+    access = []
+    for road in game.players[game.turnIndex].roads:
+        for location in road.getLocation():
+            if location not in access:
+                access.append(location)
+    return access
+
+def find_node_build_score(game:object, node:tuple):
+    BuildScore = 0
+    if not game.adjacent_to_settlement(): # if it is a legal place to build a settlement 
+        BuildScore += find_node_resource_score(game, node)
+    for location in game.get_adjacent_nodes(node): # increase by one for every new node that it has access to 
+       if game.node_empty(location) and location not in already_have_access(game):
+           BuildScore += 1
+###########################################################################
+#add number of edges it takes to get there
+    
+
+def turn(game:object):
     if game.state.currentScreen == 'place starting pieces':
         starting_pieces(game)
     else:
         if not game.state.rolled:
+            global tradesProposedOnTurn
+            tradesProposedOnTurn.clear() 
             return {'TYPE': 'prog',
                     'COMMAND': 'roll dice'}
         elif game.state.currentScreen == 'robber placement':
@@ -76,7 +99,7 @@ def turn(game):
         else:
             normal_turn(game)
 
-def decide_discard_cards(game):
+def decide_discard_cards(game:object):
     resources = game.players[game.turnIndex].resources.copy()
     numberToDiscard =  len(game.players[game.turnIndex].resources) // 2
     while len(resources) >  numberToDiscard:
@@ -101,7 +124,7 @@ def decide_discard_cards(game):
     return {'TYPE': 'prog',
             'COMMAND': 'discard cards'}
 
-def decide_player_steal_from(game): 
+def decide_player_steal_from(game:object): 
     leastFavourableResourceScore = 12
     leastFavourablePlayer = []
     currentBot = game.players[game.turnIndex]
@@ -122,7 +145,7 @@ def decide_player_steal_from(game):
             'COMMAND': 'steal from player',
             'INDEX': players_can_steal_from.index(leastFavourablePlayer)}
 
-def decide_move_robber(game):
+def decide_move_robber(game:object):
     tileSettlements = []
     currentTurnColour = game.players[game.turnIndex].colour
     for tile in game.tiles:
@@ -169,7 +192,7 @@ def decide_move_robber(game):
             'HEX NUMBER': chosenTile}
 
 
-def can_build_city(game):
+def can_build_city(game:object):
     atLeastOneSettlement = False
     for outpost in game.players[game.turnIndex].outposts:
         if atLeastOneSettlement:
@@ -181,7 +204,7 @@ def can_build_city(game):
     else:
         return False
     
-def can_build_settlement(game):
+def can_build_settlement(game:object):
     legalNode = False # empty node at least one away from another outpost and attached to a road
     for road in game.players[game.turnIndex].roads:
         if legalNode:
@@ -194,13 +217,13 @@ def can_build_settlement(game):
     else:
         return False
     
-def can_buy_development(game):
+def can_buy_development(game:object):
     if len(game.developmentCards) != 0 and game.players[game.turnIndex].sufficient_resources(['sheep', 'hay', 'ore']):
         return True
     else:
         return False
     
-def can_build_road(game):
+def can_build_road(game:object):
     if game.players[game.turnIndex].sufficient_resources(['wood', 'brick']):
         emptyEdge = False
         roads = game.players[game.turnIndex].roads
@@ -218,7 +241,7 @@ def can_build_road(game):
         return emptyEdge
     return False
 
-def try_to_build_city(game):
+def try_to_build_city(game:object):
     settlements = []
     for outpost in game.outposts:
         if outpost.getisCity():
@@ -244,7 +267,7 @@ def try_to_build_city(game):
                 'COMMAND': 'build',
                 'NODES': [node, node]}
 
-def location_to_build_settlement(game):
+def location_to_build_settlement(game:object):
     possibleLocations = []
     for road in game.players[game.turnIndex].roads:
         for location in road.getLocation():
@@ -252,7 +275,7 @@ def location_to_build_settlement(game):
                 possibleLocations.append(location)
     return possibleLocations
 
-def try_to_build_settlement(game):
+def try_to_build_settlement(game:object):
     highestResourceScore = 0
     possibleLocations = location_to_build_settlement(game)
     bestNodes = []
@@ -264,22 +287,57 @@ def try_to_build_settlement(game):
     if len(bestNodes) == 1:
         return {'TYPE': 'prog',
                 'COMMAND': 'build',
-                'NODES': [bestNodes[0], bestNodes[0]]}
-    else: 
-        randomNode = random.choice(bestNodes)
+                'NODES': [bestNodes[0], bestNodes[0]]} 
+    else:  
+        randomNode = random.choice(bestNodes)  
         return {'TYPE': 'prog',
                 'COMMAND': 'build',
-                'NODES': [randomNode, randomNode]}
-
-def try_to_build_development_card(game):
-    if can_buy_development(game):
+                'NODES': [randomNode, randomNode]} 
+def try_to_build_development_card(game:object):
+    if can_buy_development(game):  
         return {'TYPE': 'prog',
                 'COMMAND': 'buy development'}
 
-def try_to_build_road(game):
-    pass
+def try_trade(game:object):
+    mostWantedNumber = 0
+    mostWantedResource = []
+    couldTrade = []
+    infomation = what_to_trade(game)
+    dontTrade = infomation[0]
+    want = infomation[1]
+    playerResources = game.players[game.turnIndex].resources
+    #decide which resource to trade based on which was wanted the most number of times
+    for resource in resourceTypes:
+        mostWantedNumber = max(mostWantedNumber, want.count(resource))
+    for resource in resourceTypes:
+        if want.count(resource) and mostWantedNumber != 0:
+            mostWantedResource.append(resource)
+    while len(mostWantedResource) > 1:
+        mostWantedResource.remove(random.choice(mostWantedResource))
+    #decide which resource to give away in the trade
+    for resource in resourceTypes:
+        if playerResources.count(resource)>dontTrade.count(resource):
+            couldTrade.append(resource)
+    for item in couldTrade:
+        if [mostWantedResource[0], item] in tradesProposedOnTurn:
+            #removing trades offers that have already been done 
+            mostWantedResource.remove(item)
+    while len(couldTrade)>1:
+        mostWantedResource.remove(random.choice(mostWantedResource))
+    if len(couldTrade) == 0:
+        global tradesProposedOnTurn
+        tradesProposedOnTurn.append('strike')#after two strikes the bot will stop proposing trades
+    else:
+        #add to list of trades proposed
+        global tradesProposedOnTurn
+        tradesProposedOnTurn.append([mostWantedResource[0], couldTrade[0]])
+        #propose trade
+        game.state.tradeOfferTurn.append(couldTrade)
+        game.state.tradeOfferOthers.append(mostWantedResource[0])
+        return {'TYPE': 'prog',
+            'COMMAND': 'trade with player'}
 
-def try_trade(game):
+def what_to_trade(game:object):
     resources = game.players[game.turnIndex].resources
     dontTrade = []
     want = []
@@ -352,20 +410,21 @@ def try_trade(game):
                 highestWantResource.append(resource)
         if len(highestWantResource) == 1:
             pass
-####################################################################################################
-def try_trade_with_harbours(game):
+    return [dontTrade, want]
+
+def try_trade_with_harbours(game:object):
     pass
 
-def trade_successful(game):
+def trade_successful(game:object):
     return False
     pass
 
-def starting_pieces(game):
+def starting_pieces(game:object):
     if len(game.players[game.turnIndex].outposts) != len(game.players[game.turnIndex].roads):
         # in the game set up if a player doesnt have equal number of roads and settlememts then they have to play a settlement 
         pass
 
-def normal_turn(game):
+def normal_turn(game:object):
     tryingToBuild = True
     while tryingToBuild:
         if can_build_city(game):
