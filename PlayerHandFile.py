@@ -24,7 +24,7 @@ class PlayerHand:
         self.playerLongestRoad = playerLongestRoad
         # avoid all players sharing the same lists
         self.resources = resources.copy() if resources is not None else self.defaultResources.copy()
-        self.development = development.copy() if development is not None else []
+        self._development = development.copy() if development is not None else []
         self.roads = roads.copy() if roads is not None else []
         self.outposts = outposts.copy() if outposts is not None else []
 
@@ -89,7 +89,7 @@ class PlayerHand:
         self.resources.remove('sheep')
         self.resources.remove('hay')
         self.resources.remove('ore')
-        self.development.append(developmentCard)
+        self._developmentdevelopment.append(developmentCard)
 
     def discard_resources(self):
         needToDiscard = self.resources // 2
@@ -105,13 +105,13 @@ class PlayerHand:
 
     def updateDevelopmentsAbleToUse(self):
         #after having the card for one turn, the player is able to play it 
-        for card in self.development:
+        for card in self._development:
             if not card.getCanPlay():
                 card.able_to_play()
 
     def getDevelopments(self):
         developments = []
-        for card in self.development:
+        for card in self._development:
             if card.getCanPlay():
                 developments.append(card.getCardType())
         return developments
@@ -119,9 +119,9 @@ class PlayerHand:
     def remove_development(self, type:str):
         removed = False
         while not removed:
-            for card in self.development:
+            for card in self._development:
                 if card.getCardType() == type:
-                    self.development.remove(card)
+                    self._development.remove(card)
                     removed = True
 
 class BotHand(PlayerHand):
