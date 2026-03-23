@@ -5,6 +5,7 @@ import BotFile
 # main game loop
 def main_loop(game):
     while game.running:
+        game.game_end()#
         if game.state.currentScreen == 'main menu':
             command = GuiFile.command(game.state.currentScreen)
         elif not (game.state.currentScreen != 'main menu' and game.players[game.turnIndex].isBot):

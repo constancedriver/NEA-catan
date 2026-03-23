@@ -197,7 +197,7 @@ def update_vp(player:object, turnIndex:int):
 
 def update_devs(player:object, turnIndex:int):
     pygame.draw.rect(screen, get_colour(player.colour), (1315,110+(turnIndex*213), 50, 20))
-    screen.blit((SMALLFONT.render(str(len(player.development)) , True , (0,0,0))), (1318,110+(turnIndex*213)))
+    screen.blit((SMALLFONT.render(str(len(player._development)) , True , (0,0,0))), (1318,110+(turnIndex*213)))
     pygame.display.update(1315, 110+(turnIndex*213), 50, 20)
 
 def update_knights(player:object, turnIndex:int):
@@ -240,7 +240,7 @@ def new_turn(player:object):
     screen.blit((SMALLFONT.render(('knights played:'+str(player.knightsPlayed)) , True , (0,0,0))), (716,160))
     i = 1
     screen.blit((SMALLFONT.render(('dev:') , True , (0,0,0))), (316,80))
-    for card in player.development: # write out each unplayed development card
+    for card in player._development: # write out each unplayed development card
         screen.blit((SMALLFONT.render(str(card.getCardType()) , True , (0,0,0))), (316+100*i,80))
         i+=1
     pygame.display.update(283,1000, 834, 100)

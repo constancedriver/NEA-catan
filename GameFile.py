@@ -212,7 +212,7 @@ class Game:
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if ((self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or self.players[self.turnIndex].connected_to_road(node)) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
+        if (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.players[self.turnIndex].connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']) and self.players[self.turnIndex].settlementsLeft > 0):
             self.outposts.append(self.players[self.turnIndex].build_settlement(node))
             GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
             # for their second starting settlement, players get starting resources
@@ -223,7 +223,7 @@ class Game:
     def create_city(self,node:tuple):
         #cities are upgraded settlements 
         #cities cost: 'ore', 'ore', 'ore', 'hay', 'hay'
-        if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
+        if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']) and self.players[self.turnIndex].citiesLeft>0:
             self.players[self.turnIndex].build_city(node)
             GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
         
@@ -234,7 +234,7 @@ class Game:
             self.create_city(node)
 
     def create_road(self,nodes:list):
-        if self.edge_empty(nodes) and self.sufficent_resources(self.players[self.turnIndex],['wood', 'brick']):
+        if self.edge_empty(nodes) and self.sufficent_resources(self.players[self.turnIndex],['wood', 'brick']) and self.players[self.turnIndex].roadsLeft >0:
             if self.state.currentScreen == 'place starting pieces':
                 connectedToSettlement = False
                 attachedToCorrectSettlement = True
@@ -591,14 +591,15 @@ class Game:
         hasWon = False
         # can only win on your turn because that is the only time you can gain VP
         player = self.players[self.turnIndex]
-        if (player.VP + player.development.count('victory points')) >= 10:
+        if (player.VP + player.getDevelopments().count('victory points')) >= 10:
             hasWon = True
         return hasWon
 
     def game_end(self):
-        if self.won():
-            GuiFile.game_end_screen(self.players[self.turnIndex].colour)
-            self.state.currentScreen = 'end'
+        if len(self.players) > 0:
+            if self.won():
+                GuiFile.game_end_screen(self.players[self.turnIndex].colour)
+                self.state.currentScreen = 'end'
     
     def draw_robber(self):
         i = 0

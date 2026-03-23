@@ -89,7 +89,7 @@ class PlayerHand:
         self.resources.remove('sheep')
         self.resources.remove('hay')
         self.resources.remove('ore')
-        self._developmentdevelopment.append(developmentCard)
+        self._development.append(developmentCard)
 
     def discard_resources(self):
         needToDiscard = self.resources // 2
@@ -147,13 +147,13 @@ class BotHand(PlayerHand):
     def decrease_player_favour(self, playerIndex:int):
         if playerIndex > self.ownIndex:
             playerIndex -= 1
-        if self.playerFavour[playerIndex] > 0:
+        if self.playerFavour[playerIndex] > 0: # avoid it going below 0
             self.playerFavour[playerIndex] -= 1
 
     def increase_player_favour(self, playerIndex:int):
         if playerIndex > self.ownIndex:
             playerIndex -= 1
-        if self.playerFavour[playerIndex] < 11:
+        if self.playerFavour[playerIndex] < 11: # avoid it going above 11
             self.playerFavour[playerIndex] += 1
 
     def accept_trade(self, playerIndex:int):
@@ -161,7 +161,7 @@ class BotHand(PlayerHand):
             playerIndex -= 1
         favourScore = self.playerFavour[playerIndex]
         if favourScore >= 2:
-            chosenNum = random.randint(0, 99, 1)
+            chosenNum = random.randint(1, 100, 1)
             if chosenNum >=  10*(favourScore-2)+5 :
                 return True
             else: 
