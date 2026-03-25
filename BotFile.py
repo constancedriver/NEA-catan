@@ -118,8 +118,8 @@ class Bot():
         return ResourceScore
 
     def decide_discard_cards(self):
-        resources = self.game.players[self.game.turnIndex].resources.copy()
-        numberToDiscard =  len(self.game.players[self.game.turnIndex].resources) // 2
+        resources = self.game.currentPlayer.resources.copy()
+        numberToDiscard =  len(self.game.currentPlayer.resources) // 2
         while len(resources) >  numberToDiscard:
             if self.can_build_city() and resources.count('hay') >= 2 and resources.count('ore') >= 3 and len(resources) >=  numberToDiscard+5:
                 for i in range (0,2,1):
@@ -148,7 +148,7 @@ class Bot():
     def decide_player_steal_from(self): 
         leastFavourableResourceScore = 12
         leastFavourablePlayer = []
-        currentBot = self.game.players[self.game.turnIndex]
+        currentBot = self.game.currentPlayer
         playerObjectsOnRobber = []
         #covert colours from players_on_robber_tile to the player objects 
         for player in self.game.players_on_robber_tile():
@@ -173,7 +173,7 @@ class Bot():
 
     def decide_move_robber(self):
         tileSettlements = []
-        currentTurnColour = self.game.players[self.game.turnIndex].colour
+        currentTurnColour = self.game.currentPlayer.colour
         for tile in self.game.tiles:
             nodes = tile.getNodes()
             numberOfSettlements = 0
@@ -220,32 +220,32 @@ class Bot():
 
     def can_build_city(self):
         atLeastOneSettlement = False
-        for outpost in self.game.players[self.game.turnIndex].outposts:
+        for outpost in self.game.currentPlayer.outposts:
             if atLeastOneSettlement:
                 break
             if not outpost.getisCity():
                 atLeastOneSettlement = True
-        if atLeastOneSettlement and self.game.players[self.game.turnIndex].sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
+        if atLeastOneSettlement and self.game.currentPlayer.sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
             return True
         else:
             return False
 
     def can_build_settlement(self):
-        if len(self.location_to_build_settlement())!= 0 and self.game.players[self.game.turnIndex].sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
+        if len(self.location_to_build_settlement())!= 0 and self.game.currentPlayer.sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
             return True
         else:
             return False
         
     def can_buy_development(self):
-        if len(self.game.developmentCards) != 0 and self.game.players[self.game.turnIndex].sufficient_resources(['sheep', 'hay', 'ore']):
+        if len(self.game.developmentCards) != 0 and self.game.currentPlayer.sufficient_resources(['sheep', 'hay', 'ore']):
             return True
         else:
             return False
         
     def can_build_road(self):
-        if self.game.players[self.game.turnIndex].sufficient_resources(['wood', 'brick']):
+        if self.game.currentPlayer.sufficient_resources(['wood', 'brick']):
             emptyEdge = False
-            roads = self.game.players[self.game.turnIndex].roads
+            roads = self.game.currentPlayer.roads
             # find is there is at least one road who has an empty adjacent edge
             for road in roads:
                 if emptyEdge:
@@ -288,7 +288,7 @@ class Bot():
 
     def location_to_build_settlement(self):
         possibleLocations = []
-        for road in self.game.players[self.game.turnIndex].roads:
+        for road in self.game.currentPlayer.roads:
             for location in road.getLocation():
                 if self.game.node_empty(location) and not self.game.adjacent_to_settlement(location):
                     possibleLocations.append(location)
@@ -378,7 +378,7 @@ class Bot():
 
     def already_have_access(self):
         access = []
-        for road in self.game.players[self.game.turnIndex].roads:
+        for road in self.game.currentPlayer.roads:
             for location in road.getLocation():
                 if location not in access:
                     access.append(location)
@@ -419,7 +419,7 @@ class Bot():
             tradesProposedOnTurn.append('strike')
             #after two strikes the bot will stop proposing trades
         else: 
-            playerResources = self.game.players[self.game.turnIndex].resources
+            playerResources = self.game.currentPlayer.resources
             #decide which resource to trade based on which was wanted the most number of times
             for resource in resourceTypes:
                 mostWantedNumber = max(mostWantedNumber, want.count(resource))
@@ -458,7 +458,7 @@ class Bot():
                     'COMMAND': 'trade with player'}
 
     def what_to_trade(self):
-        resources = self.game.players[self.game.turnIndex].resources
+        resources = self.game.currentPlayer.resources
         dontTrade = []
         want = []
         # if one away from having a city and enough spare to trade for one
@@ -524,7 +524,7 @@ class Bot():
     def calculate_trade_score(self, player:object):
         score = 0
         #add favour score 
-        score += self.game.players[self.game.turnIndex].get_favour_score(self.game.players.index(player))
+        score += self.game.currentPlayer.get_favour_score(self.game.players.index(player))
         #take away number of VP /2
         score -= player.VP
         return score
@@ -570,8 +570,8 @@ class Bot():
         return score 
 
     def starting_pieces(self):
-        numberOfRoads = len(self.game.players[self.game.turnIndex].roads)
-        numberofOutposts = len(self.game.players[self.game.turnIndex].outposts)
+        numberOfRoads = len(self.game.currentPlayer.roads)
+        numberofOutposts = len(self.game.currentPlayer.outposts)
         if numberOfRoads == numberofOutposts:
             #place a settlement
             bestScore = 0
@@ -593,10 +593,10 @@ class Bot():
                 'NODES': [randomNode, randomNode]} 
         else:
             #build a road
-            for outpost in self.game.players[self.game.turnIndex].outposts:
+            for outpost in self.game.currentPlayer.outposts:
                 roadAttached = False
                 outpostLocation = outpost.getLocation()
-                for road in self.game.players[self.game.turnIndex].roads:
+                for road in self.game.currentPlayer.roads:
                     if outpostLocation in road.getLocation():
                         roadAttached = True
                 if not roadAttached:
@@ -607,13 +607,13 @@ class Bot():
                     'NODES': [settlementToBuildFrom, random.choice(self.get_existing_adjacent_nodes(settlementToBuildFrom))]} 
             
     def robber_on_player_tile(self):
-        if self.game.players[self.game.turnIndex].colour in self.game.players_on_robber_tile():
+        if self.game.currentPlayer.colour in self.game.players_on_robber_tile():
             return True
         else:
             return False
         
     def normal_turn(self):
-        if self.robber_on_player_tile() and 'knight' in self.game.players[self.game.turnIndex].getDevelopments():
+        if self.robber_on_player_tile() and 'knight' in self.game.currentPlayer.getDevelopments():
             return {'TYPE': 'prog',
                 'COMMAND': 'play knight'}
         elif self.can_build_city():
@@ -622,7 +622,7 @@ class Bot():
             return self.try_to_build_settlement()
         elif self.can_build_road() and len(self.location_to_build_settlement()) == 0 :
             return self.try_to_build_road()
-        elif len(self.location_to_build_settlement()) == 0 and 'road building' in self.game.players[self.game.turnIndex].getDevelopments():
+        elif len(self.location_to_build_settlement()) == 0 and 'road building' in self.game.currentPlayer.getDevelopments():
             return {'TYPE': 'prog',
                 'COMMAND': 'play road building'}
         elif self.can_buy_development() and len(self.game.developmentCards) > 0:

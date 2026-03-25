@@ -10,7 +10,7 @@ class Game:
     def __init__(self, running:bool=True, tiles:list=None, harbours:list=None, players:list=None,
                 roads:list=None, outposts:list=None, longestRoad:int=4, largestArmy:int=2,
                 turnIndex:int=0, developmentCards:list=None, state=GameVisualsFile.GameVisuals(),
-                askToTrade:list=None, acceptedTrade:list=None):
+                askToTrade:list=None, acceptedTrade:list=None, currentPlayer:object=None):
         self.running = running
         self.tiles = tiles.copy() if tiles is not None else []
         self.harbours = harbours.copy() if harbours is not None else []
@@ -24,6 +24,7 @@ class Game:
         self.state = state
         self.askToTrade = askToTrade.copy() if askToTrade is not None else []
         self.acceptedTrade = acceptedTrade.copy() if acceptedTrade is not None else []
+        self.currentPlayer = currentPlayer
 
     def make_tiles(self):
         terrains = ['ore', 'ore', 'ore', 'sheep', 'sheep', 'sheep', 'sheep', 'hay', 'hay', 'hay', 'hay', 'wood', 'wood', 'wood', 'wood', 'brick', 'brick', 'brick']
@@ -54,6 +55,7 @@ class Game:
             self.players.append(PlayerHandFile.BotHand(colours.pop(0), i))
         for i in range (NumBots, 4, 1):
             self.players.append(PlayerHandFile.PlayerHand(colours.pop(0)))
+        self.currentPlayer = self.players[self.turnIndex]
 
     def next_turn(self):
         if self.state.rolled or self.state.currentScreen == 'place starting pieces':
@@ -61,15 +63,17 @@ class Game:
             self.turnIndex += 1
             if self.turnIndex > 3:
                 self.turnIndex = 0 
-            self.players[self.turnIndex].updateDevelopmentsAbleToUse()
+            self.currentPlayer.updateDevelopmentsAbleToUse()
             self.state.rolled = False
-            GuiFile.new_turn(self.players[self.turnIndex])
+            GuiFile.new_turn(self.currentPlayer)
+            self.currentPlayer = self.players[self.turnIndex]
 
     def previous_turn(self):
         self.turnIndex -= 1
         if self.turnIndex < 0:
             self.turnIndex = 3 
-        GuiFile.new_turn(self.players[self.turnIndex])
+        self.currentPlayer = self.players[self.turnIndex]
+        GuiFile.new_turn(self.currentPlayer)
 
     def roll_dice(self):
         dice1 = random.randint(1,6)
@@ -130,7 +134,7 @@ class Game:
         return edgeEmpty
     
     def give_starting_resources(self,node:tuple):
-        player = self.players[self.turnIndex]
+        player = self.currentPlayer
         for tile in self.find_tiles_at_node(node):
             player.resources.append(tile.getTileResource())
         GuiFile.update_banner_resources(self.players)
@@ -193,7 +197,7 @@ class Game:
                                 if outpost.getisCity():
                                     player.resources.append(tile.getTileResource())
             GuiFile.update_banner_resources(self.players)
-            GuiFile.new_turn(self.players[self.turnIndex])
+            GuiFile.new_turn(self.currentPlayer)
 
     def build(self, selectedNodes:list=None):
         if selectedNodes == None:
@@ -206,16 +210,16 @@ class Game:
         elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
             self.create_road(selectedNodes)
         GuiFile.create_hex_node_buttons()
-        GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.new_turn(self.currentPlayer)
         GuiFile.update_banner_resources(self.players)
         
     def create_settlement(self,node:tuple):
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.players[self.turnIndex].connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.players[self.turnIndex].sufficient_resources(['wood', 'brick', 'sheep', 'hay']) and self.players[self.turnIndex].settlementsLeft > 0):
-            self.outposts.append(self.players[self.turnIndex].build_settlement(node))
-            GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
+        if (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.currentPlayer.connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.currentPlayer.sufficient_resources(['wood', 'brick', 'sheep', 'hay']) and self.currentPlayer.settlementsLeft > 0):
+            self.outposts.append(self.currentPlayer.build_settlement(node))
+            GuiFile.update_vp(self.currentPlayer, self.turnIndex)
             # for their second starting settlement, players get starting resources
             if self.state.currentScreen == 'place starting pieces' and 4 < len(self.outposts) <= 8:
                 self.give_starting_resources(node)
@@ -224,9 +228,9 @@ class Game:
     def create_city(self,node:tuple):
         #cities are upgraded settlements 
         #cities cost: 'ore', 'ore', 'ore', 'hay', 'hay'
-        if self.players[self.turnIndex].settlement_at_node(node) and self.players[self.turnIndex].sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']) and self.players[self.turnIndex].citiesLeft>0:
-            self.players[self.turnIndex].build_city(node)
-            GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
+        if self.currentPlayer.settlement_at_node(node) and self.currentPlayer.sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']) and self.currentPlayer.citiesLeft>0:
+            self.currentPlayer.build_city(node)
+            GuiFile.update_vp(self.currentPlayer, self.turnIndex)
         
     def create_outpost(self, node:tuple):
         if self.node_empty(node):
@@ -235,20 +239,20 @@ class Game:
             self.create_city(node)
 
     def create_road(self,nodes:list):
-        if self.edge_empty(nodes) and self.sufficent_resources(self.players[self.turnIndex],['wood', 'brick']) and self.players[self.turnIndex].roadsLeft >0:
+        if self.edge_empty(nodes) and self.sufficent_resources(self.currentPlayer,['wood', 'brick']) and self.currentPlayer.roadsLeft >0:
             if self.state.currentScreen == 'place starting pieces':
                 connectedToSettlement = False
                 attachedToCorrectSettlement = True
                 # check connected to settlement 
-                for outpost in self.players[self.turnIndex].outposts:
+                for outpost in self.currentPlayer.outposts:
                     if nodes[0] == outpost.getLocation() or nodes[1] == outpost.getLocation():
                         connectedToSettlement = True
-                        for road in self.players[self.turnIndex].roads:
+                        for road in self.currentPlayer.roads:
                             if road.getLocation()[1] == outpost.getLocation() or road.getLocation()[0] == outpost.getLocation():
                                 attachedToCorrectSettlement = False
                                 #ensures not building a road attached to the previous settlement built
                 if connectedToSettlement and attachedToCorrectSettlement:
-                    self.roads.append(self.players[self.turnIndex].build_road(nodes))
+                    self.roads.append(self.currentPlayer.build_road(nodes))
                     self.check_longest_road()
                     # when placing starting roads and settlements,
                     #go one round in forwards order each placer placing 1 road and 1 settlement
@@ -261,8 +265,8 @@ class Game:
                         # end of game set up 
                         self.state.currentScreen = 'game'
                         self.load_game_screen()
-            elif self.players[self.turnIndex].connected_to_road(nodes[0]) or self.players[self.turnIndex].connected_to_road(nodes[1]):
-                self.roads.append(self.players[self.turnIndex].build_road(nodes))
+            elif self.currentPlayer.connected_to_road(nodes[0]) or self.currentPlayer.connected_to_road(nodes[1]):
+                self.roads.append(self.currentPlayer.build_road(nodes))
                 self.check_longest_road()
 
     def steal_longest_road(self):
@@ -274,26 +278,26 @@ class Game:
                 player.VP -= 2
                 GuiFile.update_vp(self.players[i], i)
             i += 1
-        self.players[self.turnIndex].hasLongestRoad = True
-        self.players[self.turnIndex].VP += 2
+        self.currentPlayer.hasLongestRoad = True
+        self.currentPlayer.VP += 2
         #update new comparison value 
-        self.longestRoad = self.players[self.turnIndex].playerLongestRoad
+        self.longestRoad = self.currentPlayer.playerLongestRoad
         #update visuals
-        GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
-        GuiFile.update_longest_road(self.players[self.turnIndex].colour)
+        GuiFile.update_vp(self.currentPlayer, self.turnIndex)
+        GuiFile.update_longest_road(self.currentPlayer.colour)
 
     def check_longest_road(self):
         # get all locations to calculate the players longest road
         roads = []
         blocks =[]
-        for road in self.players[self.turnIndex].roads:
+        for road in self.currentPlayer.roads:
             roads.append(road.getLocation())
         for outpost in self.outposts:
-            if outpost.getColour() != self.players[self.turnIndex].colour:
+            if outpost.getColour() != self.currentPlayer.colour:
                 blocks.append(outpost.getLocation())
         #calculate players longest road and if new longest road update longest road
-        self.players[self.turnIndex].playerLongestRoad = self.dfs_max_length(roads, blocks)
-        if self.players[self.turnIndex].playerLongestRoad > self.longestRoad:
+        self.currentPlayer.playerLongestRoad = self.dfs_max_length(roads, blocks)
+        if self.currentPlayer.playerLongestRoad > self.longestRoad:
             self.steal_longest_road()
 
     def get_road_nodes(self, roads:list):
@@ -352,8 +356,8 @@ class Game:
     def create_development_card(self):
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
-        if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
-            self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
+        if self.sufficent_resources(self.currentPlayer, ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
+            self.currentPlayer.buy_development_card(self.developmentCards.pop(0))
             self.load_game_screen()
             print('bought develpoment card')
 
@@ -441,9 +445,8 @@ class Game:
         chosenPlayerColour = possiblePlayers[chosenPlayerNum]
         for player in self.players:
             if player.colour == chosenPlayerColour and len(player.resources) != 0:
-                print(player.colour)
                 stolenResource = player.resources.pop(random.randint(0,len(player.resources)-1))
-                self.players[self.turnIndex].resources.append(stolenResource)
+                self.currentPlayer.resources.append(stolenResource)
                 # update bot favorability (if stolen from decrease)
                 if player.isBot:
                     player.decrease_player_favour(self.turnIndex)
@@ -455,17 +458,17 @@ class Game:
             if player.hasLargestArmy == True:
                 player.hasLargestArmy = False
                 player.VP -= 2
-        self.players[self.turnIndex].hasLargestArmy = True
-        self.players[self.turnIndex].VP += 2
-        self.largestArmy = self.players[self.turnIndex].knightsPlayed
-        GuiFile.update_vp(self.players[self.turnIndex], self.turnIndex)
-        GuiFile.update_largest_army(self.players[self.turnIndex].colour)
+        self.currentPlayer.hasLargestArmy = True
+        self.currentPlayer.VP += 2
+        self.largestArmy = self.currentPlayer.knightsPlayed
+        GuiFile.update_vp(self.currentPlayer, self.turnIndex)
+        GuiFile.update_largest_army(self.currentPlayer.colour)
     
     def play_knight(self):
-        if 'knight' in self.players[self.turnIndex].getDevelopments():
-            self.players[self.turnIndex].use_knight()
-            GuiFile.update_knights(self.players[self.turnIndex], self.turnIndex)
-            if self.players[self.turnIndex].knightsPlayed > self.largestArmy:
+        if 'knight' in self.currentPlayer.getDevelopments():
+            self.currentPlayer.use_knight()
+            GuiFile.update_knights(self.currentPlayer, self.turnIndex)
+            if self.currentPlayer.knightsPlayed > self.largestArmy:
                 self.steal_largest_army()
             self.load_board()
             GuiFile.select_robber_placement_screen()
@@ -473,31 +476,31 @@ class Game:
             self.state.currentScreen = 'robber placement'
     
     def play_monopoly(self,resourceType:str):
-        if 'monopoly' in self.players[self.turnIndex].getDevelopments():
+        if 'monopoly' in self.currentPlayer.getDevelopments():
             resourceTypeCount = 0
             for player in self.players:
                 resourceTypeCount += player.resources.count(resourceType)
                 # removes all instances of the resourceType from the resources list
                 player.resources = list(filter(lambda a: a != resourceType, player.resources))
             for i in range(0,resourceTypeCount,1):
-                self.players[self.turnIndex].resources.append(resourceType)
-            self.players[self.turnIndex].remove_development('monopoly')
+                self.currentPlayer.resources.append(resourceType)
+            self.currentPlayer.remove_development('monopoly')
             self.load_game_screen()
         
     def play_year_of_plenty(self):
-        if 'year of plenty' in self.players[self.turnIndex].getDevelopments() and len(self.state.yoPlenty) == 2:
+        if 'year of plenty' in self.currentPlayer.getDevelopments() and len(self.state.yoPlenty) == 2:
             resources = self.state.yoPlenty
-            self.players[self.turnIndex].resources.append(resources[0])
-            self.players[self.turnIndex].resources.append(resources[1])
-            self.players[self.turnIndex].remove_development('year of plenty')
+            self.currentPlayer.resources.append(resources[0])
+            self.currentPlayer.resources.append(resources[1])
+            self.currentPlayer.remove_development('year of plenty')
             self.load_game_screen()
 
     def play_road_building(self):
-        if 'road building' in self.players[self.turnIndex].getDevelopments():
+        if 'road building' in self.currentPlayer.getDevelopments():
             for i in range(2):
-                self.players[self.turnIndex].resources.append('brick')
-                self.players[self.turnIndex].resources.append('wood')
-            self.players[self.turnIndex].remove_development('road building')
+                self.currentPlayer.resources.append('brick')
+                self.currentPlayer.resources.append('wood')
+            self.currentPlayer.remove_development('road building')
             self.load_game_screen()
 
     def trade_with_bank(self,resourceInput:list, resourceOutput:list):
@@ -511,11 +514,11 @@ class Game:
                 numberRequired = 3
             else: 
                 numberRequired = 4
-            playerResources = self.players[self.turnIndex].resources
+            playerResources = self.currentPlayer.resources
             if playerResources.count(inputResource) >= numberRequired:
                 for i in range (numberRequired):
-                    self.players[self.turnIndex].resources.remove(inputResource)
-                self.players[self.turnIndex].resources.append(resourceOutput[0])
+                    self.currentPlayer.resources.remove(inputResource)
+                self.currentPlayer.resources.append(resourceOutput[0])
                 self.state.tradeOfferTurn.clear()
                 self.state.tradeOfferOthers.clear()
                 self.load_game_screen()
@@ -523,7 +526,7 @@ class Game:
     def trade_with_harbour(self):
         possibleResources = []
         # in order to get the benifit of a harbour, you must have an outpost on it
-        for outpost in self.players[self.turnIndex].outposts:
+        for outpost in self.currentPlayer.outposts:
             for harbour in self.harbours:
                 if harbour.getPosition() == outpost.getLocation():
                     possibleResources.append(harbour.getType())
@@ -532,15 +535,15 @@ class Game:
     def complete_trade_player(self):
         #give resources from player whos turn it is to other player
         for resourceTurn in self.state.tradeOfferTurn:
-            self.players[self.turnIndex].resources.remove(resourceTurn)
+            self.currentPlayer.resources.remove(resourceTurn)
             self.acceptedTrade[0].resources.append(resourceTurn)
         #give resources from other player to players whos turn it is
         for resourceOther in self.state.tradeOfferOthers:
             self.acceptedTrade[0].resources.remove(resourceOther)
-            self.players[self.turnIndex].resources.append(resourceOther)
+            self.currentPlayer.resources.append(resourceOther)
         # update bot favorability
-        if self.players[self.turnIndex].isBot:
-            self.players[self.turnIndex].increase_player_favour(self.players.index(self.acceptedTrade[0]))
+        if self.currentPlayer.isBot:
+            self.currentPlayer.increase_player_favour(self.players.index(self.acceptedTrade[0]))
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
         self.askToTrade.clear()
@@ -554,9 +557,9 @@ class Game:
         self.complete_trade_player()
 
     def can_trade_with(self,resourceInput:list, resourceOutput:list):
-        if len(resourceInput) != 0 and len(resourceOutput) != 0 and self.sufficent_resources(self.players[self.turnIndex], resourceInput):
+        if len(resourceInput) != 0 and len(resourceOutput) != 0 and self.sufficent_resources(self.currentPlayer, resourceInput):
             for player in self.players:
-                if self.sufficent_resources(player, resourceOutput) and player != self.players[self.turnIndex]:
+                if self.sufficent_resources(player, resourceOutput) and player != self.currentPlayer:
                     self.askToTrade.append(player)
             if len(self.askToTrade) != 0:
                 self.state.currentScreen = 'ask player about trade'
@@ -603,7 +606,7 @@ class Game:
     def won(self):
         hasWon = False
         # can only win on your turn because that is the only time you can gain VP
-        player = self.players[self.turnIndex]
+        player = self.currentPlayer
         if (player.VP + player.getDevelopments().count('victory points')) >= 10:
             hasWon = True
         return hasWon
@@ -611,7 +614,7 @@ class Game:
     def game_end(self):
         if len(self.players) > 0:
             if self.won():
-                GuiFile.game_end_screen(self.players[self.turnIndex].colour)
+                GuiFile.game_end_screen(self.currentPlayer.colour)
                 self.state.currentScreen = 'end'
     
     def draw_robber(self):
@@ -650,7 +653,7 @@ class Game:
                 if player.hasLongestRoad:
                     GuiFile.update_longest_road(player.colour)
         GuiFile.draw_player_banners(self.players)
-        GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.new_turn(self.currentPlayer)
         GuiFile.display_dice(0,0)
         GuiFile.pygame.display.flip()
         self.state.currentScreen = 'game'
@@ -659,7 +662,7 @@ class Game:
         self.load_board()
         GuiFile.draw_player_banners(self.players)
         GuiFile.starting_screen()
-        GuiFile.new_turn(self.players[self.turnIndex])
+        GuiFile.new_turn(self.currentPlayer)
 
     def cancel_trade(self):
         self.state.tradeOfferOthers.clear()
