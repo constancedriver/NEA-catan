@@ -409,7 +409,7 @@ def try_trade(game:object):
     infomation = what_to_trade(game)
     dontTrade = infomation[0]
     want = infomation[1]
-    if want == []:
+    if len(want) == 0: # no point in trading 
         tradesProposedOnTurn.append('strike')
         tradesProposedOnTurn.append('strike')
         #after two strikes the bot will stop proposing trades
@@ -510,25 +510,21 @@ def what_to_trade(game:object):
         want.append('hay')
         dontTrade.append('sheep')
         dontTrade.append('ore')
-    if len(want) >0: # otherwise no point in trading
-        highestWantCount = 0
-        highestWantResource = []
-        resourceTypes = ['ore', 'sheep', 'hay', 'wood', 'brick']
-        for resource in resourceTypes:
-            highestWantCount = max(highestWantCount, want.count(resource))
-        for resource in resourceTypes:
-            if want.count(resource) == highestWantCount:
-                highestWantResource.append(resource)
-        if len(highestWantResource) == 1:
-            pass
     return [dontTrade, want]
 
 def calculate_trade_score(game:object, player:object):
-    pass
+    score = 0
+    #add favour score 
+    score += game.players[game.turnIndex].get_favour_score(game.players[game.turnIndex].index(player))
+    #take away number of VP /2
+    score -= player.VP
+    return score
 
 def who_to_trade_with(game:object, playersAccepted:list):
+    playersAccepted = game.acceptedTrade
     bestScore = calculate_trade_score(playersAccepted[0]) #ensures starting score isnt too high
     bestPlayers = []
+    # find player(s) with best trade score
     for player in playersAccepted:
         tradeScore = calculate_trade_score(player)
         if bestScore < tradeScore:
@@ -537,7 +533,9 @@ def who_to_trade_with(game:object, playersAccepted:list):
             bestPlayers.append(player)
         elif bestScore == tradeScore:
             bestPlayers.append(player)
-    pass  
+    return {'TYPE': 'prog',
+            'COMMAND': 'choose player trade',
+            'INDEX' : playersAccepted.index(random.choice(bestPlayers))}
 
 def get_tiles_at_node(game:object, node:tuple):
     tilesAtNode = []
