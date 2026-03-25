@@ -373,12 +373,16 @@ class Game:
         self.state.discardCards.clear()
         self.robber_turn()
 
-    def robber_turn(self):
+    def find_who_needs_to_discard(self):
         needToDiscard = []
         for player in self.players:
             #must discard cards if have 7 or more cards
             if len(player.resources) >=7:
                 needToDiscard.append(player)
+        return needToDiscard
+    
+    def robber_turn(self):
+        needToDiscard = self.find_who_needs_to_discard()
         if len(needToDiscard) == 0:
             self.load_game_screen()
             GuiFile.select_robber_placement_screen()
