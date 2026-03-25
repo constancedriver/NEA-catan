@@ -195,11 +195,12 @@ class Game:
             GuiFile.update_banner_resources(self.players)
             GuiFile.new_turn(self.players[self.turnIndex])
 
-    def build(self):
-        selectedNodes = []
-        for node in self.state.pressedNodes:
-            selectedNodes.append(node)
-        self.state.pressedNodes.clear()
+    def build(self, selectedNodes:list=None):
+        if selectedNodes == None:
+            selectedNodes = []
+            for node in self.state.pressedNodes:
+                selectedNodes.append(node)
+            self.state.pressedNodes.clear()
         if selectedNodes[0] == selectedNodes[1]:
             self.create_outpost(selectedNodes[0])
         elif self.is_adjacent(selectedNodes[0], selectedNodes[1]):
@@ -435,6 +436,7 @@ class Game:
         chosenPlayerColour = possiblePlayers[chosenPlayerNum]
         for player in self.players:
             if player.colour == chosenPlayerColour and len(player.resources) != 0:
+                print(player.colour)
                 stolenResource = player.resources.pop(random.randint(0,len(player.resources)-1))
                 self.players[self.turnIndex].resources.append(stolenResource)
                 # update bot favorability (if stolen from decrease)
@@ -620,7 +622,6 @@ class Game:
             GuiFile.draw_road(road)
         for outpost in self.outposts:
             if outpost.getisCity():
-                outpost.upgrade()
                 GuiFile.draw_city(outpost)
             else: 
                 GuiFile.draw_settlement(outpost)
@@ -677,7 +678,7 @@ class Game:
                   'choose player trade' : lambda:self.choose_player_to_trade_with(command['INDEX']),
                   'discard cards'       : lambda:self.discard_cards(self.state.discardCards),
                   'choose where to play knight' : lambda:self.move_knight(command['HEX NUMBER']),
-                  'build'               : lambda:self.build(),
+                  'build'               : lambda:self.build(command['NODES']),
                   'quit'                : lambda:self.quit()
                   }
         #returns the function but doesnt complete the function

@@ -1,4 +1,5 @@
 import random
+import GuiFile
 resourceTypes = ['sheep', 'hay', 'brick', 'wood', 'ore']
 NodeToTiles = {}
 NodeToResourceScore = {}
@@ -72,7 +73,8 @@ def get_resource_resource_score(resourceNum:int):
                      3:2,
                      11:2,
                      2:1,
-                     12:1}
+                     12:1,
+                     0:0}
     return ResourceScore[resourceNum]
 
 def find_tiles_at_node(game:object,node:tuple):
@@ -149,14 +151,22 @@ def decide_player_steal_from(game:object):
         playerIndex = game.players.index(player)
         leastFavourableResourceScore = min(currentBot.get_favour_ResourceScore(playerIndex), leastFavourableResourceScore)
     # find which player(s) have this lowest ResourceScore
+    playerObjectsOnRobber = []
     for player in game.players_on_robber_tile():
+            for playerObject in game.players:
+                if player == playerObject.colour:
+                    playerObjectsOnRobber.append(playerObject)
+    for object in playerObjectsOnRobber:
         playerIndex = game.players.index(player)
         if currentBot.get_favour_ResourceScore(playerIndex) == leastFavourableResourceScore:
             leastFavourablePlayer.append(player)
     # if more than one least favoured, pick a random one of them
+    chosen = random.choice(leastFavourablePlayer)
+    print(players_can_steal_from.index(chosen))
+    print(chosen.colour)
     return {'TYPE': 'prog',
             'COMMAND': 'steal from player',
-            'INDEX': players_can_steal_from.index(random.choice(leastFavourablePlayer))}
+            'INDEX': players_can_steal_from.index(chosen)}
 
 def decide_move_robber(game:object):
     tileSettlements = []
@@ -295,11 +305,13 @@ def try_to_build_settlement(game:object):
     highestResourceScore = 0
     possibleLocations = location_to_build_settlement(game)
     bestNodes = []
+    print('possible locations', possibleLocations)
     for location in possibleLocations:
         highestResourceScore = max (highestResourceScore, find_node_resource_score(game, location))
     for node in possibleLocations:
         if find_node_resource_score(game, node) == highestResourceScore:
             bestNodes.append(node)
+            print('adding to best node', node)
     if len(bestNodes) == 1:
         return {'TYPE': 'prog',
                 'COMMAND': 'build',
@@ -397,6 +409,10 @@ def trade_with_bank(game:object, resourceWant:str, resourceGiveAway:str):
     for i in range (0,numberGive,1):
         game.state.tradeOfferTurn.append(resourceGiveAway)
     game.state.tradeOfferOthers.append(resourceWant)
+    # allows other players to see what the trade being proposed is 
+    GuiFile.trade_screen()
+    GuiFile.redraw_trade_offer_you(game.state.tradeOfferOthers, True)
+    GuiFile.redraw_trade_offer_you(game.state.tradeOfferTurn, False)
     return {'TYPE': 'prog',
             'COMMAND': 'trade with bank'}
 
@@ -571,7 +587,7 @@ def starting_pieces(game:object):
             for node in tile.getNodes():
                 #if a legal place to play
                 if game.node_empty(node) and not game.adjacent_to_settlement(node):
-                    startingScore = get_starting_score(node)
+                    startingScore = get_starting_score(game, node)
                     if startingScore > bestScore:
                         bestScore = startingScore
                         bestNodes.clear()

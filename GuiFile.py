@@ -175,6 +175,11 @@ def draw_player_banners(players:list):
         screen.blit((SMALLFONT.render(('resources:') , True , (0,0,0))), (1188,70+(turnIndex*213)))
         screen.blit((SMALLFONT.render(('devs:') , True , (0,0,0))), (1188,110+(turnIndex*213)))
         screen.blit((SMALLFONT.render(('knights:') , True , (0,0,0))), (1188,150+(turnIndex*213)))
+        if player.isBot:
+            message = 'bot'
+        else:
+            message = 'human'
+        screen.blit((SMALLFONT.render((message) , True , (0,0,0))), (1188,190+(turnIndex*213)))
         update_vp(player, turnIndex)
         update_devs(player, turnIndex)
         update_knights(player, turnIndex)
