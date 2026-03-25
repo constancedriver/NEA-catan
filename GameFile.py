@@ -355,6 +355,7 @@ class Game:
         if self.sufficent_resources(self.players[self.turnIndex], ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
             self.players[self.turnIndex].buy_development_card(self.developmentCards.pop(0))
             self.load_game_screen()
+            print('bought develpoment card')
 
     def sufficent_resources(self,player:object,resourcesNeeded:list):
         sufficent = True

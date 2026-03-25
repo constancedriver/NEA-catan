@@ -623,8 +623,8 @@ def normal_turn(game:object):
             'COMMAND': 'play road building'}
     elif can_buy_development(game) and len(game.developmentCards) > 0:
         return try_to_build_development_card(game)
-    #elif tradesProposedOnTurn.count('strike') < 2:
-        #return try_trade(game)
+    elif tradesProposedOnTurn.count('strike') < 2 and len(tradesProposedOnTurn)<3:
+        return try_trade(game)
     else:
         return {'TYPE': 'prog',
             'COMMAND': 'end turn'}
