@@ -520,7 +520,7 @@ def calculate_trade_score(game:object, player:object):
     score -= player.VP
     return score
 
-def who_to_trade_with(game:object, playersAccepted:list):
+def who_to_trade_with(game:object):
     playersAccepted = game.acceptedTrade
     bestScore = calculate_trade_score(playersAccepted[0]) #ensures starting score isnt too high
     bestPlayers = []
@@ -639,5 +639,7 @@ def turn(game:object):
             return decide_player_steal_from(game)
         elif game.state.currentScreen == 'discard':
             return decide_discard_cards(game)
+        elif game.state.currentScreen == 'choose player to trade with':
+            return who_to_trade_with(game)
         else:
             return normal_turn(game)
