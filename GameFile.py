@@ -620,6 +620,7 @@ class Game:
             GuiFile.draw_road(road)
         for outpost in self.outposts:
             if outpost.getisCity():
+                outpost.upgrade()
                 GuiFile.draw_city(outpost)
             else: 
                 GuiFile.draw_settlement(outpost)

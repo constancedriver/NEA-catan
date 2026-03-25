@@ -26,7 +26,7 @@ class Outpost(Piece):
         return self._isCity
     
     def upgrade(self):
-        self.isCity = True
+        self._isCity = True
         GuiFile.draw_city(self)
         
 class Harbour:

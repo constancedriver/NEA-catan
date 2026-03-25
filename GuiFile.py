@@ -274,6 +274,7 @@ def draw_city(city:object):
     draw_settlement(city)
     pygame.draw.rect(screen, get_colour(colour), (x-30, y-15, 15, 30))
     pygame.display.update(x-30, y-15, 15, 30)
+    pygame.display.flip()
 
 def draw_harbours(harbours:list):
     for harbour in harbours:
