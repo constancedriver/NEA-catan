@@ -407,7 +407,6 @@ class Bot():
 
         
     def try_trade(self):
-        global tradesProposedOnTurn
         mostWantedNumber = 0
         mostWantedResource = []
         couldTrade = []
@@ -415,8 +414,8 @@ class Bot():
         dontTrade = infomation[0]
         want = infomation[1]
         if len(want) == 0: # no point in trading 
-            tradesProposedOnTurn.append('strike')
-            tradesProposedOnTurn.append('strike')
+            self.tradesProposedOnTurn.append('strike')
+            self.tradesProposedOnTurn.append('strike')
             #after two strikes the bot will stop proposing trades
         else: 
             playerResources = self.game.currentPlayer.resources
@@ -437,16 +436,16 @@ class Bot():
                 elif playerResources.count(resource)>dontTrade.count(resource):
                     couldTrade.append(resource)
             for item in couldTrade:
-                if [mostWantedResource[0], item] in tradesProposedOnTurn:
+                if [mostWantedResource[0], item] in self.tradesProposedOnTurn:
                     #removing trades offers that have already been done 
                     couldTrade.remove(item)
             if len(couldTrade) == 0:
-                tradesProposedOnTurn.append('strike')#after two strikes the bot will stop proposing trades
+                self.tradesProposedOnTurn.append('strike')#after two strikes the bot will stop proposing trades
             else:
                 while len(couldTrade)>1:
                     couldTrade.remove(random.choice(couldTrade))
                 #add to list of trades proposed
-                tradesProposedOnTurn.append([mostWantedResource[0], couldTrade[0]])
+                self.tradesProposedOnTurn.append([mostWantedResource[0], couldTrade[0]])
                 #propose trade
                 self.game.state.tradeOfferTurn.append(couldTrade[0])
                 self.game.state.tradeOfferOthers.append(mostWantedResource[0])
@@ -627,7 +626,7 @@ class Bot():
                 'COMMAND': 'play road building'}
         elif self.can_buy_development() and len(self.game.developmentCards) > 0:
             return self.try_to_build_development_card()
-        elif tradesProposedOnTurn.count('strike') < 2 and len(tradesProposedOnTurn)<3:
+        elif self.tradesProposedOnTurn.count('strike') < 2 and len(self.tradesProposedOnTurn)<3:
             return self.try_trade()
         else:
             return {'TYPE': 'prog',
@@ -638,8 +637,7 @@ class Bot():
             return self.starting_pieces()
         else:
             if not self.game.state.rolled:
-                global tradesProposedOnTurn
-                tradesProposedOnTurn.clear() 
+                self.tradesProposedOnTurn.clear() 
                 return {'TYPE': 'prog',
                         'COMMAND': 'roll dice'}
             elif self.game.state.currentScreen == 'robber placement':
