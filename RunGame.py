@@ -10,7 +10,7 @@ def main_loop(game):
             command = GuiFile.command(game.state.currentScreen)
         elif game.players[game.turnIndex].isBot and not(game.state.currentScreen == 'discard' and not game.find_who_needs_to_discard[0].isBot) and game.state.currentScreen != 'ask player about trade':
             # if its the bots turn unless a human player is trying to dicard cards or players are trying to accept a trade 
-            command = BotFile.turn(game)
+            command = bot.turn(game)
         else: 
             command = GuiFile.command(game.state.currentScreen)
         #if game.state.currentScreen == 'main menu':
@@ -36,15 +36,13 @@ def main_loop(game):
             else: 
                 action()
             if len(game.state.pressedNodes) == 2:
-                game.build()
-    BotFile.make_board(game)
-    print(BotFile.board)    
+                game.build()   
     
     GuiFile.pygame.quit()
     GuiFile.sys.exit()
 
 #calling game 
-game =  GameFile.Game()    
+game =  GameFile.Game() 
+bot = BotFile.Bot(game)   
 GuiFile.start_menu()
 main_loop(game)
-print(BotFile.board)
