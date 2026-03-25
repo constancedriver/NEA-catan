@@ -145,28 +145,27 @@ def decide_player_steal_from(game:object):
     leastFavourableResourceScore = 12
     leastFavourablePlayer = []
     currentBot = game.players[game.turnIndex]
-    # find lowest favour ResourceScore of players that can steal from
-    players_can_steal_from = game.players_on_robber_tile()
-    for player in players_can_steal_from:
-        playerIndex = game.players.index(player)
-        leastFavourableResourceScore = min(currentBot.get_favour_ResourceScore(playerIndex), leastFavourableResourceScore)
-    # find which player(s) have this lowest ResourceScore
     playerObjectsOnRobber = []
+    #covert colours from players_on_robber_tile to the player objects 
     for player in game.players_on_robber_tile():
             for playerObject in game.players:
                 if player == playerObject.colour:
                     playerObjectsOnRobber.append(playerObject)
-    for object in playerObjectsOnRobber:
+    # find lowest favour ResourceScore of players that can steal from
+    for player in playerObjectsOnRobber:
         playerIndex = game.players.index(player)
-        if currentBot.get_favour_ResourceScore(playerIndex) == leastFavourableResourceScore:
-            leastFavourablePlayer.append(player)
+        leastFavourableResourceScore = min(currentBot.get_favour_score(playerIndex), leastFavourableResourceScore)
+    print(leastFavourableResourceScore)
+    # find which player(s) have this lowest ResourceScore
+    for playerObject in playerObjectsOnRobber:
+        playerIndex = game.players.index(playerObject)
+        if currentBot.get_favour_score(playerIndex) == leastFavourableResourceScore:
+            leastFavourablePlayer.append(playerObject)
     # if more than one least favoured, pick a random one of them
     chosen = random.choice(leastFavourablePlayer)
-    print(players_can_steal_from.index(chosen))
-    print(chosen.colour)
     return {'TYPE': 'prog',
             'COMMAND': 'steal from player',
-            'INDEX': players_can_steal_from.index(chosen)}
+            'INDEX': playerObjectsOnRobber.index(chosen)}
 
 def decide_move_robber(game:object):
     tileSettlements = []
@@ -227,18 +226,8 @@ def can_build_city(game:object):
     else:
         return False
 
-def nowhere_to_build_settlement(game:object):
-    legalNode = False # empty node at least one away from another outpost and attached to a road
-    for road in game.players[game.turnIndex].roads:
-        if legalNode:
-            break 
-        location = road.getLocation()
-        if (not game.adjacent_to_settlement(location[0])) or (not game.adjacent_to_settlement(location[1])):
-            legalNode = True
-    return not legalNode
-
 def can_build_settlement(game:object):
-    if not nowhere_to_build_settlement(game) and game.players[game.turnIndex].sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
+    if len(location_to_build_settlement(game))!= 0 and game.players[game.turnIndex].sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
         return True
     else:
         return False
@@ -348,10 +337,9 @@ def try_to_build_road(game:object):
         chosenNode = random.choice(bestNodes)
         for road in allowsNewSettlement:
             if chosenNode in road:
-                roadLoactions = road.getLocation()
                 return {'TYPE': 'prog',
                 'COMMAND': 'build',
-                'NODES': [roadLoactions[0], roadLoactions[0]]} 
+                'NODES': [road[0], road[1]]} 
     else:
         # no roads create access to a new place to build a settlement 
         # choose a random road to build 
@@ -410,9 +398,6 @@ def trade_with_bank(game:object, resourceWant:str, resourceGiveAway:str):
         game.state.tradeOfferTurn.append(resourceGiveAway)
     game.state.tradeOfferOthers.append(resourceWant)
     # allows other players to see what the trade being proposed is 
-    GuiFile.trade_screen()
-    GuiFile.redraw_trade_offer_you(game.state.tradeOfferOthers, True)
-    GuiFile.redraw_trade_offer_you(game.state.tradeOfferTurn, False)
     return {'TYPE': 'prog',
             'COMMAND': 'trade with bank'}
 
@@ -461,6 +446,10 @@ def try_trade(game:object):
             #propose trade
             game.state.tradeOfferTurn.append(couldTrade[0])
             game.state.tradeOfferOthers.append(mostWantedResource[0])
+            GuiFile.trade_screen()
+            GuiFile.redraw_trade_offer_you(game.state.tradeOfferOthers, True)
+            GuiFile.redraw_trade_offer_you(game.state.tradeOfferTurn, False)
+            GuiFile.pygame.display.flip()   
             return {'TYPE': 'prog',
                 'COMMAND': 'trade with player'}
 
@@ -531,18 +520,18 @@ def what_to_trade(game:object):
 def calculate_trade_score(game:object, player:object):
     score = 0
     #add favour score 
-    score += game.players[game.turnIndex].get_favour_score(game.players[game.turnIndex].index(player))
+    score += game.players[game.turnIndex].get_favour_score(game.players.index(player))
     #take away number of VP /2
     score -= player.VP
     return score
 
 def who_to_trade_with(game:object):
     playersAccepted = game.acceptedTrade
-    bestScore = calculate_trade_score(playersAccepted[0]) #ensures starting score isnt too high
+    bestScore = calculate_trade_score(game, playersAccepted[0]) #ensures starting score isnt too high
     bestPlayers = []
     # find player(s) with best trade score
     for player in playersAccepted:
-        tradeScore = calculate_trade_score(player)
+        tradeScore = calculate_trade_score(game, player)
         if bestScore < tradeScore:
             bestScore == tradeScore
             bestPlayers.clear()
@@ -627,15 +616,15 @@ def normal_turn(game:object):
         return try_to_build_city(game)
     elif can_build_settlement(game):
         return try_to_build_settlement(game)
-    elif can_build_road(game) and nowhere_to_build_settlement(game):
+    elif can_build_road(game) and len(location_to_build_settlement(game)) == 0 :
         return try_to_build_road(game)
-    elif nowhere_to_build_settlement(game) and 'road building' in game.players[game.turnIndex].getDevelopments():
+    elif len(location_to_build_settlement(game)) == 0 and 'road building' in game.players[game.turnIndex].getDevelopments():
         return {'TYPE': 'prog',
             'COMMAND': 'play road building'}
     elif can_buy_development(game) and len(game.developmentCards) > 0:
         return try_to_build_development_card(game)
-    elif tradesProposedOnTurn.count('strike') < 2:
-        return try_trade(game)
+    #elif tradesProposedOnTurn.count('strike') < 2:
+        #return try_trade(game)
     else:
         return {'TYPE': 'prog',
             'COMMAND': 'end turn'}

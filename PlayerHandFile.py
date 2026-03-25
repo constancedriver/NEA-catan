@@ -149,19 +149,21 @@ class BotHand(PlayerHand):
             playerIndex -= 1
         if self.playerFavour[playerIndex] > 0: # avoid it going below 0
             self.playerFavour[playerIndex] -= 1
+            print(self.colour, 'has decreased your favour score by one')
 
     def increase_player_favour(self, playerIndex:int):
         if playerIndex > self.ownIndex:
             playerIndex -= 1
         if self.playerFavour[playerIndex] < 11: # avoid it going above 11
             self.playerFavour[playerIndex] += 1
+            print(self.colour, 'has increased your favour score by one')
 
     def accept_trade(self, playerIndex:int):
         if playerIndex > self.ownIndex:
             playerIndex -= 1
         favourScore = self.playerFavour[playerIndex]
         if favourScore >= 2:
-            chosenNum = random.randint(1, 100, 1)
+            chosenNum = random.randint(1, 100)
             if chosenNum >=  10*(favourScore-2)+5 :
                 return True
             else: 

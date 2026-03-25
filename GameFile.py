@@ -575,7 +575,13 @@ class Game:
             self.trade_with_players()
         else:
             self.state.currentScreen = 'ask player about trade'
-            GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
+            # if is a bot, run function to see if it accepts the trade
+            if self.askToTrade[0].isBot:
+                accepted = self.askToTrade[0].accept_trade(self.turnIndex)
+                self.answered_trade(accepted)
+            else:
+                #otherise get input from human
+                GuiFile.ask_others_for_trade(self.askToTrade[0].colour)
 
     def trade_with_players(self):
         if len(self.acceptedTrade) == 1:
