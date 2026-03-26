@@ -226,10 +226,7 @@ class Bot():
                 break
             if not outpost.getisCity():
                 atLeastOneSettlement = True
-        if atLeastOneSettlement and self.game.currentPlayer.sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
-            return True
-        else:
-            return False
+        return atLeastOneSettlement
 
     def can_build_settlement(self):
         if len(self.location_to_build_settlement())!= 0 and self.game.currentPlayer.sufficient_resources(['sheep', 'hay', 'brick', 'wood']):
@@ -263,8 +260,8 @@ class Bot():
 
     def try_to_build_city(self):
         settlements = []
-        for outpost in self.game.outposts:
-            if outpost.getisCity():
+        for outpost in self.game.currentPlayer.outposts:
+            if not outpost.getisCity():
                 settlements.append(outpost)
         if len(settlements) != 0:
             ResourceScores = []
@@ -349,10 +346,9 @@ class Bot():
             # no roads create access to a new place to build a settlement 
             # choose a random road to build 
             randomRoad = random.choice(self.possible_road_locations())
-            roadLoactions = randomRoad.getLocation()
             return {'TYPE': 'prog',
                     'COMMAND': 'build',
-                    'NODES': [roadLoactions[0], roadLoactions[0]]} 
+                    'NODES': [randomRoad[0], randomRoad[1]]} 
 
     def allows_build_settlement(self):
         possibleLocations = self.possible_road_locations()
@@ -403,7 +399,7 @@ class Bot():
             self.game.state.tradeOfferTurn.append(resourceGiveAway)
         self.game.state.tradeOfferOthers.append(resourceWant)
         # allows other players to see what the trade being proposed is 
-        print(self.game.currentPlayer.colour, 'traded with bank', self.game.state.tradeOfferTurn, 'for', self.game.state.tradeOfferOthers)
+        print(self.game.currentPlayer.colour, 'traded with bank', self.game.state.tradeOfferTurn, 'for', self.game.state.tradeOfferOthers[0])
         return {'TYPE': 'prog',
                 'COMMAND': 'trade with bank'}
 
@@ -575,7 +571,7 @@ class Bot():
         numberofOutposts = len(self.game.currentPlayer.outposts)
         if numberOfRoads == numberofOutposts:
             #place a settlement
-            bestScore = 0
+            bestScore = -1
             bestNodes = []
             for tile in self.game.tiles:
                 for node in tile.getNodes():
@@ -699,7 +695,7 @@ class Bot():
         if self.robber_on_player_tile() and 'knight' in self.game.currentPlayer.getDevelopments():
             return {'TYPE': 'prog',
                 'COMMAND': 'play knight'}
-        elif self.can_build_city():
+        elif self.can_build_city() and self.game.currentPlayer.sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
             return self.try_to_build_city()
         elif self.can_build_settlement():
             return self.try_to_build_settlement()

@@ -65,8 +65,8 @@ class Game:
                 self.turnIndex = 0 
             self.currentPlayer.updateDevelopmentsAbleToUse()
             self.state.rolled = False
-            GuiFile.new_turn(self.currentPlayer)
             self.currentPlayer = self.players[self.turnIndex]
+            GuiFile.new_turn(self.currentPlayer)
 
     def previous_turn(self):
         self.turnIndex -= 1
@@ -610,6 +610,7 @@ class Game:
         # can only win on your turn because that is the only time you can gain VP
         player = self.currentPlayer
         if (player.VP + player.getDevelopments().count('victory points')) >= 10:
+            player.VP += player.getDevelopments().count('victory points')
             hasWon = True
         return hasWon
 
