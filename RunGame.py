@@ -8,8 +8,8 @@ def main_loop(game):
         game.game_end()
         if len(game.players) == 0: 
             command = GuiFile.command(game.state.currentScreen)
-        elif game.players[game.turnIndex].isBot and not(game.state.currentScreen == 'discard' and not game.find_who_needs_to_discard()[0].isBot) and game.state.currentScreen != 'ask player about trade':
-            # if its the bots turn unless a human player is trying to dicard cards or players are trying to accept a trade 
+        elif game.players[game.turnIndex].isBot and not(game.state.currentScreen == 'discard' and not game.find_who_needs_to_discard()[0].isBot) and game.state.currentScreen != 'ask player about trade' or (game.state.currentScreen == 'discard' and game.find_who_needs_to_discard()[0].isBot):
+            # if its the bots turn unless a human player is trying to dicard cards or players are trying to accept a trade or when it isnt the bots turn but  abot needs to discard 
             command = bot.turn()
         else: 
             command = GuiFile.command(game.state.currentScreen)

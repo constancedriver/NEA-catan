@@ -125,7 +125,7 @@ class PlayerHand:
                     removed = True
 
 class BotHand(PlayerHand):
-    defaultPlayerFavour = [4,4,4]
+    defaultPlayerFavour = [4,4,4,4]
     def __init__(self, colour:str, ownIndex:int, isBot:bool=True, VP:int=0, roadsLeft:int=15, settlementsLeft:int=5,
                  citiesLeft:int=4, resources:list=None, development:list=None, knightsPlayed:int=0,
                  roads:list=None, outposts:list=None, hasLargestArmy:bool=False, hasLongestRoad:bool=False,
@@ -138,29 +138,19 @@ class BotHand(PlayerHand):
         self.ownIndex = ownIndex
 
     def get_favour_score(self, playerIndex:int):
-        if playerIndex == self.ownIndex: # safety precausion 
-            return 12
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
         return self.playerFavour[playerIndex]
 
     def decrease_player_favour(self, playerIndex:int):
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
         if self.playerFavour[playerIndex] > 0: # avoid it going below 0
             self.playerFavour[playerIndex] -= 1
-            print(self.colour, 'has decreased your favour score by one')
+            print(self.colour, 'has decreased', playerIndex, 'favour score by one')
 
     def increase_player_favour(self, playerIndex:int):
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
         if self.playerFavour[playerIndex] < 11: # avoid it going above 11
             self.playerFavour[playerIndex] += 1
-            print(self.colour, 'has increased your favour score by one')
+            print(self.colour, 'has increased',  playerIndex, 'favour score by one')
 
     def accept_trade(self, playerIndex:int):
-        if playerIndex > self.ownIndex:
-            playerIndex -= 1
         favourScore = self.playerFavour[playerIndex]
         if favourScore >= 2:
             chosenNum = random.randint(1, 100)

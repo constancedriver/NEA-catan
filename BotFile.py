@@ -141,6 +141,7 @@ class Bot():
             else:
                 resources.remove(random.choice(resources))
         for resource in resources:
+            print(resources)
             self.game.state.discardCards.append(resource)
         return {'TYPE': 'prog',
                 'COMMAND': 'discard cards'}
@@ -159,7 +160,7 @@ class Bot():
         for player in playerObjectsOnRobber:
             playerIndex = self.game.players.index(player)
             leastFavourableResourceScore = min(currentBot.get_favour_score(playerIndex), leastFavourableResourceScore)
-        print(leastFavourableResourceScore)
+        # print(leastFavourableResourceScore)
         # find which player(s) have this lowest ResourceScore
         for playerObject in playerObjectsOnRobber:
             playerIndex = self.game.players.index(playerObject)
@@ -298,13 +299,13 @@ class Bot():
         highestResourceScore = 0
         possibleLocations = self.location_to_build_settlement()
         bestNodes = []
-        print('possible locations', possibleLocations)
+        # print('possible locations', possibleLocations)
         for location in possibleLocations:
             highestResourceScore = max (highestResourceScore, self.find_node_resource_score(location))
         for node in possibleLocations:
             if self.find_node_resource_score(node) == highestResourceScore:
                 bestNodes.append(node)
-                print('adding to best node', node)
+                # print('adding to best node', node)
         if len(bestNodes) == 1:
             return {'TYPE': 'prog',
                     'COMMAND': 'build',
@@ -317,7 +318,6 @@ class Bot():
 
     def try_to_build_road(self):
         allowsNewSettlement = self.allows_build_settlement()
-        self.game.state.pressedNodes.clear()
         if len(allowsNewSettlement) == 1:
             return {'TYPE': 'prog',
                     'COMMAND': 'build',
@@ -403,6 +403,7 @@ class Bot():
             self.game.state.tradeOfferTurn.append(resourceGiveAway)
         self.game.state.tradeOfferOthers.append(resourceWant)
         # allows other players to see what the trade being proposed is 
+        print(self.game.currentPlayer.colour, 'traded with bank', self.game.state.tradeOfferTurn, 'for', self.game.state.tradeOfferOthers)
         return {'TYPE': 'prog',
                 'COMMAND': 'trade with bank'}
 
@@ -620,11 +621,11 @@ class Bot():
                     cityResources.remove(cityResources) # will remove on instance of the resource 
             if len(cityResources) == 2:
                 return True 
-        if self.len(self.location_to_build_settlement()) == 0:
+        if len(self.location_to_build_settlement()) == 0:
             settlementResources = ['hay', 'brick', 'wood', 'sheep']
             for resource in self.game.currentPlayer.resources:
                 if resource in settlementResources:
-                    settlementResources.remove(settlementResources) # will remove on instance of the resource 
+                    settlementResources.remove(resource) # will remove on instance of the resource 
             if len(settlementResources) == 2:
                 return True
         if 'brick' not in self.game.currentPlayer.resources and 'wood' not in self.game.currentPlayer.resources:
@@ -636,7 +637,7 @@ class Bot():
             cityResources = ['hay', 'hay', 'hay', 'ore', 'ore']
             for resource in self.game.currentPlayer.resources:
                 if resource in cityResources:
-                    cityResources.remove(cityResources) # will remove on instance of the resource 
+                    cityResources.remove(resource) # will remove on instance of the resource 
             if len(cityResources) == 2:
                 self.game.state.yoPlenty.clear()
                 for resource in cityResources:
@@ -716,6 +717,7 @@ class Bot():
         elif 'monopoly' in self.game.currentPlayer.getDevelopments() and self.should_play_monopoly():
             return self.decide_play_monopoly()
         else:
+            self.game.load_game_screen()
             return {'TYPE': 'prog',
                 'COMMAND': 'end turn'}
         

@@ -217,7 +217,7 @@ class Game:
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if  (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.currentPlayer.connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.currentPlayer.settlementsLeft > 0) and self.currentPlayer.sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
+        if  ((self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.currentPlayer.connected_to_road(node) and not(self.adjacent_to_settlement(node)))) and self.currentPlayer.settlementsLeft > 0 and self.currentPlayer.sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.currentPlayer.build_settlement(node))
             GuiFile.update_vp(self.currentPlayer, self.turnIndex)
             # for their second starting settlement, players get starting resources
@@ -357,9 +357,10 @@ class Game:
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
         if self.sufficent_resources(self.currentPlayer, ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
+            print(self.developmentCards[0].getCardType())
             self.currentPlayer.buy_development_card(self.developmentCards.pop(0))
             self.load_game_screen()
-            print('bought develpoment card')
+            print(self.currentPlayer.colour, 'bought develpoment card')
 
     def sufficent_resources(self,player:object,resourcesNeeded:list):
         sufficent = True
@@ -543,6 +544,7 @@ class Game:
             self.currentPlayer.resources.append(resourceOther)
         # update bot favorability
         if self.currentPlayer.isBot:
+            print(self.players.index(self.acceptedTrade[0]))
             self.currentPlayer.increase_player_favour(self.players.index(self.acceptedTrade[0]))
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()
