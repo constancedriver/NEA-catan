@@ -611,6 +611,88 @@ class Bot():
         else:
             return False
         
+    def should_play_yop(self):
+        if self.can_build_city():
+            cityResources = ['hay', 'hay', 'hay', 'ore', 'ore']
+            for resource in self.game.currentPlayer.resources:
+                if resource in cityResources:
+                    cityResources.remove(cityResources) # will remove on instance of the resource 
+            if len(cityResources) == 2:
+                return True 
+        if self.len(self.location_to_build_settlement()) == 0:
+            settlementResources = ['hay', 'brick', 'wood', 'sheep']
+            for resource in self.game.currentPlayer.resources:
+                if resource in settlementResources:
+                    settlementResources.remove(settlementResources) # will remove on instance of the resource 
+            if len(settlementResources) == 2:
+                return True
+        if 'brick' not in self.game.currentPlayer.resources and 'wood' not in self.game.currentPlayer.resources:
+            return True
+        return False 
+        
+    def decide_to_play_yop(self):
+        if self.can_build_city():
+            cityResources = ['hay', 'hay', 'hay', 'ore', 'ore']
+            for resource in self.game.currentPlayer.resources:
+                if resource in cityResources:
+                    cityResources.remove(cityResources) # will remove on instance of the resource 
+            if len(cityResources) == 2:
+                self.game.state.yoPlenty.clear()
+                for resource in cityResources:
+                    self.game.state.yoPlenty.append(resource)
+                return {'TYPE': 'prog',
+                        'COMMAND': 'play year of plenty'}
+        if self.len(self.location_to_build_settlement()) == 0:
+            settlementResources = ['hay', 'brick', 'wood', 'sheep']
+            for resource in self.game.currentPlayer.resources:
+                if resource in settlementResources:
+                    settlementResources.remove(settlementResources) # will remove on instance of the resource 
+            if len(settlementResources) == 2:
+                self.game.state.yoPlenty.clear()
+                for resource in cityResources:
+                    self.game.state.yoPlenty.append(resource)
+                return {'TYPE': 'prog',
+                        'COMMAND': 'play year of plenty'}
+        if 'brick' not in self.game.currentPlayer.resources and 'wood' not in self.game.currentPlayer.resources:
+            self.game.state.yoPlenty.clear()
+            self.game.state.yoPlenty.append('brick')
+            self.game.state.yoPlenty.append('wood')
+            return {'TYPE': 'prog',
+                    'COMMAND': 'play year of plenty'}
+        
+    def should_play_monopoly(self):
+        for resource in resourceTypes:
+            resourceCount = 0
+            for player in self.game.players:
+                resourceCount += player.resources.count(resource)
+            if resourceCount > 5 and self.game.currentPlayer.resources.count(resource) <= 1:
+                return True 
+        return False 
+
+    def decide_play_monopoly(self):
+        resourcesAskFor = []
+        maxResourceCount = 0
+        for resource in resourceTypes:
+            resourceCount = 0
+            for player in self.game.players:
+                resourceCount += player.resources.count(resource)
+            if resourceCount > 5 and self.game.currentPlayer.resources.count(resource) <= 1:
+                resourcesAskFor.append(resource)
+                maxResourceCount = max(maxResourceCount, resourceCount)
+        if len(resourcesAskFor)>1:
+            #remove ones with fewer resources in game 
+            for resource in resourcesAskFor:
+                resourceCount = 0
+                for player in self.game.players:
+                    resourceCount += player.resources.count(resource)
+                if resourceCount != maxResourceCount:
+                    resourcesAskFor.remove(resource)
+            while len(resourcesAskFor)>1:
+                resourcesAskFor.remove(random.choice(resourcesAskFor))
+        return {'TYPE': 'prog',
+                'COMMAND': 'play monopoly',
+                'RESOURCE' : resourcesAskFor[0]}
+
     def normal_turn(self):
         if self.robber_on_player_tile() and 'knight' in self.game.currentPlayer.getDevelopments():
             return {'TYPE': 'prog',
@@ -628,6 +710,10 @@ class Bot():
             return self.try_to_build_development_card()
         elif self.tradesProposedOnTurn.count('strike') < 2 and len(self.tradesProposedOnTurn)<3:
             return self.try_trade()
+        elif 'year of plenty' in self.game.currentPlayer.getDevelopments() and self.should_play_yop():
+            return self.decide_to_play_yop()
+        elif 'monopoly' in self.game.currentPlayer.getDevelopments() and self.should_play_monopoly():
+            return self.decide_play_monopoly()
         else:
             return {'TYPE': 'prog',
                 'COMMAND': 'end turn'}
