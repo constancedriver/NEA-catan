@@ -119,32 +119,33 @@ class Bot():
 
     def decide_discard_cards(self):
         resources = self.game.currentPlayer.resources.copy()
-        numberToDiscard =  len(self.game.currentPlayer.resources) // 2
-        while len(resources) >  numberToDiscard:
-            if self.can_build_city() and resources.count('hay') >= 2 and resources.count('ore') >= 3 and len(resources) >=  numberToDiscard+5:
-                for i in range (0,2,1):
+        if len(resources) >= 7:
+            numberToDiscard =  len(self.game.currentPlayer.resources) // 2
+            while len(resources) >  numberToDiscard:
+                if self.can_build_city() and resources.count('hay') >= 2 and resources.count('ore') >= 3 and len(resources) >=  numberToDiscard+5:
+                    for i in range (0,2,1):
+                        resources.remove('hay')
+                        resources.remove('ore')
+                    resources.remove('ore')
+                elif self.can_build_settlement() and 'hay' in resources and 'sheep' in resources and 'wood' in resources and 'brick' in resources and len(resources) >=  numberToDiscard+4:
+                    resources.remove('hay')
+                    resources.remove('brick')
+                    resources.remove('wood')
+                    resources.remove('sheep')
+                elif self.can_build_road() and 'brick' in resources and 'wood' in resources and len(resources) >=  numberToDiscard+2:
+                    resources.remove('brick')
+                    resources.remove('wood')
+                elif self.can_buy_development() and 'hay' in resources and 'sheep' in resources and 'ore' in resources and len(resources) >=  numberToDiscard+3:
                     resources.remove('hay')
                     resources.remove('ore')
-                resources.remove('ore')
-            elif self.can_build_settlement() and 'hay' in resources and 'sheep' in resources and 'wood' in resources and 'brick' in resources and len(resources) >=  numberToDiscard+4:
-                resources.remove('hay')
-                resources.remove('brick')
-                resources.remove('wood')
-                resources.remove('sheep')
-            elif self.can_build_road() and 'brick' in resources and 'wood' in resources and len(resources) >=  numberToDiscard+2:
-                resources.remove('brick')
-                resources.remove('wood')
-            elif self.can_buy_development() and 'hay' in resources and 'sheep' in resources and 'ore' in resources and len(resources) >=  numberToDiscard+3:
-                resources.remove('hay')
-                resources.remove('ore')
-                resources.remove('sheep')
-            else:
-                resources.remove(random.choice(resources))
-        for resource in resources:
-            print(resources)
-            self.game.state.discardCards.append(resource)
-        return {'TYPE': 'prog',
-                'COMMAND': 'discard cards'}
+                    resources.remove('sheep')
+                else:
+                    resources.remove(random.choice(resources))
+            for resource in resources:
+                print(resources)
+                self.game.state.discardCards.append(resource)
+            return {'TYPE': 'prog',
+                    'COMMAND': 'discard cards'}
 
     def decide_player_steal_from(self): 
         leastFavourableResourceScore = 12

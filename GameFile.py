@@ -371,7 +371,7 @@ class Game:
         return sufficent
 
     def discard_cards(self, chosenCards:list):
-        player = self.robber_turn()
+        player = self.find_who_needs_to_discard()[0]
         # must discard no. resources DIV 2
         if len(chosenCards) == (len(player.resources)//2) and self.sufficent_resources(player, chosenCards):
             for resource in chosenCards:

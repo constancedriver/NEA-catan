@@ -53,10 +53,8 @@ class PlayerHand:
 #before called in game check location     
     def build_settlement(self,node:tuple):
         if self.settlementsLeft > 0:
-            self.resources.remove('wood')
-            self.resources.remove('hay')
-            self.resources.remove('sheep')
-            self.resources.remove('brick')
+            for resource in ['hay', 'brick', 'wood', 'sheep']:    
+                self.resources.remove(resource)
             settlement = PiecesFile.Outpost(self.colour,node)
             self.outposts.append(settlement)
             self.VP += 1
@@ -86,9 +84,8 @@ class PlayerHand:
             return road
      
     def buy_development_card(self, developmentCard:object):
-        self.resources.remove('sheep')
-        self.resources.remove('hay')
-        self.resources.remove('ore')
+        for resource in ['hay', 'ore', 'sheep']:    
+                self.resources.remove(resource)
         self._development.append(developmentCard)
 
     def discard_resources(self):
