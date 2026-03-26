@@ -695,7 +695,7 @@ class Bot():
         if self.robber_on_player_tile() and 'knight' in self.game.currentPlayer.getDevelopments():
             return {'TYPE': 'prog',
                 'COMMAND': 'play knight'}
-        elif self.can_build_city() and self.game.currentPlayer.sufficient_resources(['ore', 'ore', 'hay', 'hay', 'hay']):
+        elif self.can_build_city() and self.game.currentPlayer.sufficient_resources(['ore', 'ore', 'ore', 'hay', 'hay']):
             return self.try_to_build_city()
         elif self.can_build_settlement():
             return self.try_to_build_settlement()

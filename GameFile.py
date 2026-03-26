@@ -609,8 +609,7 @@ class Game:
         hasWon = False
         # can only win on your turn because that is the only time you can gain VP
         player = self.currentPlayer
-        if (player.VP + player.getDevelopments().count('victory points')) >= 10:
-            player.VP += player.getDevelopments().count('victory points')
+        if (player.VP + player.getDevelopments().count('victory point')) >= 10:
             hasWon = True
         return hasWon
 
