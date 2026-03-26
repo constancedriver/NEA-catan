@@ -217,7 +217,7 @@ class Game:
         #settlemets must be attached to a road of the player
         #settlements must be at least 2 edges away from another i.e. not adjacent 
         #settlements cost: 'wood', 'brick', 'sheep', 'hay'
-        if (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.currentPlayer.connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.currentPlayer.sufficient_resources(['wood', 'brick', 'sheep', 'hay']) and self.currentPlayer.settlementsLeft > 0):
+        if  (self.state.currentScreen == 'place starting pieces' and len(self.outposts) == len(self.roads))or (self.currentPlayer.connected_to_road(node) and not(self.adjacent_to_settlement(node)) and self.currentPlayer.settlementsLeft > 0) and self.currentPlayer.sufficient_resources(['wood', 'brick', 'sheep', 'hay']):
             self.outposts.append(self.currentPlayer.build_settlement(node))
             GuiFile.update_vp(self.currentPlayer, self.turnIndex)
             # for their second starting settlement, players get starting resources

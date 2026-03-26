@@ -65,9 +65,9 @@ class PlayerHand:
      
     def build_city(self,node:tuple):
         if self.citiesLeft>0:
-            for i in range(1,3):
+            for i in range(1,4):
                 self.resources.remove('ore')
-            for i in range (1,2):
+            for i in range (1,3):
                 self.resources.remove('hay')
             for outpost in self.outposts:
                 if outpost.getLocation() == node:

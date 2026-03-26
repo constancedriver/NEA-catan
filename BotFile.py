@@ -319,8 +319,9 @@ class Bot():
         allowsNewSettlement = self.allows_build_settlement()
         self.game.state.pressedNodes.clear()
         if len(allowsNewSettlement) == 1:
-            for node in allowsNewSettlement[0]:
-                self.game.state.pressedNodes.append(node)
+            return {'TYPE': 'prog',
+                    'COMMAND': 'build',
+                    'NODES': [allowsNewSettlement[0][0], allowsNewSettlement[0][1]]} 
         elif len(allowsNewSettlement) > 1:
             access = self.already_have_access()
             newNodes = []
