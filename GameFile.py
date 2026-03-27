@@ -159,6 +159,7 @@ class Game:
         GuiFile.screen.fill((GuiFile.get_colour('none')))
         GuiFile.pygame.display.flip()
         self.turnIndex = self.players.index(self.dice_roll_winner(self.players))
+        self.currentPlayer = self.players[self.turnIndex]
         self.state.currentScreen = 'place starting pieces'
         self.load_starting_screen()
 
@@ -357,10 +358,10 @@ class Game:
         # developmet cards give you a random card from the pile 
         # cost: 'sheep', 'ore', 'hay'
         if self.sufficent_resources(self.currentPlayer, ['sheep', 'ore', 'hay']) and len(self.developmentCards) > 0:
-            print(self.developmentCards[0].getCardType())
+            #print(self.developmentCards[0].getCardType())
             self.currentPlayer.buy_development_card(self.developmentCards.pop(0))
             self.load_game_screen()
-            print(self.currentPlayer.colour, 'bought develpoment card')
+            #print(self.currentPlayer.colour, 'bought develpoment card')
 
     def sufficent_resources(self,player:object,resourcesNeeded:list):
         sufficent = True
@@ -487,6 +488,7 @@ class Game:
                 self.currentPlayer.resources.append(resourceType)
             self.currentPlayer.remove_development('monopoly')
             self.load_game_screen()
+            #print('play monopoly')
         
     def play_year_of_plenty(self):
         if 'year of plenty' in self.currentPlayer.getDevelopments() and len(self.state.yoPlenty) == 2:
@@ -495,6 +497,7 @@ class Game:
             self.currentPlayer.resources.append(resources[1])
             self.currentPlayer.remove_development('year of plenty')
             self.load_game_screen()
+           #print('play yop')
 
     def play_road_building(self):
         if 'road building' in self.currentPlayer.getDevelopments():
@@ -544,7 +547,7 @@ class Game:
             self.currentPlayer.resources.append(resourceOther)
         # update bot favorability
         if self.currentPlayer.isBot:
-            print(self.players.index(self.acceptedTrade[0]))
+            #print(self.players.index(self.acceptedTrade[0]))
             self.currentPlayer.increase_player_favour(self.players.index(self.acceptedTrade[0]))
         self.state.tradeOfferOthers.clear()
         self.state.tradeOfferTurn.clear()

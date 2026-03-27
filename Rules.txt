@@ -3,8 +3,14 @@ development cards(1/5 chance) or by earning the longest road(2VP) or largest arm
 must collect resources by having an outpost(settlement or city) on the corner of a tile when its number is rolled.
 
 
-On your turn you must first roll the dice(by clicking on them) then you can build and/or trade. In order to build an
-outpost, click twice on the corner you wish to place them on. This must be connected to a road of your colour and be
+On your turn you must first roll the dice(by clicking on them) then you can build and/or trade. Rolling the dice means
+that each tile with the resource number that is the sum of the dice produces resources. These resources are then colected
+by players who have a outpost (city/settlement) on that tile. However, if the dice add to 7 then a 'robber turn' starts and players with more than 7 cards must discard half of their
+resources rounded down. Then the player whos turn it is moves the robber and steals a resurce card. When the robber is
+on a tile that tile doesnt produce resources. 
+
+In order to build an outpost, click twice on the corner
+you wish to place them on. This must be connected to a road of your colour and be
 at least two corners away from any other outpost. A city must be played ontop of an existing settlement that that
 player owns. To build a road you must click on the corners either end of the edge
 you want to place it on. This must be attached to another of your roads. To buy a development card click on the
@@ -23,6 +29,3 @@ input in 4 of the same type in return for 1 of another. If you have an outpost o
 If you have another harbour then you input 2 of that specific resource for 1 of another. You can only trade with resurces you currently have.
 
 
-If the dice add to 7 then a 'robber turn' starts and players with more than 7 cards must discard half of their
-resources rounded down. Then the player whos turn it is moves the robber and steals a resurce card. When the robber is
-on a tile that tile doesnt produce resources. 

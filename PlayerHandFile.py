@@ -88,13 +88,13 @@ class PlayerHand:
                 self.resources.remove(resource)
         self._development.append(developmentCard)
 
-    def discard_resources(self):
-        needToDiscard = self.resources // 2
-        while needToDiscard > 0:
-            wantToDiscard = input('which resource discard')
-            if wantToDiscard in self.resources:
-                self.resources.remove()
-                needToDiscard -= 1
+    #def discard_resources(self):
+    #    needToDiscard = self.resources // 2
+    #    while needToDiscard > 0:
+    #        wantToDiscard = input('which resource discard')
+    #        if wantToDiscard in self.resources:
+    #            self.resources.remove()
+    #            needToDiscard -= 1
         
     def use_knight(self):
         self.remove_development('knight')
@@ -140,12 +140,12 @@ class BotHand(PlayerHand):
     def decrease_player_favour(self, playerIndex:int):
         if self.playerFavour[playerIndex] > 0: # avoid it going below 0
             self.playerFavour[playerIndex] -= 1
-            print(self.colour, 'has decreased', playerIndex, 'favour score by one')
+            #print(self.colour, 'has decreased', playerIndex, 'favour score by one')
 
     def increase_player_favour(self, playerIndex:int):
         if self.playerFavour[playerIndex] < 11: # avoid it going above 11
             self.playerFavour[playerIndex] += 1
-            print(self.colour, 'has increased',  playerIndex, 'favour score by one')
+            #print(self.colour, 'has increased',  playerIndex, 'favour score by one')
 
     def accept_trade(self, playerIndex:int):
         favourScore = self.playerFavour[playerIndex]

@@ -118,32 +118,37 @@ class Bot():
         return ResourceScore
 
     def decide_discard_cards(self):
-        resources = self.game.currentPlayer.resources.copy()
+        resources = self.game.find_who_needs_to_discard()[0].resources.copy()
+        discard = []
         if len(resources) >= 7:
-            numberToDiscard =  len(self.game.currentPlayer.resources) // 2
-            while len(resources) >  numberToDiscard:
+            numberToDiscard =  len(self.game.find_who_needs_to_discard()[0].resources) // 2
+            while len(discard) <  numberToDiscard:
                 if self.can_build_city() and resources.count('hay') >= 2 and resources.count('ore') >= 3 and len(resources) >=  numberToDiscard+5:
                     for i in range (0,2,1):
+                        discard.append('hay')
                         resources.remove('hay')
+                    for i in range (0,3,1):
+                        discard.append('ore')
                         resources.remove('ore')
-                    resources.remove('ore')
                 elif self.can_build_settlement() and 'hay' in resources and 'sheep' in resources and 'wood' in resources and 'brick' in resources and len(resources) >=  numberToDiscard+4:
-                    resources.remove('hay')
-                    resources.remove('brick')
-                    resources.remove('wood')
-                    resources.remove('sheep')
+                    for resource in ['hay', 'brick', 'wood', 'sheep']:
+                        discard.append(resource)
+                        resources.remove(resource)
                 elif self.can_build_road() and 'brick' in resources and 'wood' in resources and len(resources) >=  numberToDiscard+2:
+                    discard.append('brick')
                     resources.remove('brick')
+                    discard.append('wood')
                     resources.remove('wood')
                 elif self.can_buy_development() and 'hay' in resources and 'sheep' in resources and 'ore' in resources and len(resources) >=  numberToDiscard+3:
-                    resources.remove('hay')
-                    resources.remove('ore')
-                    resources.remove('sheep')
+                    for resource in ['hay', 'ore', 'sheep']:
+                        discard.append(resource)
+                        resources.remove(resource)
                 else:
-                    resources.remove(random.choice(resources))
-            for resource in resources:
-                print(resources)
-                self.game.state.discardCards.append(resource)
+                    randomCard = random.choice(resources)
+                    discard.append(randomCard)
+                    resources.remove(randomCard)
+            self.game.state.discardCards.clear()
+            self.game.state.discardCards = discard
             return {'TYPE': 'prog',
                     'COMMAND': 'discard cards'}
 
@@ -400,7 +405,7 @@ class Bot():
             self.game.state.tradeOfferTurn.append(resourceGiveAway)
         self.game.state.tradeOfferOthers.append(resourceWant)
         # allows other players to see what the trade being proposed is 
-        print(self.game.currentPlayer.colour, 'traded with bank', self.game.state.tradeOfferTurn, 'for', self.game.state.tradeOfferOthers[0])
+        #print(self.game.currentPlayer.colour, 'traded with bank', self.game.state.tradeOfferTurn, 'for', self.game.state.tradeOfferOthers[0])
         return {'TYPE': 'prog',
                 'COMMAND': 'trade with bank'}
 
@@ -615,7 +620,7 @@ class Bot():
             cityResources = ['hay', 'hay', 'hay', 'ore', 'ore']
             for resource in self.game.currentPlayer.resources:
                 if resource in cityResources:
-                    cityResources.remove(cityResources) # will remove on instance of the resource 
+                    cityResources.remove(resource) # will remove on instance of the resource 
             if len(cityResources) == 2:
                 return True 
         if len(self.location_to_build_settlement()) == 0:
@@ -641,11 +646,11 @@ class Bot():
                     self.game.state.yoPlenty.append(resource)
                 return {'TYPE': 'prog',
                         'COMMAND': 'play year of plenty'}
-        if self.len(self.location_to_build_settlement()) == 0:
+        if len(self.location_to_build_settlement()) == 0:
             settlementResources = ['hay', 'brick', 'wood', 'sheep']
             for resource in self.game.currentPlayer.resources:
                 if resource in settlementResources:
-                    settlementResources.remove(settlementResources) # will remove on instance of the resource 
+                    settlementResources.remove(resource) # will remove on instance of the resource 
             if len(settlementResources) == 2:
                 self.game.state.yoPlenty.clear()
                 for resource in cityResources:
